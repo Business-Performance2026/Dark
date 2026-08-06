@@ -214,6 +214,31 @@ footer ul a:hover{color:var(--gold-2)}
 .hero-center .hero-cta{justify-content:center;margin-bottom:0}
 .hero-center p{margin-inline:auto}
 
+/* ===== شريط متحرك تلقائي ===== */
+.marquee{overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.marquee-track{display:flex;gap:18px;width:max-content;padding:12px 0 26px;animation:marqueeMove 45s linear infinite}
+.pro-track{animation-duration:60s}
+.marquee:hover .marquee-track{animation-play-state:paused}
+@keyframes marqueeMove{from{transform:translateX(0)}to{transform:translateX(50%)}}
+.marquee .cat-card{flex:0 0 185px}
+.marquee .pro-card{flex:0 0 330px}
+
+/* ===== أدوات الأدمن ===== */
+.admin-tabs{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.admin-tabs button{padding:10px 22px;border-radius:12px;background:#fff;color:var(--navy);font-weight:700;box-shadow:var(--shadow);transition:.2s}
+.admin-tabs button.active{background:var(--navy);color:#fff}
+.status-approved{background:#dcfce7;color:#15803d}
+.status-pending{background:#fef9c3;color:#a16207}
+.status-rejected{background:#fee2e2;color:#b91c1c}
+.status-suspended{background:#ffedd5;color:#c2410c}
+.action-btn{padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:700;margin:2px;transition:.2s}
+.action-approve{background:#dcfce7;color:#15803d}
+.action-reject{background:#fee2e2;color:#b91c1c}
+.action-suspend{background:#ffedd5;color:#c2410c}
+.action-edit{background:#e0f2fe;color:#0369a1}
+.action-delete{background:#f3f4f6;color:#6b7280}
+.action-btn:hover{filter:brightness(.94);transform:translateY(-1px)}
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
   .cats-grid{grid-template-columns:repeat(3,1fr)}
@@ -265,7 +290,7 @@ footer ul a:hover{color:var(--gold-2)}
 <section class="hero">
   <div class="container hero-grid hero-single">
     <div class="hero-center">
-      <div class="hero-badge">🇴🇲 منصة البناء والتشطيب الأولى في سلطنة عمان</div>
+      <div class="hero-badge">منصة البناء والتشطيب الأولى في سلطنة عمان</div>
       <h1>من أول خطوة..<br>لـ <em>بيت أحلامك</em></h1>
       <p>دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
       <div class="hero-cta">
@@ -292,10 +317,12 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="sec-head" style="margin-bottom:30px">
       <span class="sec-tag">التخصصات</span>
       <h2>كل ما يحتاجه بيتك في مكان واحد</h2>
-      <p>اسحب واستكشف — 12 تخصصًا من الأساس حتى المفتاح</p>
+      <p>12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف</p>
     </div>
   </div>
-  <div class="cats-strip" id="catsGrid"></div>
+  <div class="marquee">
+    <div class="marquee-track" id="catsGrid"></div>
+  </div>
 </section>
 
 <!-- ================= How it works ================= -->
@@ -339,7 +366,9 @@ footer ul a:hover{color:var(--gold-2)}
       <h2>نخبة من أمهر الحرفيين والشركات</h2>
       <p>مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع</p>
     </div>
-    <div class="providers-grid" id="providersGrid"></div>
+    <div class="marquee">
+      <div class="marquee-track pro-track" id="providersGrid"></div>
+    </div>
   </div>
 </section>
 
@@ -358,8 +387,43 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="dash-stat"><b id="statNew">0</b><span>جديدة هذا الأسبوع</span></div>
       <div class="dash-stat"><b id="statBudget">—</b><span>متوسط الميزانية (ر.ع)</span></div>
     </div>
-    <div class="dash-table-wrap">
+    <div class="admin-tabs" id="adminTabs" style="display:none">
+      <button class="active" data-atab="requests" type="button">📋 الطلبات</button>
+      <button data-atab="users" type="button">👥 إدارة المستخدمين</button>
+      <button data-atab="footer" type="button">⚙️ إعدادات الفوتر</button>
+    </div>
+    <div class="dash-table-wrap" id="requestsWrap">
       <div id="dashContent"></div>
+    </div>
+    <div class="dash-table-wrap" id="usersWrap" style="display:none">
+      <div id="usersContent"></div>
+    </div>
+    <div id="footerWrap" style="display:none">
+      <div class="form-card" style="max-width:560px;margin-inline:auto">
+        <h3>⚙️ إعدادات شريط المعلومات (الفوتر)</h3>
+        <p>تعديلاتك تظهر مباشرة لكل زوار الموقع</p>
+        <form id="footerForm">
+          <div class="form-group">
+            <label>وصف المنصة</label>
+            <textarea id="ffDesc" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>البريد الإلكتروني</label>
+              <input type="email" id="ffEmail" dir="ltr" style="text-align:right">
+            </div>
+            <div class="form-group">
+              <label>رقم الواتساب (بالكود الدولي)</label>
+              <input type="text" id="ffPhone" dir="ltr" placeholder="9689xxxxxxx" style="text-align:right">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>الموقع</label>
+            <input type="text" id="ffLocation">
+          </div>
+          <button type="submit" class="submit-btn" id="ffSubmit">حفظ التعديلات 💾</button>
+        </form>
+      </div>
     </div>
   </div>
 </section>
@@ -371,7 +435,7 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="footer-brand">
         <img src="assets/logo.png" alt="دارك">
         <h4>دارك</h4>
-        <p>منصة تربط أصحاب المنازل قيد الإنشاء بأفضل مقدمي الخدمات — من أول خطوة.. لبيت أحلامك.</p>
+        <p id="fDesc">منصة تربط أصحاب المنازل قيد الإنشاء بأفضل مقدمي الخدمات — من أول خطوة.. لبيت أحلامك.</p>
       </div>
       <div>
         <h5>التخصصات</h5>
@@ -394,9 +458,9 @@ footer ul a:hover{color:var(--gold-2)}
       <div>
         <h5>تواصل معنا</h5>
         <ul>
-          <li><a href="/cdn-cgi/l/email-protection#c1a8afa7ae81a5a0b3a0aaefa0b1b1">📧 <span class="__cf_email__" data-cfemail="b9d0d7dfd6f9ddd8cbd8d297d8c9c9">[email&#160;protected]</span></a></li>
-          <li><a href="tel:+966500000000">📞 0500 000 000</a></li>
-          <li><a href="#">📍 سلطنة عمان 🇴🇲</a></li>
+          <li><a href="mailto:info@darak.app" id="fEmailLink">📧 <span id="fEmail">info@darak.app</span></a></li>
+          <li><a href="https://wa.me/96890000000" target="_blank" id="fPhoneLink">💬 <span id="fPhone">90000000</span></a></li>
+          <li><a href="#">📍 <span id="fLocation">سلطنة عمان</span></a></li>
         </ul>
       </div>
     </div>
@@ -495,6 +559,37 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </div>
 
+<!-- ================= نافذة سبب الرفض / الإيقاف ================= -->
+<div class="modal-overlay" id="reasonModal">
+  <div class="modal">
+    <button class="modal-close" id="reasonClose" aria-label="إغلاق">✕</button>
+    <h3 id="reasonTitle">سبب الرفض</h3>
+    <p>اكتب السبب — بيظهر للمستخدم في حسابه</p>
+    <div class="form-group">
+      <textarea id="reasonText" rows="3" placeholder="مثال: المعلومات غير مكتملة، يرجى تحديث البيانات…"></textarea>
+    </div>
+    <button class="submit-btn" id="reasonConfirm" type="button">تأكيد ✅</button>
+  </div>
+</div>
+
+<!-- ================= نافذة تعديل مستخدم ================= -->
+<div class="modal-overlay" id="userEditModal">
+  <div class="modal">
+    <button class="modal-close" id="userEditClose" aria-label="إغلاق">✕</button>
+    <h3>✏️ تعديل المستخدم</h3>
+    <p>عدّل البيانات ثم احفظ</p>
+    <div class="form-group">
+      <label>الاسم</label>
+      <input type="text" id="ueName">
+    </div>
+    <div class="form-group">
+      <label>التخصص</label>
+      <select id="ueCategory"></select>
+    </div>
+    <button class="submit-btn" id="ueSave" type="button">حفظ 💾</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================
@@ -507,7 +602,7 @@ footer ul a:hover{color:var(--gold-2)}
         البيانات مباشرة. (بدون الإعداد يعمل التطبيق بوضع تجريبي
         ويحفظ الطلبات في متصفح المستخدم فقط)
      ============================================================ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+<script type="module">
 // ============ بيانات Firebase — مشروع دارك ============
 const firebaseConfig = {
   apiKey: "AIzaSyBx9Mowie9zDbNH5ctGjtNKPqR88ffIMDU",
@@ -522,6 +617,7 @@ const FIREBASE_READY = true;
 let db = null, auth = null;
 let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
+let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null;
 
 if (FIREBASE_READY) {
@@ -537,6 +633,10 @@ if (FIREBASE_READY) {
     getDocsFn = firestore.getDocs;
     queryFn = firestore.query;
     whereFn = firestore.where;
+    docFn = firestore.doc;
+    updateDocFn = firestore.updateDoc;
+    deleteDocFn = firestore.deleteDoc;
+    setDocFn = firestore.setDoc;
     auth = authMod.getAuth(app);
     createUserFn = authMod.createUserWithEmailAndPassword;
     signInFn = authMod.signInWithEmailAndPassword;
@@ -565,7 +665,7 @@ const CATEGORIES = [
 ];
 
 const catsGrid = document.getElementById("catsGrid");
-catsGrid.innerHTML = CATEGORIES.map(c => `
+catsGrid.innerHTML = [...CATEGORIES, ...CATEGORIES].map(c => `
   <div class="cat-card">
     <div class="cat-icon">${c.icon}</div>
     <h3>${c.name}</h3>
@@ -584,7 +684,7 @@ const PROVIDERS = [
   { name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", icon: "🌴", exp: 7, projects: 88, rating: 4.9, tags: ["لاندسكيب", "شلالات", "إضاءة"] },
 ];
 
-document.getElementById("providersGrid").innerHTML = PROVIDERS.map(p => `
+document.getElementById("providersGrid").innerHTML = [...PROVIDERS, ...PROVIDERS].map(p => `
   <div class="pro-card">
     <div class="pro-cover"></div>
     <div class="pro-avatar">${p.icon}</div>
@@ -806,7 +906,9 @@ authForm.addEventListener("submit", async e => {
           email: fd.email,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: selectedRole === "provider" ? fd.category : ""
+          category: selectedRole === "provider" ? fd.category : "",
+          status: selectedRole === "provider" ? "pending" : "approved",
+          statusReason: ""
         };
         await addDocFn(collectionFn(db, "users"), { ...currentUser, createdAt: serverTimestampFn() });
       } else {
@@ -827,7 +929,9 @@ authForm.addEventListener("submit", async e => {
           password: fd.password,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: selectedRole === "provider" ? fd.category : ""
+          category: selectedRole === "provider" ? fd.category : "",
+          status: selectedRole === "provider" ? "pending" : "approved",
+          statusReason: ""
         };
         users.push(profile);
         localStorage.setItem("darak_users", JSON.stringify(users));
@@ -871,6 +975,14 @@ async function logout() {
 const ADMIN_EMAILS = ["m.alhinai11@gmail.com"];
 function isAdmin() { return !!currentUser && ADMIN_EMAILS.includes(currentUser.email); }
 
+// تحويل الجوال لصيغة واتساب (عمان +968)
+function waNumber(phone) {
+  let d = (phone || "").replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.length === 8) d = "968" + d;
+  return d;
+}
+
 // ============================================================
 // لوحة التحكم — العميل يشوف طلباته، ومقدم الخدمة يشوف عملاءه
 // ============================================================
@@ -889,6 +1001,28 @@ async function openDashboard() {
     : "تابع طلباتك المرسلة وتفاصيلها من هنا";
   document.getElementById("dashActionBtn").style.display = (isProvider || admin) ? "none" : "inline-flex";
   document.getElementById("statTotalLabel").textContent = admin ? "كل الطلبات" : isProvider ? "طلب عميل" : "طلباتي";
+
+  // تبويبات الأدمن
+  document.getElementById("adminTabs").style.display = admin ? "flex" : "none";
+  if (admin) switchAdminTab(currentAdminTab);
+
+  // بوابة حالة الحساب (قيد المراجعة / مرفوض / موقوف)
+  const st = currentUser.status || "approved";
+  if (!admin && st !== "approved") {
+    const msgs = {
+      pending: ["⏳", "حسابك قيد المراجعة", "فريق دارك يراجع طلب انضمامك — بنتواصل معك قريبًا"],
+      rejected: ["❌", "تم رفض طلب الانضمام", currentUser.statusReason ? "السبب: " + currentUser.statusReason : "تواصل معنا لمزيد من التفاصيل"],
+      suspended: ["🚫", "حسابك موقوف مؤقتًا", currentUser.statusReason ? "السبب: " + currentUser.statusReason : "تواصل معنا لمزيد من التفاصيل"]
+    };
+    const [icon, title, sub] = msgs[st] || msgs.pending;
+    document.getElementById("statTotal").textContent = "—";
+    document.getElementById("statNew").textContent = "—";
+    document.getElementById("statBudget").textContent = "—";
+    document.getElementById("dashActionBtn").style.display = "none";
+    document.getElementById("dashContent").innerHTML = `<div class="dash-empty"><div class="big">${icon}</div><h3 style="color:var(--navy);margin-bottom:8px">${title}</h3><p>${sub}</p></div>`;
+    dash.scrollIntoView({ behavior: "smooth" });
+    return;
+  }
 
   // جلب الطلبات
   let rows = [];
@@ -937,7 +1071,7 @@ async function openDashboard() {
       </tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td><b>${r.name || "—"}</b></td>
-        <td><a href="tel:${r.phone}" style="color:var(--gold);font-weight:700" dir="ltr">${r.phone || "—"}</a></td>
+        <td><a href="https://wa.me/${waNumber(r.phone)}" target="_blank" style="color:var(--gold);font-weight:700" dir="ltr">💬 ${r.phone || "—"}</a></td>
         <td>${r.city || "—"}</td>
         <td>${r.category || "—"}</td>
         <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
@@ -949,6 +1083,228 @@ async function openDashboard() {
   dash.scrollIntoView({ behavior: "smooth" });
 }
 
+// ============================================================
+// إدارة الأدمن — تبويبات + إدارة المستخدمين
+// ============================================================
+let currentAdminTab = "requests";
+
+function switchAdminTab(tab) {
+  currentAdminTab = tab;
+  document.querySelectorAll("#adminTabs button").forEach(b => b.classList.toggle("active", b.dataset.atab === tab));
+  document.getElementById("requestsWrap").style.display = tab === "requests" ? "block" : "none";
+  document.getElementById("usersWrap").style.display = tab === "users" ? "block" : "none";
+  document.getElementById("footerWrap").style.display = tab === "footer" ? "block" : "none";
+  if (tab === "users") loadUsersTable();
+  if (tab === "footer") fillFooterForm();
+}
+document.querySelectorAll("#adminTabs button").forEach(b => b.addEventListener("click", () => switchAdminTab(b.dataset.atab)));
+
+async function fetchAllUsers() {
+  if (db && getDocsFn) {
+    const snap = await getDocsFn(queryFn(collectionFn(db, "users")));
+    return snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+  }
+  return JSON.parse(localStorage.getItem("darak_users") || "[]");
+}
+
+const STATUS_LABELS = {
+  approved: ["مفعّل ✅", "status-approved"],
+  pending: ["قيد المراجعة ⏳", "status-pending"],
+  rejected: ["مرفوض ⛔", "status-rejected"],
+  suspended: ["موقوف 🚫", "status-suspended"]
+};
+
+async function loadUsersTable() {
+  const box = document.getElementById("usersContent");
+  box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
+  let users = [];
+  try { users = await fetchAllUsers(); } catch (e) { console.error(e); }
+  if (!users.length) {
+    box.innerHTML = `<div class="dash-empty"><div class="big">👥</div>لا يوجد مستخدمون مسجلون بعد</div>`;
+    return;
+  }
+  box.innerHTML = `<table class="dash-table"><thead><tr>
+    <th>الاسم</th><th>البريد</th><th>النوع</th><th>التخصص</th><th>الحالة</th><th>السبب</th><th>إجراءات</th>
+  </tr></thead><tbody>${users.map(u => {
+    const st = u.status || "approved";
+    const [lbl, cls] = STATUS_LABELS[st] || STATUS_LABELS.approved;
+    const roleName = u.role === "provider" ? "🛠️ مقدم خدمة" : "🏠 صاحب مشروع";
+    let btns = "";
+    if (st !== "approved") btns += `<button class="action-btn action-approve" onclick="adminApprove('${u.uid}')">✅ تفعيل</button>`;
+    if (st === "pending" && u.role === "provider") btns += `<button class="action-btn action-reject" onclick="adminReject('${u.uid}')">⛔ رفض</button>`;
+    if (st === "approved") btns += `<button class="action-btn action-suspend" onclick="adminSuspend('${u.uid}')">🚫 إيقاف</button>`;
+    btns += `<button class="action-btn action-edit" onclick="adminEdit('${u.uid}')">✏️ تعديل</button>`;
+    btns += `<button class="action-btn action-delete" onclick="adminDelete('${u.uid}')">🗑️ حذف</button>`;
+    return `<tr>
+      <td><b>${u.displayName || "—"}</b></td>
+      <td dir="ltr" style="font-size:.82rem">${u.email || "—"}</td>
+      <td>${roleName}</td>
+      <td>${u.category || "—"}</td>
+      <td><span class="status-badge ${cls}">${lbl}</span></td>
+      <td style="max-width:170px;font-size:.82rem">${u.statusReason || "—"}</td>
+      <td style="white-space:nowrap">${btns}</td>
+    </tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+// --- إجراءات الأدمن على المستخدمين ---
+async function updateUserStatus(uid, status, reason = "") {
+  if (db && getDocsFn) {
+    const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
+    if (!snap.docs.length) throw new Error("user_not_found");
+    await updateDocFn(docFn(db, "users", snap.docs[0].id), { status, statusReason: reason });
+  } else {
+    const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+    const u = users.find(x => x.uid === uid);
+    if (u) { u.status = status; u.statusReason = reason; localStorage.setItem("darak_users", JSON.stringify(users)); }
+  }
+  showToast("تم تحديث حالة المستخدم ✅");
+  loadUsersTable();
+}
+
+window.adminApprove = uid => updateUserStatus(uid, "approved", "").catch(e => showToast("تعذر التحديث", "error"));
+window.adminReject = uid => openReasonModal("⛔ رفض مقدم الخدمة", reason => updateUserStatus(uid, "rejected", reason).catch(e => showToast("تعذر التحديث", "error")));
+window.adminSuspend = uid => openReasonModal("🚫 إيقاف الحساب", reason => updateUserStatus(uid, "suspended", reason).catch(e => showToast("تعذر التحديث", "error")));
+window.adminDelete = async uid => {
+  if (!confirm("متأكد من حذف هذا المستخدم؟ لا يمكن التراجع")) return;
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
+      if (snap.docs.length) await deleteDocFn(docFn(db, "users", snap.docs[0].id));
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(x => x.uid !== uid);
+      localStorage.setItem("darak_users", JSON.stringify(users));
+    }
+    showToast("تم حذف المستخدم 🗑️");
+    loadUsersTable();
+  } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
+};
+
+// --- نافذة السبب ---
+let reasonCallback = null;
+function openReasonModal(title, cb) {
+  document.getElementById("reasonTitle").textContent = title;
+  document.getElementById("reasonText").value = "";
+  reasonCallback = cb;
+  document.getElementById("reasonModal").classList.add("open");
+}
+function closeReasonModal() { document.getElementById("reasonModal").classList.remove("open"); reasonCallback = null; }
+document.getElementById("reasonClose").addEventListener("click", closeReasonModal);
+document.getElementById("reasonModal").addEventListener("click", e => { if (e.target.id === "reasonModal") closeReasonModal(); });
+document.getElementById("reasonConfirm").addEventListener("click", () => {
+  const reason = document.getElementById("reasonText").value.trim();
+  if (!reason) { showToast("اكتب السبب أولًا", "error"); return; }
+  const cb = reasonCallback;
+  closeReasonModal();
+  if (cb) cb(reason);
+});
+
+// --- نافذة تعديل المستخدم ---
+let editingUid = null;
+const ueCat = document.getElementById("ueCategory");
+CATEGORIES.forEach(c => {
+  const o = document.createElement("option");
+  o.value = c.name;
+  o.textContent = `${c.icon} ${c.name}`;
+  ueCat.appendChild(o);
+});
+window.adminEdit = async uid => {
+  const users = await fetchAllUsers();
+  const u = users.find(x => x.uid === uid);
+  if (!u) { showToast("تعذر تحميل بيانات المستخدم", "error"); return; }
+  editingUid = uid;
+  document.getElementById("ueName").value = u.displayName || "";
+  document.getElementById("ueCategory").value = u.category || "";
+  document.getElementById("userEditModal").classList.add("open");
+};
+document.getElementById("userEditClose").addEventListener("click", () => document.getElementById("userEditModal").classList.remove("open"));
+document.getElementById("userEditModal").addEventListener("click", e => { if (e.target.id === "userEditModal") e.target.classList.remove("open"); });
+document.getElementById("ueSave").addEventListener("click", async () => {
+  if (!editingUid) return;
+  const data = { displayName: document.getElementById("ueName").value.trim(), category: document.getElementById("ueCategory").value };
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", editingUid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const u = users.find(x => x.uid === editingUid);
+      if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+    document.getElementById("userEditModal").classList.remove("open");
+    showToast("تم حفظ التعديلات ✅");
+    loadUsersTable();
+  } catch (e) { console.error(e); showToast("تعذر الحفظ", "error"); }
+});
+
+// ============================================================
+// إعدادات الفوتر — يديرها الأدمن وتظهر لكل الزوار
+// ============================================================
+const DEFAULT_FOOTER = {
+  desc: "منصة تربط أصحاب المنازل قيد الإنشاء بأفضل مقدمي الخدمات — من أول خطوة.. لبيت أحلامك.",
+  email: "info@darak.app",
+  phone: "96890000000",
+  location: "سلطنة عمان"
+};
+
+async function getFooterSettings() {
+  if (db && getDocsFn) {
+    try {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "settings")));
+      const d = snap.docs.find(x => x.id === "footer");
+      if (d) return { ...DEFAULT_FOOTER, ...d.data() };
+    } catch (e) { console.warn(e); }
+    return DEFAULT_FOOTER;
+  }
+  return { ...DEFAULT_FOOTER, ...JSON.parse(localStorage.getItem("darak_footer") || "{}") };
+}
+
+function applyFooter(s) {
+  document.getElementById("fDesc").textContent = s.desc;
+  document.getElementById("fEmail").textContent = s.email;
+  document.getElementById("fEmailLink").href = "mailto:" + s.email;
+  document.getElementById("fPhone").textContent = s.phone;
+  document.getElementById("fPhoneLink").href = "https://wa.me/" + s.phone.replace(/\D/g, "");
+  document.getElementById("fLocation").textContent = s.location;
+}
+getFooterSettings().then(applyFooter);
+
+async function fillFooterForm() {
+  const s = await getFooterSettings();
+  document.getElementById("ffDesc").value = s.desc;
+  document.getElementById("ffEmail").value = s.email;
+  document.getElementById("ffPhone").value = s.phone;
+  document.getElementById("ffLocation").value = s.location;
+}
+
+document.getElementById("footerForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = document.getElementById("ffSubmit");
+  btn.disabled = true;
+  btn.textContent = "جارٍ الحفظ…";
+  const data = {
+    desc: document.getElementById("ffDesc").value.trim(),
+    email: document.getElementById("ffEmail").value.trim(),
+    phone: document.getElementById("ffPhone").value.trim(),
+    location: document.getElementById("ffLocation").value.trim()
+  };
+  try {
+    if (db && setDocFn) {
+      await setDocFn(docFn(db, "settings", "footer"), data, { merge: true });
+    } else {
+      localStorage.setItem("darak_footer", JSON.stringify(data));
+    }
+    applyFooter(data);
+    showToast("تم حفظ إعدادات الفوتر ✅ بيظهر للزوار فورًا");
+  } catch (err) {
+    console.error(err);
+    showToast("تعذر الحفظ — تأكد من صلاحيات الأدمن في قواعد Firestore", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "حفظ التعديلات 💾";
+  }
+});
+
 // استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
 const savedSession = localStorage.getItem("darak_session");
 if (savedSession && !auth) {
@@ -956,6 +1312,5 @@ if (savedSession && !auth) {
 }
 renderAuthArea();
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4655f3c58dd6497fb7ddb85b68480db7"}' crossorigin="anonymous"></script>
 </body>
 </html>
