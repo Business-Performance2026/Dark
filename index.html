@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>دارك | من أول خطوة.. لبيت أحلامك</title>
-<meta name="description" content="منصة دارك تربط أصحاب المنازل قيد الإنشاء بأفضل المقاولين ومقدمي الخدمات — من الأساس حتى التشطيب.">
+<meta name="description" content="منصة دارك تربط أصحاب المنازل قيد الإنشاء بأفضل المقاولين ومقدمي الخدمات — من الأساس حتى التشطيب في سلطنة عمان.">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,16 +90,17 @@ section{padding:90px 0}
 .sec-head h2{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:900;color:var(--navy);margin-bottom:12px}
 .sec-head p{color:var(--muted);font-size:1.06rem}
 
-/* ===== Categories ===== */
-.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-.cat-card{background:var(--card);border-radius:var(--radius);padding:30px 22px;text-align:center;box-shadow:var(--shadow);transition:.3s;border:2px solid transparent;position:relative;overflow:hidden}
-.cat-card::after{content:'';position:absolute;inset-inline:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-2));transform:scaleX(0);transition:.3s}
-.cat-card:hover{transform:translateY(-8px);border-color:var(--gold-soft);box-shadow:var(--shadow-lg)}
-.cat-card:hover::after{transform:scaleX(1)}
-.cat-icon{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(135deg,var(--navy),var(--navy-2));display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 8px 18px rgba(22,40,58,.25)}
-.cat-card h3{color:var(--navy);font-size:1.08rem;font-weight:800;margin-bottom:6px}
-.cat-card p{color:var(--muted);font-size:.86rem}
-.cat-count{display:inline-block;margin-top:12px;font-size:.78rem;font-weight:700;color:var(--gold);background:var(--gold-soft);padding:4px 14px;border-radius:100px}
+/* ===== Categories (شريط أفقي) ===== */
+.cats-strip{display:flex;gap:16px;overflow-x:auto;padding:10px max(4%,calc((100% - 1200px)/2)) 26px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.cats-strip::-webkit-scrollbar{height:8px}
+.cats-strip::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px}
+.cats-strip::-webkit-scrollbar-track{background:#eee4d4;border-radius:10px}
+.cat-card{flex:0 0 185px;scroll-snap-align:start;background:var(--card);border-radius:var(--radius);padding:24px 16px;text-align:center;box-shadow:var(--shadow);transition:.3s;border:2px solid transparent}
+.cat-card:hover{transform:translateY(-6px);border-color:var(--gold-soft);box-shadow:var(--shadow-lg)}
+.cat-icon{width:56px;height:56px;margin:0 auto 12px;border-radius:16px;background:linear-gradient(135deg,var(--navy),var(--navy-2));display:flex;align-items:center;justify-content:center;font-size:1.55rem;box-shadow:0 8px 18px rgba(22,40,58,.25)}
+.cat-card h3{color:var(--navy);font-size:.98rem;font-weight:800;margin-bottom:4px}
+.cat-card p{color:var(--muted);font-size:.78rem;line-height:1.5}
+.cat-count{display:inline-block;margin-top:10px;font-size:.73rem;font-weight:700;color:var(--gold);background:var(--gold-soft);padding:3px 12px;border-radius:100px}
 
 /* ===== How it works ===== */
 .how{background:linear-gradient(160deg,var(--navy-3),var(--navy));position:relative}
@@ -207,6 +208,12 @@ footer ul a:hover{color:var(--gold-2)}
 .logout-btn{background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 14px;font-size:.85rem;font-weight:700;transition:.2s}
 .logout-btn:hover{background:rgba(255,255,255,.22)}
 
+/* ===== Hero (صف واحد بدون بطاقة الشعار) ===== */
+.hero-single{grid-template-columns:1fr}
+.hero-center{max-width:720px;margin-inline:auto;text-align:center}
+.hero-center .hero-cta{justify-content:center;margin-bottom:0}
+.hero-center p{margin-inline:auto}
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
   .cats-grid{grid-template-columns:repeat(3,1fr)}
@@ -248,8 +255,6 @@ footer ul a:hover{color:var(--gold-2)}
       <a href="#categories">التخصصات</a>
       <a href="#how">كيف نعمل</a>
       <a href="#providers">مقدمو الخدمة</a>
-      <a href="#post">اطلب خدمة</a>
-      <a href="#join">سجّل كمقدم خدمة</a>
     </nav>
     <div id="authArea" style="display:flex;align-items:center"></div>
     <button class="menu-toggle" id="menuToggle" aria-label="القائمة">☰</button>
@@ -258,22 +263,14 @@ footer ul a:hover{color:var(--gold-2)}
 
 <!-- ================= Hero ================= -->
 <section class="hero">
-  <div class="container hero-grid">
-    <div>
-      <div class="hero-badge">🏗️ منصة البناء والتشطيب الأولى</div>
+  <div class="container hero-grid hero-single">
+    <div class="hero-center">
+      <div class="hero-badge">🇴🇲 منصة البناء والتشطيب الأولى في سلطنة عمان</div>
       <h1>من أول خطوة..<br>لـ <em>بيت أحلامك</em></h1>
       <p>دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
       <div class="hero-cta">
-        <a href="#post" class="btn btn-gold">📋 اطلب خدمة الآن</a>
-        <a href="#join" class="btn btn-outline">🤝 سجّل كمقدم خدمة</a>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <div class="float-chip chip1"><i>🧱</i> مقاولون معتمدون</div>
-      <div class="float-chip chip2"><i>⚡</i> كهرباء وسباكة</div>
-      <div class="float-chip chip3"><i>🏠</i> منازل ذكية</div>
-      <div class="hero-logo-card">
-        <img src="assets/logo.png" alt="دارك — من أول خطوة لبيت أحلامك">
+        <button class="btn btn-gold" id="btnRequestService">📋 اطلب خدمة الآن</button>
+        <button class="btn btn-outline" id="btnJoinProvider">🤝 سجّل كمقدم خدمة</button>
       </div>
     </div>
   </div>
@@ -292,13 +289,13 @@ footer ul a:hover{color:var(--gold-2)}
 <!-- ================= Categories ================= -->
 <section id="categories">
   <div class="container">
-    <div class="sec-head">
+    <div class="sec-head" style="margin-bottom:30px">
       <span class="sec-tag">التخصصات</span>
       <h2>كل ما يحتاجه بيتك في مكان واحد</h2>
-      <p>من الأساس حتى المفتاح — تصفح التخصصات واختر مقدم الخدمة المناسب لمشروعك</p>
+      <p>اسحب واستكشف — 12 تخصصًا من الأساس حتى المفتاح</p>
     </div>
-    <div class="cats-grid" id="catsGrid"></div>
   </div>
+  <div class="cats-strip" id="catsGrid"></div>
 </section>
 
 <!-- ================= How it works ================= -->
@@ -346,100 +343,6 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </section>
 
-<!-- ================= Forms ================= -->
-<section class="cta-section" id="post">
-  <div class="container">
-    <div class="sec-head">
-      <span class="sec-tag">ابدأ الآن</span>
-      <h2>اطلب خدمة أو انضم كمقدم خدمة</h2>
-      <p>سواء كنت تبني بيتك أو تملك مشروعًا في مجال المنازل — دارك مكانك</p>
-    </div>
-    <div class="forms-grid">
-
-      <!-- نموذج طلب خدمة -->
-      <div class="form-card">
-        <h3>📋 اطلب خدمة لمشروعك</h3>
-        <p>عبّئ البيانات وسيصلك عروض من مقدمي الخدمة في منطقتك</p>
-        <form id="requestForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label>الاسم الكامل *</label>
-              <input type="text" name="name" required placeholder="مثال: محمد العتيبي">
-            </div>
-            <div class="form-group">
-              <label>رقم الجوال *</label>
-              <input type="tel" name="phone" required placeholder="05xxxxxxxx" pattern="[0-9+]{9,15}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>المدينة *</label>
-              <input type="text" name="city" required placeholder="مثال: الرياض">
-            </div>
-            <div class="form-group">
-              <label>التخصص المطلوب *</label>
-              <select name="category" required id="categorySelect">
-                <option value="">اختر التخصص…</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>الميزانية التقريبية (ر.س)</label>
-            <input type="number" name="budget" min="0" placeholder="اختياري">
-          </div>
-          <div class="form-group">
-            <label>تفاصيل المشروع *</label>
-            <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
-          </div>
-          <button type="submit" class="submit-btn">إرسال الطلب 🚀</button>
-          <div class="form-note">بإرسالك الطلب أنت توافق على مشاركة بياناتك مع مقدمي الخدمة المؤهلين</div>
-        </form>
-      </div>
-
-      <!-- نموذج تسجيل مقدم خدمة -->
-      <div class="form-card" id="join">
-        <h3>🤝 سجّل كمقدم خدمة</h3>
-        <p>انضم لشبكة دارك وابدأ باستقبال مشاريع جديدة في تخصصك</p>
-        <form id="providerForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label>اسم المنشأة / الحرفي *</label>
-              <input type="text" name="business" required placeholder="مثال: مؤسسة البنيان">
-            </div>
-            <div class="form-group">
-              <label>رقم الجوال *</label>
-              <input type="tel" name="phone" required placeholder="05xxxxxxxx" pattern="[0-9+]{9,15}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>التخصص *</label>
-              <select name="category" required id="providerCategorySelect">
-                <option value="">اختر التخصص…</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>سنوات الخبرة *</label>
-              <input type="number" name="experience" min="0" max="60" required placeholder="مثال: 8">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>المدينة / نطاق العمل *</label>
-            <input type="text" name="city" required placeholder="مثال: جدة ومكة">
-          </div>
-          <div class="form-group">
-            <label>نبذة عن أعمالك</label>
-            <textarea name="bio" rows="3" placeholder="أبرز المشاريع السابقة، الضمانات، المميزات…"></textarea>
-          </div>
-          <button type="submit" class="submit-btn">إرسال طلب الانضمام ✅</button>
-          <div class="form-note">سيتم مراجعة طلبك والتواصل معك خلال 48 ساعة</div>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</section>
-
 <!-- ================= لوحة التحكم (تظهر بعد تسجيل الدخول) ================= -->
 <section class="dashboard" id="dashboard">
   <div class="container">
@@ -448,12 +351,12 @@ footer ul a:hover{color:var(--gold-2)}
         <h2 id="dashTitle">لوحة التحكم</h2>
         <p id="dashSubtitle"></p>
       </div>
-      <a href="#post" class="btn btn-gold" id="dashActionBtn">➕ طلب خدمة جديد</a>
+      <button class="btn btn-gold" id="dashActionBtn">➕ طلب خدمة جديد</button>
     </div>
     <div class="dash-stats">
       <div class="dash-stat"><b id="statTotal">0</b><span id="statTotalLabel">إجمالي الطلبات</span></div>
       <div class="dash-stat"><b id="statNew">0</b><span>جديدة هذا الأسبوع</span></div>
-      <div class="dash-stat"><b id="statBudget">—</b><span>متوسط الميزانية (ر.س)</span></div>
+      <div class="dash-stat"><b id="statBudget">—</b><span>متوسط الميزانية (ر.ع)</span></div>
     </div>
     <div class="dash-table-wrap">
       <div id="dashContent"></div>
@@ -484,8 +387,8 @@ footer ul a:hover{color:var(--gold-2)}
         <ul>
           <li><a href="#how">كيف نعمل</a></li>
           <li><a href="#providers">مقدمو الخدمة</a></li>
-          <li><a href="#post">اطلب خدمة</a></li>
-          <li><a href="#join">انضم إلينا</a></li>
+          <li><a href="#" class="footer-request">اطلب خدمة</a></li>
+          <li><a href="#" class="footer-join">انضم كمقدم خدمة</a></li>
         </ul>
       </div>
       <div>
@@ -493,7 +396,7 @@ footer ul a:hover{color:var(--gold-2)}
         <ul>
           <li><a href="mailto:info@darak.app">📧 info@darak.app</a></li>
           <li><a href="tel:+966500000000">📞 0500 000 000</a></li>
-          <li><a href="#">📍 المملكة العربية السعودية</a></li>
+          <li><a href="#">📍 سلطنة عمان 🇴🇲</a></li>
         </ul>
       </div>
     </div>
@@ -546,6 +449,48 @@ footer ul a:hover{color:var(--gold-2)}
         <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right">
       </div>
       <button type="submit" class="submit-btn" id="authSubmit">دخول</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= نافذة طلب خدمة (للمسجلين فقط) ================= -->
+<div class="modal-overlay" id="requestModal">
+  <div class="modal" style="width:min(540px,100%)">
+    <button class="modal-close" id="requestClose" aria-label="إغلاق">✕</button>
+    <h3>📋 اطلب خدمة لمشروعك</h3>
+    <p>عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب</p>
+    <form id="requestModalForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>الاسم الكامل *</label>
+          <input type="text" name="name" id="reqName" required placeholder="مثال: محمد البلوشي">
+        </div>
+        <div class="form-group">
+          <label>رقم الجوال *</label>
+          <input type="tel" name="phone" required placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>المدينة *</label>
+          <input type="text" name="city" required placeholder="مثال: مسقط">
+        </div>
+        <div class="form-group">
+          <label>التخصص المطلوب *</label>
+          <select name="category" required id="reqCategory">
+            <option value="">اختر التخصص…</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>الميزانية التقريبية (ر.ع)</label>
+        <input type="number" name="budget" min="0" placeholder="اختياري">
+      </div>
+      <div class="form-group">
+        <label>تفاصيل المشروع *</label>
+        <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
+      </div>
+      <button type="submit" class="submit-btn" id="reqSubmit">إرسال الطلب 🚀</button>
     </form>
   </div>
 </div>
@@ -629,17 +574,6 @@ catsGrid.innerHTML = CATEGORIES.map(c => `
   </div>
 `).join("");
 
-// تعبئة قوائم التخصص في النموذجين
-["categorySelect", "providerCategorySelect"].forEach(id => {
-  const sel = document.getElementById(id);
-  CATEGORIES.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.name;
-    opt.textContent = `${c.icon} ${c.name}`;
-    sel.appendChild(opt);
-  });
-});
-
 // ============ مقدمو خدمة مميزون (بيانات تعريفية) ============
 const PROVIDERS = [
   { name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", icon: "🏗️", exp: 15, projects: 140, rating: 4.9, tags: ["إشراف هندسي", "ضمان 10 سنوات", "تسليم مفتاح"] },
@@ -664,7 +598,7 @@ document.getElementById("providersGrid").innerHTML = PROVIDERS.map(p => `
         <span><b>${p.projects}</b> مشروعًا</span>
       </div>
       <div class="pro-tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
-      <button class="pro-btn" onclick="document.querySelector('#post').scrollIntoView({behavior:'smooth'})">اطلب عرض سعر</button>
+      <button class="pro-btn" onclick="darakRequestFlow()">اطلب عرض سعر</button>
     </div>
   </div>
 `).join("");
@@ -719,30 +653,76 @@ async function saveToDB(collectionName, data) {
   return "local";
 }
 
-function bindForm(formId, collectionName, successMsg) {
-  const form = document.getElementById(formId);
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
-    const btn = form.querySelector(".submit-btn");
-    btn.disabled = true;
-    btn.textContent = "جارٍ الإرسال…";
-    const data = Object.fromEntries(new FormData(form).entries());
-    try {
-      const mode = await saveToDB(collectionName, data);
-      showToast(successMsg + (mode === "local" ? " (وضع تجريبي — اربط Firebase للحفظ السحابي)" : ""));
-      form.reset();
-    } catch (err) {
-      console.error(err);
-      showToast("تعذر إرسال الطلب، حاول مرة أخرى", "error");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = formId === "requestForm" ? "إرسال الطلب 🚀" : "إرسال طلب الانضمام ✅";
-    }
-  });
-}
+// ============================================================
+// نافذة طلب الخدمة (تتطلب حسابًا — البريد الإلكتروني شرط)
+// ============================================================
+const requestModal = document.getElementById("requestModal");
+const reqCat = document.getElementById("reqCategory");
+CATEGORIES.forEach(c => {
+  const o = document.createElement("option");
+  o.value = c.name;
+  o.textContent = `${c.icon} ${c.name}`;
+  reqCat.appendChild(o);
+});
 
-bindForm("requestForm", "service_requests", "تم استلام طلبك! سيتواصل معك مقدمو الخدمة قريبًا");
-bindForm("providerForm", "provider_applications", "تم استلام طلب انضمامك! سنراجعه ونتواصل معك خلال 48 ساعة");
+function openRequestModal() {
+  document.getElementById("reqName").value = currentUser?.displayName || "";
+  requestModal.classList.add("open");
+}
+function closeRequestModal() { requestModal.classList.remove("open"); }
+document.getElementById("requestClose").addEventListener("click", closeRequestModal);
+requestModal.addEventListener("click", e => { if (e.target === requestModal) closeRequestModal(); });
+
+document.getElementById("requestModalForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = document.getElementById("reqSubmit");
+  btn.disabled = true;
+  btn.textContent = "جارٍ الإرسال…";
+  const data = {
+    ...Object.fromEntries(new FormData(e.target).entries()),
+    ownerUid: currentUser?.uid || null,
+    ownerEmail: currentUser?.email || ""
+  };
+  try {
+    const mode = await saveToDB("service_requests", data);
+    showToast("تم استلام طلبك! بيشوفه مقدمو الخدمة في التخصص المطلوب" + (mode === "local" ? " (وضع تجريبي)" : ""));
+    e.target.reset();
+    closeRequestModal();
+    openDashboard();
+  } catch (err) {
+    console.error(err);
+    showToast("تعذر إرسال الطلب، حاول مرة أخرى", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "إرسال الطلب 🚀";
+  }
+});
+
+// ============================================================
+// مسارات الأزرار — لا طلب ولا انضمام بدون حساب
+// ============================================================
+function setAuthTab(mode) { document.querySelector(`.auth-tabs button[data-tab="${mode}"]`).click(); }
+function setRole(role) { document.querySelector(`.role-option[data-role="${role}"]`).click(); }
+
+function openRequestFlow() {
+  if (currentUser?.role === "client") { openRequestModal(); }
+  else if (currentUser?.role === "provider") { showToast("أنت مسجل كمقدم خدمة — طلبات عملائك في لوحتك 👇"); openDashboard(); }
+  else if (currentUser) { openDashboard(); }
+  else { setAuthTab("register"); setRole("client"); openAuth(); }
+}
+function openJoinFlow() {
+  if (currentUser) { openDashboard(); return; }
+  setAuthTab("register"); setRole("provider"); openAuth();
+}
+window.darakRequestFlow = openRequestFlow;
+
+document.getElementById("btnRequestService").addEventListener("click", openRequestFlow);
+document.getElementById("btnJoinProvider").addEventListener("click", openJoinFlow);
+document.getElementById("dashActionBtn").addEventListener("click", () => {
+  if (currentUser?.role === "client") openRequestModal(); else openRequestFlow();
+});
+document.querySelectorAll(".footer-request").forEach(a => a.addEventListener("click", e => { e.preventDefault(); openRequestFlow(); }));
+document.querySelectorAll(".footer-join").forEach(a => a.addEventListener("click", e => { e.preventDefault(); openJoinFlow(); }));
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -887,6 +867,10 @@ async function logout() {
   showToast("تم تسجيل الخروج — نراك قريبًا");
 }
 
+// ⚙️ بريد الأدمن — صاحب هذا البريد يشوف كل طلبات المنصة من لوحته
+const ADMIN_EMAILS = ["m.alhinai11@gmail.com"];
+function isAdmin() { return !!currentUser && ADMIN_EMAILS.includes(currentUser.email); }
+
 // ============================================================
 // لوحة التحكم — العميل يشوف طلباته، ومقدم الخدمة يشوف عملاءه
 // ============================================================
@@ -894,27 +878,34 @@ async function openDashboard() {
   if (!currentUser) { openAuth(); return; }
   const dash = document.getElementById("dashboard");
   dash.classList.add("open");
-  const isProvider = currentUser.role === "provider";
+  const admin = isAdmin();
+  const isProvider = currentUser.role === "provider" && !admin;
 
-  document.getElementById("dashTitle").textContent = isProvider ? "لوحة مقدم الخدمة 🛠️" : "لوحة مشاريعي 🏠";
-  document.getElementById("dashSubtitle").textContent = isProvider
+  document.getElementById("dashTitle").textContent = admin ? "لوحة الإدارة 👑" : isProvider ? "لوحة مقدم الخدمة 🛠️" : "لوحة مشاريعي 🏠";
+  document.getElementById("dashSubtitle").textContent = admin
+    ? "جميع طلبات المنصة من كل التخصصات"
+    : isProvider
     ? `طلبات العملاء الواردة في تخصصك${currentUser.category ? ` (${currentUser.category})` : ""}`
     : "تابع طلباتك المرسلة وتفاصيلها من هنا";
-  document.getElementById("dashActionBtn").style.display = isProvider ? "none" : "inline-flex";
-  document.getElementById("statTotalLabel").textContent = isProvider ? "طلب عميل" : "طلباتي";
+  document.getElementById("dashActionBtn").style.display = (isProvider || admin) ? "none" : "inline-flex";
+  document.getElementById("statTotalLabel").textContent = admin ? "كل الطلبات" : isProvider ? "طلب عميل" : "طلباتي";
 
   // جلب الطلبات
   let rows = [];
   if (db && getDocsFn) {
     const col = collectionFn(db, "service_requests");
-    const q = isProvider && currentUser.category
+    const q = admin
+      ? queryFn(col)
+      : isProvider && currentUser.category
       ? queryFn(col, whereFn("category", "==", currentUser.category))
       : queryFn(col, whereFn("ownerUid", "==", currentUser.uid));
     const snap = await getDocsFn(q);
     rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } else {
     const all = JSON.parse(localStorage.getItem("darak_service_requests") || "[]");
-    rows = isProvider
+    rows = admin
+      ? all
+      : isProvider
       ? all.filter(r => !currentUser.category || r.category === currentUser.category)
       : all.filter(r => r.ownerUid === currentUser.uid);
   }
@@ -949,7 +940,7 @@ async function openDashboard() {
         <td><a href="tel:${r.phone}" style="color:var(--gold);font-weight:700" dir="ltr">${r.phone || "—"}</a></td>
         <td>${r.city || "—"}</td>
         <td>${r.category || "—"}</td>
-        <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.س" : "—"}</td>
+        <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td style="max-width:240px">${r.details || "—"}</td>
         <td><span class="status-badge status-new">جديد</span></td>
       </tr>`).join("")}</tbody>
