@@ -55,7 +55,7 @@ header.scrolled{background:rgba(22,40,58,.96);backdrop-filter:blur(12px);box-sha
 .menu-toggle{display:none;background:none;color:#fff;font-size:1.7rem}
 
 /* ===== Hero ===== */
-.hero{min-height:100vh;display:flex;align-items:center;position:relative;background:linear-gradient(160deg,var(--navy-3) 0%,var(--navy) 55%,var(--navy-2) 100%);overflow:hidden;padding:130px 0 70px}
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;background:linear-gradient(160deg,var(--navy-3) 0%,var(--navy) 55%,var(--navy-2) 100%);overflow:hidden;padding:175px 0 70px}
 .hero::before{content:'';position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(185,141,78,.22),transparent 65%);top:-180px;left:-160px}
 .hero::after{content:'';position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(185,141,78,.14),transparent 65%);bottom:-200px;right:-120px}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center;position:relative;z-index:2}
@@ -239,6 +239,27 @@ footer ul a:hover{color:var(--gold-2)}
 .action-delete{background:#f3f4f6;color:#6b7280}
 .action-btn:hover{filter:brightness(.94);transform:translateY(-1px)}
 
+/* ===== وضع التطبيق: شريط سفلي + بحث + لغة ===== */
+.lang-toggle{background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:.85rem;transition:.2s;margin-inline-end:8px}
+.lang-toggle:hover{background:rgba(255,255,255,.22)}
+.search-row{padding:0 0 12px}
+.search-box{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:12px 18px;box-shadow:var(--shadow)}
+.search-box input{flex:1;border:none;outline:none;font-size:1rem;background:transparent;color:var(--text)}
+.search-cats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.search-cat-chip{background:#fff;border:2px solid var(--gold-soft);border-radius:100px;padding:8px 18px;font-weight:700;color:var(--navy);cursor:pointer;transition:.2s;font-size:.9rem}
+.search-cat-chip:hover{border-color:var(--gold);color:var(--gold)}
+.tabbar{display:none}
+.tab-icon{font-size:1.25rem}
+[dir="ltr"] .marquee-track{animation-name:marqueeMoveL}
+@keyframes marqueeMoveL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(max-width:820px){
+  body{padding-bottom:76px}
+  .tabbar{display:flex;position:fixed;bottom:0;inset-inline:0;z-index:120;background:#fff;box-shadow:0 -6px 24px rgba(22,40,58,.12)}
+  .tab{flex:1;padding:9px 4px 11px;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:.72rem;font-weight:700;border-top:3px solid transparent;transition:.2s}
+  .tab.active{color:var(--gold);border-top-color:var(--gold)}
+  .hero{padding-top:160px}
+}
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
   .cats-grid{grid-template-columns:repeat(3,1fr)}
@@ -277,37 +298,56 @@ footer ul a:hover{color:var(--gold-2)}
       <span>دا<b>رك</b></span>
     </a>
     <nav class="nav-links" id="navLinks">
-      <a href="#categories">التخصصات</a>
-      <a href="#how">كيف نعمل</a>
-      <a href="#providers">مقدمو الخدمة</a>
+      <a href="#categories" data-i18n="nav_cats">التخصصات</a>
+      <a href="#how" data-i18n="nav_how">كيف نعمل</a>
+      <a href="#providers" data-i18n="nav_providers">مقدمو الخدمة</a>
     </nav>
+    <button class="lang-toggle" id="langToggle" type="button">🌐 EN</button>
     <div id="authArea" style="display:flex;align-items:center"></div>
     <button class="menu-toggle" id="menuToggle" aria-label="القائمة">☰</button>
+  </div>
+  <div class="container search-row">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchInput" data-i18n-ph="search_placeholder" placeholder="ابحث عن خدمة أو شركة…">
+    </div>
   </div>
 </header>
 
 <!-- ================= Hero ================= -->
-<section class="hero">
+<section class="hero" id="heroSec">
   <div class="container hero-grid hero-single">
     <div class="hero-center">
-      <div class="hero-badge">منصة البناء والتشطيب الأولى في سلطنة عمان</div>
-      <h1>من أول خطوة..<br>لـ <em>بيت أحلامك</em></h1>
-      <p>دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
+      <div class="hero-badge" data-i18n="hero_badge">منصة البناء والتشطيب الأولى في سلطنة عمان</div>
+      <h1><span data-i18n="hero_t1">من أول خطوة..</span><br><em data-i18n="hero_t2">لبيت أحلامك</em></h1>
+      <p data-i18n="hero_desc">دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
       <div class="hero-cta">
-        <button class="btn btn-gold" id="btnRequestService">📋 اطلب خدمة الآن</button>
-        <button class="btn btn-outline" id="btnJoinProvider">🤝 سجّل كمقدم خدمة</button>
+        <button class="btn btn-gold" id="btnRequestService" data-i18n="btn_request">📋 اطلب خدمة الآن</button>
+        <button class="btn btn-outline" id="btnJoinProvider" data-i18n="btn_join">🤝 سجّل كمقدم خدمة</button>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ================= نتائج البحث ================= -->
+<section id="searchResults" style="display:none;padding-top:26px">
+  <div class="container">
+    <div class="sec-head" style="margin-bottom:22px">
+      <h2 data-i18n="search_title">نتائج البحث</h2>
+    </div>
+    <div id="searchCats" class="search-cats"></div>
+    <div class="providers-grid" id="searchPros" style="margin-top:20px"></div>
+    <div id="searchEmpty" class="dash-empty" style="display:none"><div class="big">🔍</div><span data-i18n="no_results">لا توجد نتائج مطابقة</span></div>
+  </div>
+</section>
+
 <!-- ================= Stats ================= -->
-<div class="stats">
+<div class="stats" id="statsSec">
   <div class="stats-grid">
-    <div class="stat"><b data-count="12">0</b><span>تخصصًا في البناء</span></div>
-    <div class="stat"><b data-count="500">0</b><span>مقدم خدمة</span></div>
-    <div class="stat"><b data-count="1200">0</b><span>مشروع مكتمل</span></div>
-    <div class="stat"><b data-count="98">0</b><span>% رضا العملاء</span></div>
+    <div class="stat"><b data-count="12">0</b><span data-i18n="stat_cats">تخصصًا في البناء</span></div>
+    <div class="stat"><b data-count="500">0</b><span data-i18n="stat_providers">مقدم خدمة</span></div>
+    <div class="stat"><b data-count="1200">0</b><span data-i18n="stat_projects">مشروع مكتمل</span></div>
+    <div class="stat"><b data-count="98">0</b><span data-i18n="stat_satisfaction">% رضا العملاء</span></div>
   </div>
 </div>
 
@@ -315,9 +355,9 @@ footer ul a:hover{color:var(--gold-2)}
 <section id="categories">
   <div class="container">
     <div class="sec-head" style="margin-bottom:30px">
-      <span class="sec-tag">التخصصات</span>
-      <h2>كل ما يحتاجه بيتك في مكان واحد</h2>
-      <p>12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف</p>
+      <span class="sec-tag" data-i18n="cats_tag">التخصصات</span>
+      <h2 data-i18n="cats_title">كل ما يحتاجه بيتك في مكان واحد</h2>
+      <p data-i18n="cats_sub">12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف</p>
     </div>
   </div>
   <div class="marquee">
@@ -329,30 +369,30 @@ footer ul a:hover{color:var(--gold-2)}
 <section class="how" id="how">
   <div class="container">
     <div class="sec-head">
-      <span class="sec-tag">آلية العمل</span>
-      <h2>كيف تعمل منصة دارك؟</h2>
-      <p>أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية</p>
+      <span class="sec-tag" data-i18n="how_tag">آلية العمل</span>
+      <h2 data-i18n="how_title">كيف تعمل منصة دارك؟</h2>
+      <p data-i18n="how_sub">أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية</p>
     </div>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h3>اطلب خدمتك</h3>
-        <p>حدّد التخصص وموقع المشروع وميزانيتك من خلال نموذج بسيط</p>
+        <h3 data-i18n="s1t">اطلب خدمتك</h3>
+        <p data-i18n="s1d">حدّد التخصص وموقع المشروع وميزانيتك من خلال نموذج بسيط</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3>استقبل العروض</h3>
-        <p>يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية</p>
+        <h3 data-i18n="s2t">استقبل العروض</h3>
+        <p data-i18n="s2d">يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>قارن واختر</h3>
-        <p>قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب</p>
+        <h3 data-i18n="s3t">قارن واختر</h3>
+        <p data-i18n="s3d">قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <h3>تابع حتى التسليم</h3>
-        <p>تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل</p>
+        <h3 data-i18n="s4t">تابع حتى التسليم</h3>
+        <p data-i18n="s4d">تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل</p>
       </div>
     </div>
   </div>
@@ -362,12 +402,21 @@ footer ul a:hover{color:var(--gold-2)}
 <section id="providers">
   <div class="container">
     <div class="sec-head">
-      <span class="sec-tag">مقدمو الخدمة</span>
-      <h2>نخبة من أمهر الحرفيين والشركات</h2>
-      <p>مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع</p>
+      <span class="sec-tag" data-i18n="pro_tag">مقدمو الخدمة</span>
+      <h2 data-i18n="pro_title">نخبة من أمهر الحرفيين والشركات</h2>
+      <p data-i18n="pro_sub">مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع</p>
     </div>
     <div class="marquee">
       <div class="marquee-track pro-track" id="providersGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= حسابي (تبويب التطبيق) ================= -->
+<section class="dashboard" id="accountView">
+  <div class="container" style="max-width:560px">
+    <div class="form-card" style="text-align:center">
+      <div id="accountContent"></div>
     </div>
   </div>
 </section>
@@ -380,12 +429,12 @@ footer ul a:hover{color:var(--gold-2)}
         <h2 id="dashTitle">لوحة التحكم</h2>
         <p id="dashSubtitle"></p>
       </div>
-      <button class="btn btn-gold" id="dashActionBtn">➕ طلب خدمة جديد</button>
+      <button class="btn btn-gold" id="dashActionBtn" data-i18n="dash_new_req">➕ طلب خدمة جديد</button>
     </div>
     <div class="dash-stats">
       <div class="dash-stat"><b id="statTotal">0</b><span id="statTotalLabel">إجمالي الطلبات</span></div>
-      <div class="dash-stat"><b id="statNew">0</b><span>جديدة هذا الأسبوع</span></div>
-      <div class="dash-stat"><b id="statBudget">—</b><span>متوسط الميزانية (ر.ع)</span></div>
+      <div class="dash-stat"><b id="statNew">0</b><span data-i18n="st_new">جديدة هذا الأسبوع</span></div>
+      <div class="dash-stat"><b id="statBudget">—</b><span data-i18n="st_budget">متوسط الميزانية (ر.ع)</span></div>
     </div>
     <div class="admin-tabs" id="adminTabs" style="display:none">
       <button class="active" data-atab="requests" type="button">📋 الطلبات</button>
@@ -409,7 +458,7 @@ footer ul a:hover{color:var(--gold-2)}
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>البريد الإلكتروني</label>
+              <label data-i18n="email_lbl">البريد الإلكتروني</label>
               <input type="email" id="ffEmail" dir="ltr" style="text-align:right">
             </div>
             <div class="form-group">
@@ -438,7 +487,7 @@ footer ul a:hover{color:var(--gold-2)}
         <p id="fDesc">منصة تربط أصحاب المنازل قيد الإنشاء بأفضل مقدمي الخدمات — من أول خطوة.. لبيت أحلامك.</p>
       </div>
       <div>
-        <h5>التخصصات</h5>
+        <h5 data-i18n="f_cats">التخصصات</h5>
         <ul>
           <li><a href="#categories">المقاولون</a></li>
           <li><a href="#categories">مواد البناء</a></li>
@@ -447,16 +496,16 @@ footer ul a:hover{color:var(--gold-2)}
         </ul>
       </div>
       <div>
-        <h5>المنصة</h5>
+        <h5 data-i18n="f_platform">المنصة</h5>
         <ul>
-          <li><a href="#how">كيف نعمل</a></li>
-          <li><a href="#providers">مقدمو الخدمة</a></li>
+          <li><a href="#how" data-i18n="nav_how">كيف نعمل</a></li>
+          <li><a href="#providers" data-i18n="nav_providers">مقدمو الخدمة</a></li>
           <li><a href="#" class="footer-request">اطلب خدمة</a></li>
           <li><a href="#" class="footer-join">انضم كمقدم خدمة</a></li>
         </ul>
       </div>
       <div>
-        <h5>تواصل معنا</h5>
+        <h5 data-i18n="f_contact">تواصل معنا</h5>
         <ul>
           <li><a href="mailto:info@darak.app" id="fEmailLink">📧 <span id="fEmail">info@darak.app</span></a></li>
           <li><a href="https://wa.me/96890000000" target="_blank" id="fPhoneLink">💬 <span id="fPhone">90000000</span></a></li>
@@ -465,54 +514,62 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      جميع الحقوق محفوظة © <span id="year"></span> — <b>دارك</b> | من أول خطوة.. لبيت أحلامك 🏠
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span>
     </div>
   </div>
 </footer>
+
+<!-- ================= شريط التبويب السفلي (وضع التطبيق) ================= -->
+<nav class="tabbar" id="tabbar">
+  <button class="tab active" data-view="home" type="button"><span class="tab-icon">🏠</span><span data-i18n="tab_home">الرئيسية</span></button>
+  <button class="tab" data-view="cats" type="button"><span class="tab-icon">🧱</span><span data-i18n="tab_cats">التخصصات</span></button>
+  <button class="tab" data-view="dash" type="button"><span class="tab-icon">📋</span><span data-i18n="tab_dash">طلباتي</span></button>
+  <button class="tab" data-view="account" type="button"><span class="tab-icon">👤</span><span data-i18n="tab_account">حسابي</span></button>
+</nav>
 
 <!-- ================= نافذة تسجيل الدخول / إنشاء حساب ================= -->
 <div class="modal-overlay" id="authModal">
   <div class="modal">
     <button class="modal-close" id="authClose" aria-label="إغلاق">✕</button>
-    <h3>مرحبًا بك في دارك 🏠</h3>
-    <p>سجّل دخولك أو أنشئ حسابًا جديدًا</p>
+    <h3 data-i18n="modal_welcome">مرحبًا بك في دارك 🏠</h3>
+    <p data-i18n="modal_sub">سجّل دخولك أو أنشئ حسابًا جديدًا</p>
     <div class="auth-tabs">
-      <button type="button" class="active" data-tab="login">تسجيل الدخول</button>
-      <button type="button" data-tab="register">حساب جديد</button>
+      <button type="button" class="active" data-tab="login" data-i18n="tab_login">تسجيل الدخول</button>
+      <button type="button" data-tab="register" data-i18n="tab_register">حساب جديد</button>
     </div>
     <form id="authForm">
       <div id="registerFields" style="display:none">
         <div class="form-group">
-          <label>الاسم الكامل / اسم المنشأة</label>
+          <label data-i18n="name_lbl">الاسم الكامل / اسم المنشأة</label>
           <input type="text" name="displayName" placeholder="مثال: محمد العتيبي">
         </div>
         <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px">نوع الحساب</label>
         <div class="role-picker">
           <div class="role-option active" data-role="client">
             <div class="r-icon">🏠</div>
-            <b>صاحب مشروع</b>
+            <b data-i18n="role_client">صاحب مشروع</b>
           </div>
           <div class="role-option" data-role="provider">
             <div class="r-icon">🛠️</div>
-            <b>مقدم خدمة</b>
+            <b data-i18n="role_provider">مقدم خدمة</b>
           </div>
         </div>
         <div class="form-group" id="regCategoryWrap" style="display:none">
-          <label>تخصصك</label>
+          <label data-i18n="cat_lbl">تخصصك</label>
           <select name="category" id="regCategory">
             <option value="">اختر التخصص…</option>
           </select>
         </div>
       </div>
       <div class="form-group">
-        <label>البريد الإلكتروني</label>
+        <label data-i18n="email_lbl">البريد الإلكتروني</label>
         <input type="email" name="email" required placeholder="you@email.com" dir="ltr" style="text-align:right">
       </div>
       <div class="form-group">
-        <label>كلمة المرور</label>
+        <label data-i18n="pass_lbl">كلمة المرور</label>
         <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right">
       </div>
-      <button type="submit" class="submit-btn" id="authSubmit">دخول</button>
+      <button type="submit" class="submit-btn" id="authSubmit" data-i18n="login_go">دخول</button>
     </form>
   </div>
 </div>
@@ -521,40 +578,40 @@ footer ul a:hover{color:var(--gold-2)}
 <div class="modal-overlay" id="requestModal">
   <div class="modal" style="width:min(540px,100%)">
     <button class="modal-close" id="requestClose" aria-label="إغلاق">✕</button>
-    <h3>📋 اطلب خدمة لمشروعك</h3>
-    <p>عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب</p>
+    <h3 data-i18n="req_title">📋 اطلب خدمة لمشروعك</h3>
+    <p data-i18n="req_sub">عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب</p>
     <form id="requestModalForm">
       <div class="form-row">
         <div class="form-group">
-          <label>الاسم الكامل *</label>
+          <label data-i18n="req_name">الاسم الكامل *</label>
           <input type="text" name="name" id="reqName" required placeholder="مثال: محمد البلوشي">
         </div>
         <div class="form-group">
-          <label>رقم الجوال *</label>
+          <label data-i18n="phone_lbl">رقم الجوال *</label>
           <input type="tel" name="phone" required placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>المدينة *</label>
+          <label data-i18n="city_lbl">المدينة *</label>
           <input type="text" name="city" required placeholder="مثال: مسقط">
         </div>
         <div class="form-group">
-          <label>التخصص المطلوب *</label>
+          <label data-i18n="req_cat">التخصص المطلوب *</label>
           <select name="category" required id="reqCategory">
             <option value="">اختر التخصص…</option>
           </select>
         </div>
       </div>
       <div class="form-group">
-        <label>الميزانية التقريبية (ر.ع)</label>
+        <label data-i18n="budget_lbl">الميزانية التقريبية (ر.ع)</label>
         <input type="number" name="budget" min="0" placeholder="اختياري">
       </div>
       <div class="form-group">
-        <label>تفاصيل المشروع *</label>
+        <label data-i18n="details_lbl">تفاصيل المشروع *</label>
         <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
       </div>
-      <button type="submit" class="submit-btn" id="reqSubmit">إرسال الطلب 🚀</button>
+      <button type="submit" class="submit-btn" id="reqSubmit" data-i18n="send_req">إرسال الطلب 🚀</button>
     </form>
   </div>
 </div>
@@ -650,58 +707,145 @@ if (FIREBASE_READY) {
 
 // ============ التخصصات ============
 const CATEGORIES = [
-  { icon: "🏗️", name: "المقاولون", desc: "بناء وتشطيب متكامل", count: 120 },
-  { icon: "🧱", name: "مواد البناء", desc: "موردون وأسعار تنافسية", count: 85 },
-  { icon: "⚡", name: "الكهرباء", desc: "تأسيس وتشطيب وصيانة", count: 64 },
-  { icon: "🚰", name: "السباكة", desc: "تأسيس وتمديدات وأدوات صحية", count: 58 },
-  { icon: "🪵", name: "النجارة", desc: "أبواب وخزائن وأعمال خشبية", count: 42 },
-  { icon: "🏠", name: "المنازل الذكية", desc: "أتمتة وتحكم ذكي", count: 25 },
-  { icon: "🎨", name: "الديكور", desc: "تصميم داخلي وتنفيذ", count: 70 },
-  { icon: "🪟", name: "الألمنيوم والزجاج", desc: "نوافذ وواجهات ودروع", count: 38 },
-  { icon: "🛋️", name: "الأثاث", desc: "تفصيل وتوريد وتنسيق", count: 55 },
-  { icon: "🧹", name: "شركات التنظيف", desc: "تنظيف ما بعد البناء", count: 47 },
-  { icon: "🌴", name: "تنسيق الحدائق", desc: "لاندسكيب وأنسنة خارجية", count: 30 },
-  { icon: "📹", name: "الأمن والكاميرات", desc: "أنظمة مراقبة وحماية", count: 33 },
+  { icon: "🏗️", name: "المقاولون", en: "Contractors", desc: "بناء وتشطيب متكامل", enDesc: "Full build & finish", count: 120 },
+  { icon: "🧱", name: "مواد البناء", en: "Building Materials", desc: "موردون وأسعار تنافسية", enDesc: "Suppliers, best prices", count: 85 },
+  { icon: "⚡", name: "الكهرباء", en: "Electrical", desc: "تأسيس وتشطيب وصيانة", enDesc: "Wiring & maintenance", count: 64 },
+  { icon: "🚰", name: "السباكة", en: "Plumbing", desc: "تأسيس وتمديدات وأدوات صحية", enDesc: "Pipes & sanitary", count: 58 },
+  { icon: "🪵", name: "النجارة", en: "Carpentry", desc: "أبواب وخزائن وأعمال خشبية", enDesc: "Doors & woodwork", count: 42 },
+  { icon: "🏠", name: "المنازل الذكية", en: "Smart Homes", desc: "أتمتة وتحكم ذكي", enDesc: "Automation & control", count: 25 },
+  { icon: "🎨", name: "الديكور", en: "Interior Design", desc: "تصميم داخلي وتنفيذ", enDesc: "Design & execution", count: 70 },
+  { icon: "🪟", name: "الألمنيوم والزجاج", en: "Aluminum & Glass", desc: "نوافذ وواجهات ودروع", enDesc: "Windows & facades", count: 38 },
+  { icon: "🛋️", name: "الأثاث", en: "Furniture", desc: "تفصيل وتوريد وتنسيق", enDesc: "Custom & supply", count: 55 },
+  { icon: "🧹", name: "شركات التنظيف", en: "Cleaning", desc: "تنظيف ما بعد البناء", enDesc: "Post-build cleaning", count: 47 },
+  { icon: "🌴", name: "تنسيق الحدائق", en: "Landscaping", desc: "لاندسكيب وأنسنة خارجية", enDesc: "Gardens & outdoor", count: 30 },
+  { icon: "📹", name: "الأمن والكاميرات", en: "Security & CCTV", desc: "أنظمة مراقبة وحماية", enDesc: "Cameras & protection", count: 33 },
 ];
 
+// ============================================================
+// نظام اللغة — عربي / English
+// ============================================================
+let LANG = localStorage.getItem("darak_lang") || "ar";
+const I18N = {
+  ar: {
+    login: "تسجيل الدخول", logout: "خروج", tab_home: "الرئيسية", tab_cats: "التخصصات", tab_dash: "طلباتي", tab_account: "حسابي",
+    search_placeholder: "ابحث عن خدمة أو شركة…", search_title: "نتائج البحث", no_results: "لا توجد نتائج مطابقة",
+    nav_cats: "التخصصات", nav_how: "كيف نعمل", nav_providers: "مقدمو الخدمة",
+    hero_badge: "منصة البناء والتشطيب الأولى في سلطنة عمان", hero_t1: "من أول خطوة..", hero_t2: "لبيت أحلامك",
+    hero_desc: "دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.",
+    btn_request: "📋 اطلب خدمة الآن", btn_join: "🤝 سجّل كمقدم خدمة",
+    stat_cats: "تخصصًا في البناء", stat_providers: "مقدم خدمة", stat_projects: "مشروع مكتمل", stat_satisfaction: "% رضا العملاء",
+    cats_tag: "التخصصات", cats_title: "كل ما يحتاجه بيتك في مكان واحد", cats_sub: "12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف", provider_unit: "مقدم خدمة",
+    how_tag: "آلية العمل", how_title: "كيف تعمل منصة دارك؟", how_sub: "أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية",
+    s1t: "اطلب خدمتك", s1d: "حدّد التخصص وموقع المشروع وميزانيتك من خلال نموذج بسيط",
+    s2t: "استقبل العروض", s2d: "يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية",
+    s3t: "قارن واختر", s3d: "قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب",
+    s4t: "تابع حتى التسليم", s4d: "تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل",
+    pro_tag: "مقدمو الخدمة", pro_title: "نخبة من أمهر الحرفيين والشركات", pro_sub: "مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع",
+    pro_btn: "اطلب عرض سعر", exp_unit: "سنة خبرة", proj_unit: "مشروعًا",
+    dash_new_req: "➕ طلب خدمة جديد", st_new: "جديدة هذا الأسبوع", st_budget: "متوسط الميزانية (ر.ع)",
+    dash_admin: "لوحة الإدارة 👑", dash_provider: "لوحة مقدم الخدمة 🛠️", dash_client: "لوحة مشاريعي 🏠",
+    sub_admin: "جميع طلبات المنصة من كل التخصصات", sub_provider: "طلبات العملاء الواردة في تخصصك", sub_client: "تابع طلباتك المرسلة وتفاصيلها من هنا",
+    total_admin: "كل الطلبات", total_provider: "طلب عميل", total_client: "طلباتي",
+    th_client: "العميل", th_phone: "الجوال", th_city: "المدينة", th_cat: "التخصص", th_budget: "الميزانية", th_details: "التفاصيل", th_status: "الحالة", badge_new: "جديد",
+    role_client: "صاحب مشروع", role_provider: "مقدم خدمة",
+    account_guest: "أهلًا بك في دارك", account_guest_sub: "سجّل دخولك أو أنشئ حسابًا لإدارة طلباتك",
+    register_btn: "إنشاء حساب", login_go: "دخول", register_go: "إنشاء الحساب ✅",
+    modal_welcome: "مرحبًا بك في دارك 🏠", modal_sub: "سجّل دخولك أو أنشئ حسابًا جديدًا",
+    tab_login: "تسجيل الدخول", tab_register: "حساب جديد", name_lbl: "الاسم الكامل / اسم المنشأة", email_lbl: "البريد الإلكتروني", pass_lbl: "كلمة المرور", cat_lbl: "تخصصك",
+    req_title: "📋 اطلب خدمة لمشروعك", req_sub: "عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب",
+    req_name: "الاسم الكامل *", phone_lbl: "رقم الجوال *", city_lbl: "المدينة *", req_cat: "التخصص المطلوب *", budget_lbl: "الميزانية التقريبية (ر.ع)", details_lbl: "تفاصيل المشروع *", send_req: "إرسال الطلب 🚀",
+    f_cats: "التخصصات", f_platform: "المنصة", f_contact: "تواصل معنا", rights: "جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠"
+  },
+  en: {
+    login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
+    search_placeholder: "Search a service or company…", search_title: "Search Results", no_results: "No matching results",
+    nav_cats: "Services", nav_how: "How it works", nav_providers: "Providers",
+    hero_badge: "Oman's #1 building & finishing platform", hero_t1: "From the first step..", hero_t2: "to your dream home",
+    hero_desc: "Darak connects you with the best contractors and home service providers — from foundations and concrete to décor, furniture and cleaning. Every building trade in one platform.",
+    btn_request: "📋 Request a service", btn_join: "🤝 Join as a provider",
+    stat_cats: "Building trades", stat_providers: "Service providers", stat_projects: "Completed projects", stat_satisfaction: "% satisfaction",
+    cats_tag: "Services", cats_title: "Everything your home needs in one place", cats_sub: "12 trades from foundation to handover — auto-scrolling, hover to pause", provider_unit: "providers",
+    how_tag: "Process", how_title: "How does Darak work?", how_sub: "Four simple steps between you and a professional finish",
+    s1t: "Request a service", s1d: "Set the trade, project location and budget in a simple form",
+    s2t: "Receive offers", s2d: "Qualified providers reach out with competitive quotes",
+    s3t: "Compare & choose", s3d: "Compare ratings, past work and prices, then pick the best",
+    s4t: "Track to handover", s4d: "Follow execution and rate the provider when done",
+    pro_tag: "Providers", pro_title: "Top craftsmen and companies", pro_sub: "Verified providers with real ratings from project owners",
+    pro_btn: "Request a quote", exp_unit: "yrs experience", proj_unit: "projects",
+    dash_new_req: "➕ New service request", st_new: "New this week", st_budget: "Avg. budget (OMR)",
+    dash_admin: "Admin Dashboard 👑", dash_provider: "Provider Dashboard 🛠️", dash_client: "My Projects 🏠",
+    sub_admin: "All platform requests across every trade", sub_provider: "Incoming client requests in your trade", sub_client: "Track your submitted requests here",
+    total_admin: "All requests", total_provider: "Client requests", total_client: "My requests",
+    th_client: "Client", th_phone: "Phone", th_city: "City", th_cat: "Trade", th_budget: "Budget", th_details: "Details", th_status: "Status", badge_new: "New",
+    role_client: "Project owner", role_provider: "Service provider",
+    account_guest: "Welcome to Darak", account_guest_sub: "Sign in or create an account to manage your requests",
+    register_btn: "Create account", login_go: "Sign in", register_go: "Create account ✅",
+    modal_welcome: "Welcome to Darak 🏠", modal_sub: "Sign in or create a new account",
+    tab_login: "Sign in", tab_register: "New account", name_lbl: "Full name / Business name", email_lbl: "Email", pass_lbl: "Password", cat_lbl: "Your trade",
+    req_title: "📋 Request a service", req_sub: "Fill the details and providers in this trade will see your request",
+    req_name: "Full name *", phone_lbl: "Phone *", city_lbl: "City *", req_cat: "Required trade *", budget_lbl: "Approx. budget (OMR)", details_lbl: "Project details *", send_req: "Send request 🚀",
+    f_cats: "Services", f_platform: "Platform", f_contact: "Contact us", rights: "All rights reserved | From the first step to your dream home 🏠"
+  }
+};
+function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
+
 const catsGrid = document.getElementById("catsGrid");
-catsGrid.innerHTML = [...CATEGORIES, ...CATEGORIES].map(c => `
-  <div class="cat-card">
+function renderCats() {
+  catsGrid.innerHTML = [...CATEGORIES, ...CATEGORIES].map(c => `
+  <div class="cat-card" onclick="pickCategory('${c.name}')" style="cursor:pointer">
     <div class="cat-icon">${c.icon}</div>
-    <h3>${c.name}</h3>
-    <p>${c.desc}</p>
-    <span class="cat-count">+${c.count} مقدم خدمة</span>
-  </div>
-`).join("");
+    <h3>${LANG === "en" ? c.en : c.name}</h3>
+    <p>${LANG === "en" ? c.enDesc : c.desc}</p>
+    <span class="cat-count">+${c.count} ${t("provider_unit")}</span>
+  </div>`).join("");
+}
 
 // ============ مقدمو خدمة مميزون (بيانات تعريفية) ============
 const PROVIDERS = [
-  { name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", icon: "🏗️", exp: 15, projects: 140, rating: 4.9, tags: ["إشراف هندسي", "ضمان 10 سنوات", "تسليم مفتاح"] },
-  { name: "الأمانة للكهرباء", cat: "الكهرباء", icon: "⚡", exp: 10, projects: 320, rating: 4.8, tags: ["تأسيس", "أتمتة", "صيانة"] },
-  { name: "اللمسة الذهبية للديكور", cat: "الديكور", icon: "🎨", exp: 8, projects: 95, rating: 4.7, tags: ["تصميم 3D", "تنفيذ", "تشطيبات فاخرة"] },
-  { name: "الخبراء للسباكة", cat: "السباكة", icon: "🚰", exp: 12, projects: 410, rating: 4.8, tags: ["تأسيس", "عزل", "كشف تسريبات"] },
-  { name: "روائع الألمنيوم والزجاج", cat: "الألمنيوم والزجاج", icon: "🪟", exp: 9, projects: 180, rating: 4.6, tags: ["واجهات", "دبل جلاس", "دروع"] },
-  { name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", icon: "🌴", exp: 7, projects: 88, rating: 4.9, tags: ["لاندسكيب", "شلالات", "إضاءة"] },
+  { name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", catEn: "Contractors", icon: "🏗️", exp: 15, projects: 140, rating: 4.9, tags: ["إشراف هندسي", "ضمان 10 سنوات", "تسليم مفتاح"] },
+  { name: "الأمانة للكهرباء", cat: "الكهرباء", catEn: "Electrical", icon: "⚡", exp: 10, projects: 320, rating: 4.8, tags: ["تأسيس", "أتمتة", "صيانة"] },
+  { name: "اللمسة الذهبية للديكور", cat: "الديكور", catEn: "Interior Design", icon: "🎨", exp: 8, projects: 95, rating: 4.7, tags: ["تصميم 3D", "تنفيذ", "تشطيبات فاخرة"] },
+  { name: "الخبراء للسباكة", cat: "السباكة", catEn: "Plumbing", icon: "🚰", exp: 12, projects: 410, rating: 4.8, tags: ["تأسيس", "عزل", "كشف تسريبات"] },
+  { name: "روائع الألمنيوم والزجاج", cat: "الألمنيوم والزجاج", catEn: "Aluminum & Glass", icon: "🪟", exp: 9, projects: 180, rating: 4.6, tags: ["واجهات", "دبل جلاس", "دروع"] },
+  { name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", catEn: "Landscaping", icon: "🌴", exp: 7, projects: 88, rating: 4.9, tags: ["لاندسكيب", "شلالات", "إضاءة"] },
 ];
 
-document.getElementById("providersGrid").innerHTML = [...PROVIDERS, ...PROVIDERS].map(p => `
+function proCard(p) {
+  return `
   <div class="pro-card">
     <div class="pro-cover"></div>
     <div class="pro-avatar">${p.icon}</div>
     <div class="pro-body">
       <h3>${p.name}</h3>
-      <div class="pro-cat">${p.cat}</div>
+      <div class="pro-cat">${LANG === "en" ? p.catEn : p.cat}</div>
       <div class="stars">${"★".repeat(Math.round(p.rating))} <span style="color:var(--muted);font-size:.85rem">${p.rating}</span></div>
       <div class="pro-meta">
-        <span>خبرة <b>${p.exp}</b> سنة</span>
+        <span><b>${p.exp}</b> ${t("exp_unit")}</span>
         <span>•</span>
-        <span><b>${p.projects}</b> مشروعًا</span>
+        <span><b>${p.projects}</b> ${t("proj_unit")}</span>
       </div>
-      <div class="pro-tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
-      <button class="pro-btn" onclick="darakRequestFlow()">اطلب عرض سعر</button>
+      <div class="pro-tags">${p.tags.map(tg => `<span>${tg}</span>`).join("")}</div>
+      <button class="pro-btn" onclick="darakRequestFlow()">${t("pro_btn")}</button>
     </div>
-  </div>
-`).join("");
+  </div>`;
+}
+function renderProviders() {
+  document.getElementById("providersGrid").innerHTML = [...PROVIDERS, ...PROVIDERS].map(proCard).join("");
+}
+
+// تطبيق اللغة على كل الواجهة
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.getElementById("langToggle").textContent = LANG === "ar" ? "🌐 EN" : "🌐 ع";
+  renderCats();
+  renderProviders();
+  renderAuthArea();
+  const dash = document.getElementById("dashboard");
+  if (dash.classList.contains("open")) openDashboard();
+}
 
 // ============ عدّاد الإحصائيات ============
 const counters = document.querySelectorAll("[data-count]");
@@ -767,6 +911,10 @@ CATEGORIES.forEach(c => {
 
 function openRequestModal() {
   document.getElementById("reqName").value = currentUser?.displayName || "";
+  if (pendingCategory) {
+    document.getElementById("reqCategory").value = pendingCategory;
+    pendingCategory = null;
+  }
   requestModal.classList.add("open");
 }
 function closeRequestModal() { requestModal.classList.remove("open"); }
@@ -847,7 +995,7 @@ document.querySelectorAll(".auth-tabs button").forEach(btn => {
     btn.classList.add("active");
     authMode = btn.dataset.tab;
     document.getElementById("registerFields").style.display = authMode === "register" ? "block" : "none";
-    document.getElementById("authSubmit").textContent = authMode === "register" ? "إنشاء الحساب ✅" : "دخول";
+    document.getElementById("authSubmit").textContent = authMode === "register" ? t("register_go") : t("login_go");
   });
 });
 
@@ -879,11 +1027,11 @@ function renderAuthArea() {
       <div class="user-chip">
         <div class="avatar">${initial}</div>
         <span>${currentUser.displayName || currentUser.email}</span>
-        <button class="logout-btn" id="logoutBtn">خروج</button>
+        <button class="logout-btn" id="logoutBtn">${t("logout")}</button>
       </div>`;
     document.getElementById("logoutBtn").addEventListener("click", logout);
   } else {
-    area.innerHTML = `<button class="btn btn-gold" id="loginBtn" style="padding:10px 22px">🔐 تسجيل الدخول</button>`;
+    area.innerHTML = `<button class="btn btn-gold" id="loginBtn" style="padding:10px 22px">🔐 ${t("login")}</button>`;
     document.getElementById("loginBtn").addEventListener("click", openAuth);
   }
 }
@@ -957,7 +1105,7 @@ authForm.addEventListener("submit", async e => {
       : "بيانات الدخول غير صحيحة", "error");
   } finally {
     btn.disabled = false;
-    btn.textContent = authMode === "register" ? "إنشاء الحساب ✅" : "دخول";
+    btn.textContent = authMode === "register" ? t("register_go") : t("login_go");
   }
 });
 
@@ -993,14 +1141,14 @@ async function openDashboard() {
   const admin = isAdmin();
   const isProvider = currentUser.role === "provider" && !admin;
 
-  document.getElementById("dashTitle").textContent = admin ? "لوحة الإدارة 👑" : isProvider ? "لوحة مقدم الخدمة 🛠️" : "لوحة مشاريعي 🏠";
+  document.getElementById("dashTitle").textContent = admin ? t("dash_admin") : isProvider ? t("dash_provider") : t("dash_client");
   document.getElementById("dashSubtitle").textContent = admin
-    ? "جميع طلبات المنصة من كل التخصصات"
+    ? t("sub_admin")
     : isProvider
-    ? `طلبات العملاء الواردة في تخصصك${currentUser.category ? ` (${currentUser.category})` : ""}`
-    : "تابع طلباتك المرسلة وتفاصيلها من هنا";
+    ? t("sub_provider") + (currentUser.category ? ` (${currentUser.category})` : "")
+    : t("sub_client");
   document.getElementById("dashActionBtn").style.display = (isProvider || admin) ? "none" : "inline-flex";
-  document.getElementById("statTotalLabel").textContent = admin ? "كل الطلبات" : isProvider ? "طلب عميل" : "طلباتي";
+  document.getElementById("statTotalLabel").textContent = admin ? t("total_admin") : isProvider ? t("total_provider") : t("total_client");
 
   // تبويبات الأدمن
   document.getElementById("adminTabs").style.display = admin ? "flex" : "none";
@@ -1067,7 +1215,7 @@ async function openDashboard() {
   } else {
     content.innerHTML = `<table class="dash-table">
       <thead><tr>
-        <th>العميل</th><th>الجوال</th><th>المدينة</th><th>التخصص</th><th>الميزانية</th><th>التفاصيل</th><th>الحالة</th>
+        <th>${t("th_client")}</th><th>${t("th_phone")}</th><th>${t("th_city")}</th><th>${t("th_cat")}</th><th>${t("th_budget")}</th><th>${t("th_details")}</th><th>${t("th_status")}</th>
       </tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td><b>${r.name || "—"}</b></td>
@@ -1076,7 +1224,7 @@ async function openDashboard() {
         <td>${r.category || "—"}</td>
         <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td style="max-width:240px">${r.details || "—"}</td>
-        <td><span class="status-badge status-new">جديد</span></td>
+        <td><span class="status-badge status-new">${t("badge_new")}</span></td>
       </tr>`).join("")}</tbody>
     </table>`;
   }
@@ -1304,6 +1452,107 @@ document.getElementById("footerForm").addEventListener("submit", async e => {
     btn.textContent = "حفظ التعديلات 💾";
   }
 });
+
+// ============================================================
+// وضع التطبيق — تبويبات سفلية + بحث + حسابي
+// ============================================================
+let pendingCategory = null;
+window.pickCategory = function(name) {
+  pendingCategory = name;
+  openRequestFlow();
+};
+
+// --- التبويبات السفلية (موبايل) ---
+let currentView = "home";
+const VIEW_MAP = {
+  home: ["heroSec", "statsSec", "categories", "how", "providers"],
+  cats: ["categories"],
+  dash: ["dashboard"],
+  account: ["accountView"]
+};
+const ALL_VIEWS = ["heroSec", "statsSec", "categories", "how", "providers", "dashboard", "accountView"];
+function isMobileView() { return window.innerWidth <= 820; }
+
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === v));
+  const sr = document.getElementById("searchResults");
+  if (sr) sr.style.display = "none";
+  if (!isMobileView()) return;
+  ALL_VIEWS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = VIEW_MAP[v].includes(id) ? "" : "none";
+  });
+  if (v === "dash") {
+    if (currentUser) { openDashboard(); }
+    else { setAuthTab("login"); openAuth(); showView("home"); return; }
+  }
+  if (v === "account") {
+    const av = document.getElementById("accountView");
+    av.style.display = "";
+    av.classList.add("open");
+    renderAccountView();
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+window.showView = showView;
+document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => showView(tb.dataset.view)));
+window.addEventListener("resize", () => {
+  if (!isMobileView()) {
+    ALL_VIEWS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && id !== "dashboard" && id !== "accountView") el.style.display = "";
+    });
+  } else {
+    showView(currentView);
+  }
+});
+
+// --- صفحة حسابي ---
+function renderAccountView() {
+  const box = document.getElementById("accountContent");
+  if (currentUser) {
+    const roleName = (currentUser.role === "provider" ? "🛠️ " : "🏠 ") + t(currentUser.role === "provider" ? "role_provider" : "role_client");
+    box.innerHTML = `
+      <div class="pro-avatar" style="margin:0 auto 14px">${(currentUser.displayName || "د").trim()[0]}</div>
+      <h3 style="color:var(--navy)">${currentUser.displayName || ""}</h3>
+      <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
+      <p style="margin:8px 0 18px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
+      <button class="submit-btn" onclick="showView('dash')" style="margin-bottom:10px">📋 ${t("tab_dash")}</button>
+      <button class="submit-btn" style="background:#f3f4f6;color:var(--muted)" onclick="logout()">${t("logout")}</button>`;
+  } else {
+    box.innerHTML = `
+      <div style="font-size:2.4rem">👤</div>
+      <h3 style="color:var(--navy);margin:8px 0">${t("account_guest")}</h3>
+      <p style="color:var(--muted);margin-bottom:18px">${t("account_guest_sub")}</p>
+      <button class="submit-btn" onclick="setAuthTab('login');openAuth()">🔐 ${t("login")}</button>
+      <button class="submit-btn" style="background:var(--navy);margin-top:10px" onclick="setAuthTab('register');openAuth()">${t("register_btn")}</button>`;
+  }
+}
+
+// --- البحث الفوري ---
+document.getElementById("searchInput").addEventListener("input", e => {
+  const q = e.target.value.trim();
+  const sec = document.getElementById("searchResults");
+  if (q.length < 2) { sec.style.display = "none"; return; }
+  const ql = q.toLowerCase();
+  const matchedCats = CATEGORIES.filter(c => c.name.includes(q) || c.en.toLowerCase().includes(ql));
+  const matchedPros = PROVIDERS.filter(p => p.name.includes(q) || p.cat.includes(q) || p.catEn.toLowerCase().includes(ql));
+  if (isMobileView() && currentView !== "home") showView("home");
+  sec.style.display = "";
+  document.getElementById("searchCats").innerHTML = matchedCats.map(c =>
+    `<button class="search-cat-chip" onclick="pickCategory('${c.name}')">${c.icon} ${LANG === "en" ? c.en : c.name}</button>`).join("");
+  document.getElementById("searchPros").innerHTML = matchedPros.map(proCard).join("");
+  document.getElementById("searchEmpty").style.display = (!matchedCats.length && !matchedPros.length) ? "" : "none";
+});
+
+// --- زر تبديل اللغة ---
+document.getElementById("langToggle").addEventListener("click", () => {
+  LANG = LANG === "ar" ? "en" : "ar";
+  localStorage.setItem("darak_lang", LANG);
+  applyLang();
+});
+applyLang();
 
 // استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
 const savedSession = localStorage.getItem("darak_session");
