@@ -260,6 +260,24 @@ footer ul a:hover{color:var(--gold-2)}
   .hero{padding-top:160px}
 }
 
+/* ===== ضبط الجوال ===== */
+@media(max-width:820px){
+  footer{display:none}
+  .hero{padding-top:150px;min-height:auto;padding-bottom:48px}
+  .hero h1{font-size:1.8rem;line-height:1.4;margin-bottom:22px}
+  .hero-badge{font-size:.78rem;padding:6px 14px}
+  .lang-toggle{padding:7px 10px;font-size:.78rem;margin-inline-end:6px}
+  #loginBtn{padding:8px 14px !important;font-size:.85rem}
+  .brand img{width:42px;height:42px;border-radius:12px}
+  .brand span{font-size:1.2rem}
+  .user-chip{gap:7px}
+  .user-chip .avatar{width:34px;height:34px;border-radius:10px;font-size:.9rem}
+  .user-chip span{font-size:.85rem;max-width:105px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .logout-btn{padding:6px 10px;font-size:.76rem}
+}
+.marquee .pro-card{flex:0 0 215px}
+.pro-card .pro-avatar{width:68px;height:68px;border-radius:18px;font-size:1.6rem}
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
   .cats-grid{grid-template-columns:repeat(3,1fr)}
@@ -297,14 +315,8 @@ footer ul a:hover{color:var(--gold-2)}
       <img src="assets/logo.png" alt="شعار دارك">
       <span>دا<b>رك</b></span>
     </a>
-    <nav class="nav-links" id="navLinks">
-      <a href="#categories" data-i18n="nav_cats">التخصصات</a>
-      <a href="#how" data-i18n="nav_how">كيف نعمل</a>
-      <a href="#providers" data-i18n="nav_providers">مقدمو الخدمة</a>
-    </nav>
     <button class="lang-toggle" id="langToggle" type="button">🌐 EN</button>
     <div id="authArea" style="display:flex;align-items:center"></div>
-    <button class="menu-toggle" id="menuToggle" aria-label="القائمة">☰</button>
   </div>
   <div class="container search-row">
     <div class="search-box">
@@ -320,7 +332,7 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="hero-center">
       <div class="hero-badge" data-i18n="hero_badge">منصة البناء والتشطيب الأولى في سلطنة عمان</div>
       <h1><span data-i18n="hero_t1">من أول خطوة..</span><br><em data-i18n="hero_t2">لبيت أحلامك</em></h1>
-      <p data-i18n="hero_desc">دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
+      
       <div class="hero-cta">
         <button class="btn btn-gold" id="btnRequestService" data-i18n="btn_request">📋 اطلب خدمة الآن</button>
         <button class="btn btn-outline" id="btnJoinProvider" data-i18n="btn_join">🤝 سجّل كمقدم خدمة</button>
@@ -341,16 +353,6 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </section>
 
-<!-- ================= Stats ================= -->
-<div class="stats" id="statsSec">
-  <div class="stats-grid">
-    <div class="stat"><b data-count="12">0</b><span data-i18n="stat_cats">تخصصًا في البناء</span></div>
-    <div class="stat"><b data-count="500">0</b><span data-i18n="stat_providers">مقدم خدمة</span></div>
-    <div class="stat"><b data-count="1200">0</b><span data-i18n="stat_projects">مشروع مكتمل</span></div>
-    <div class="stat"><b data-count="98">0</b><span data-i18n="stat_satisfaction">% رضا العملاء</span></div>
-  </div>
-</div>
-
 <!-- ================= Categories ================= -->
 <section id="categories">
   <div class="container">
@@ -365,38 +367,6 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </section>
 
-<!-- ================= How it works ================= -->
-<section class="how" id="how">
-  <div class="container">
-    <div class="sec-head">
-      <span class="sec-tag" data-i18n="how_tag">آلية العمل</span>
-      <h2 data-i18n="how_title">كيف تعمل منصة دارك؟</h2>
-      <p data-i18n="how_sub">أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3 data-i18n="s1t">اطلب خدمتك</h3>
-        <p data-i18n="s1d">حدّد التخصص وموقع المشروع وميزانيتك من خلال نموذج بسيط</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3 data-i18n="s2t">استقبل العروض</h3>
-        <p data-i18n="s2d">يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3 data-i18n="s3t">قارن واختر</h3>
-        <p data-i18n="s3d">قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h3 data-i18n="s4t">تابع حتى التسليم</h3>
-        <p data-i18n="s4d">تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ================= Providers ================= -->
 <section id="providers">
@@ -543,6 +513,10 @@ footer ul a:hover{color:var(--gold-2)}
           <label data-i18n="name_lbl">الاسم الكامل / اسم المنشأة</label>
           <input type="text" name="displayName" placeholder="مثال: محمد العتيبي">
         </div>
+        <div class="form-group">
+          <label data-i18n="reg_phone">رقم الجوال</label>
+          <input type="tel" name="phone" placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
+        </div>
         <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px">نوع الحساب</label>
         <div class="role-picker">
           <div class="role-option active" data-role="client">
@@ -568,6 +542,9 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="form-group">
         <label data-i18n="pass_lbl">كلمة المرور</label>
         <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right">
+      </div>
+      <div style="text-align:left;margin:-6px 0 14px">
+        <a href="#" id="forgotPass" style="color:var(--gold);font-size:.85rem;font-weight:700" data-i18n="forgot">نسيت كلمة المرور؟</a>
       </div>
       <button type="submit" class="submit-btn" id="authSubmit" data-i18n="login_go">دخول</button>
     </form>
@@ -675,7 +652,7 @@ let db = null, auth = null;
 let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
 let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
-let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null;
+let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
 
 if (FIREBASE_READY) {
   try {
@@ -699,6 +676,8 @@ if (FIREBASE_READY) {
     signInFn = authMod.signInWithEmailAndPassword;
     signOutFn = authMod.signOut;
     updateProfileFn = authMod.updateProfile;
+    onAuthStateFn = authMod.onAuthStateChanged;
+    sendResetFn = authMod.sendPasswordResetEmail;
     console.log("✅ Firebase متصل");
   } catch (e) {
     console.warn("⚠️ تعذر الاتصال بـ Firebase — الوضع التجريبي", e);
@@ -754,7 +733,12 @@ const I18N = {
     tab_login: "تسجيل الدخول", tab_register: "حساب جديد", name_lbl: "الاسم الكامل / اسم المنشأة", email_lbl: "البريد الإلكتروني", pass_lbl: "كلمة المرور", cat_lbl: "تخصصك",
     req_title: "📋 اطلب خدمة لمشروعك", req_sub: "عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب",
     req_name: "الاسم الكامل *", phone_lbl: "رقم الجوال *", city_lbl: "المدينة *", req_cat: "التخصص المطلوب *", budget_lbl: "الميزانية التقريبية (ر.ع)", details_lbl: "تفاصيل المشروع *", send_req: "إرسال الطلب 🚀",
-    f_cats: "التخصصات", f_platform: "المنصة", f_contact: "تواصل معنا", rights: "جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠"
+    f_cats: "التخصصات", f_platform: "المنصة", f_contact: "تواصل معنا", rights: "جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠",
+    reg_phone: "رقم الجوال", forgot: "نسيت كلمة المرور؟",
+    forgot_need_email: "اكتب بريدك الإلكتروني أولًا في الخانة ثم اضغط نسيت كلمة المرور",
+    forgot_sent: "تم إرسال رابط إعادة تعيين كلمة المرور لبريدك 📧",
+    forgot_err: "تعذر الإرسال — تأكد من البريد أو أن الحساب موجود",
+    forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -784,7 +768,12 @@ const I18N = {
     tab_login: "Sign in", tab_register: "New account", name_lbl: "Full name / Business name", email_lbl: "Email", pass_lbl: "Password", cat_lbl: "Your trade",
     req_title: "📋 Request a service", req_sub: "Fill the details and providers in this trade will see your request",
     req_name: "Full name *", phone_lbl: "Phone *", city_lbl: "City *", req_cat: "Required trade *", budget_lbl: "Approx. budget (OMR)", details_lbl: "Project details *", send_req: "Send request 🚀",
-    f_cats: "Services", f_platform: "Platform", f_contact: "Contact us", rights: "All rights reserved | From the first step to your dream home 🏠"
+    f_cats: "Services", f_platform: "Platform", f_contact: "Contact us", rights: "All rights reserved | From the first step to your dream home 🏠",
+    reg_phone: "Phone number", forgot: "Forgot password?",
+    forgot_need_email: "Enter your email in the field first, then tap Forgot password",
+    forgot_sent: "Password reset link sent to your email 📧",
+    forgot_err: "Could not send — check the email or that the account exists",
+    forgot_demo: "Password reset requires Firebase"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -813,19 +802,12 @@ const PROVIDERS = [
 function proCard(p) {
   return `
   <div class="pro-card">
-    <div class="pro-cover"></div>
-    <div class="pro-avatar">${p.icon}</div>
-    <div class="pro-body">
-      <h3>${p.name}</h3>
+    <div class="pro-avatar" style="margin-top:20px">${p.icon}</div>
+    <div class="pro-body" style="padding:12px 12px 16px">
+      <h3 style="font-size:.95rem">${p.name}</h3>
       <div class="pro-cat">${LANG === "en" ? p.catEn : p.cat}</div>
-      <div class="stars">${"★".repeat(Math.round(p.rating))} <span style="color:var(--muted);font-size:.85rem">${p.rating}</span></div>
-      <div class="pro-meta">
-        <span><b>${p.exp}</b> ${t("exp_unit")}</span>
-        <span>•</span>
-        <span><b>${p.projects}</b> ${t("proj_unit")}</span>
-      </div>
-      <div class="pro-tags">${p.tags.map(tg => `<span>${tg}</span>`).join("")}</div>
-      <button class="pro-btn" onclick="darakRequestFlow()">${t("pro_btn")}</button>
+      <div class="stars" style="margin-top:6px">${"★".repeat(Math.round(p.rating))} <span style="color:var(--muted);font-size:.82rem">${p.rating}</span></div>
+      <button class="pro-btn" style="margin-top:12px" onclick="darakRequestFlow()">${t("pro_btn")}</button>
     </div>
   </div>`;
 }
@@ -847,33 +829,10 @@ function applyLang() {
   if (dash.classList.contains("open")) openDashboard();
 }
 
-// ============ عدّاد الإحصائيات ============
-const counters = document.querySelectorAll("[data-count]");
-const counterObs = new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    const el = en.target;
-    const target = +el.dataset.count;
-    let cur = 0;
-    const step = Math.max(1, Math.ceil(target / 60));
-    const t = setInterval(() => {
-      cur += step;
-      if (cur >= target) { cur = target; clearInterval(t); }
-      el.textContent = target === 98 ? cur : "+" + cur.toLocaleString("ar");
-    }, 24);
-    counterObs.unobserve(el);
-  });
-}, { threshold: .5 });
-counters.forEach(c => counterObs.observe(c));
-
 // ============ الهيدر والقائمة ============
 const header = document.getElementById("header");
 header.classList.add("scrolled");
 window.addEventListener("scroll", () => header.classList.toggle("scrolled", window.scrollY > 30 || true));
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
-menuToggle.addEventListener("click", () => navLinks.classList.toggle("open"));
-navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => navLinks.classList.remove("open")));
 
 // ============ Toast ============
 function showToast(msg, type = "success") {
@@ -963,6 +922,10 @@ function openJoinFlow() {
   setAuthTab("register"); setRole("provider"); openAuth();
 }
 window.darakRequestFlow = openRequestFlow;
+window.openAuth = openAuth;
+window.logout = logout;
+window.setAuthTab = setAuthTab;
+window.setRole = setRole;
 
 document.getElementById("btnRequestService").addEventListener("click", openRequestFlow);
 document.getElementById("btnJoinProvider").addEventListener("click", openJoinFlow);
@@ -1055,6 +1018,7 @@ authForm.addEventListener("submit", async e => {
           displayName: fd.displayName || fd.email,
           role: selectedRole,
           category: selectedRole === "provider" ? fd.category : "",
+          phone: fd.phone || "",
           status: selectedRole === "provider" ? "pending" : "approved",
           statusReason: ""
         };
@@ -1078,6 +1042,7 @@ authForm.addEventListener("submit", async e => {
           displayName: fd.displayName || fd.email,
           role: selectedRole,
           category: selectedRole === "provider" ? fd.category : "",
+          phone: fd.phone || "",
           status: selectedRole === "provider" ? "pending" : "approved",
           statusReason: ""
         };
@@ -1106,6 +1071,24 @@ authForm.addEventListener("submit", async e => {
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === "register" ? t("register_go") : t("login_go");
+  }
+});
+
+// نسيت كلمة المرور — إرسال رابط إعادة التعيين للبريد
+document.getElementById("forgotPass").addEventListener("click", async e => {
+  e.preventDefault();
+  const email = authForm.querySelector('input[name="email"]').value.trim();
+  if (!email) { showToast(t("forgot_need_email"), "error"); return; }
+  if (auth && sendResetFn) {
+    try {
+      await sendResetFn(auth, email);
+      showToast(t("forgot_sent"));
+    } catch (err) {
+      console.error(err);
+      showToast(t("forgot_err"), "error");
+    }
+  } else {
+    showToast(t("forgot_demo"), "error");
   }
 });
 
@@ -1272,7 +1255,7 @@ async function loadUsersTable() {
     return;
   }
   box.innerHTML = `<table class="dash-table"><thead><tr>
-    <th>الاسم</th><th>البريد</th><th>النوع</th><th>التخصص</th><th>الحالة</th><th>السبب</th><th>إجراءات</th>
+    <th>الاسم</th><th>البريد</th><th>الجوال</th><th>النوع</th><th>التخصص</th><th>الحالة</th><th>السبب</th><th>إجراءات</th>
   </tr></thead><tbody>${users.map(u => {
     const st = u.status || "approved";
     const [lbl, cls] = STATUS_LABELS[st] || STATUS_LABELS.approved;
@@ -1286,6 +1269,7 @@ async function loadUsersTable() {
     return `<tr>
       <td><b>${u.displayName || "—"}</b></td>
       <td dir="ltr" style="font-size:.82rem">${u.email || "—"}</td>
+      <td>${u.phone ? `<a href="https://wa.me/${waNumber(u.phone)}" target="_blank" style="color:var(--gold);font-weight:700" dir="ltr">💬 ${u.phone}</a>` : "—"}</td>
       <td>${roleName}</td>
       <td>${u.category || "—"}</td>
       <td><span class="status-badge ${cls}">${lbl}</span></td>
@@ -1465,12 +1449,12 @@ window.pickCategory = function(name) {
 // --- التبويبات السفلية (موبايل) ---
 let currentView = "home";
 const VIEW_MAP = {
-  home: ["heroSec", "statsSec", "categories", "how", "providers"],
+  home: ["heroSec", "categories", "providers"],
   cats: ["categories"],
   dash: ["dashboard"],
   account: ["accountView"]
 };
-const ALL_VIEWS = ["heroSec", "statsSec", "categories", "how", "providers", "dashboard", "accountView"];
+const ALL_VIEWS = ["heroSec", "categories", "providers", "dashboard", "accountView"];
 function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
@@ -1560,6 +1544,25 @@ if (savedSession && !auth) {
   try { currentUser = JSON.parse(savedSession); } catch (e) {}
 }
 renderAuthArea();
+
+// استعادة جلسة Firebase تلقائيًا (يبقى المستخدم مسجلًا حتى بعد تحديث الصفحة)
+if (auth && onAuthStateFn) {
+  onAuthStateFn(auth, async user => {
+    if (user && !currentUser) {
+      try {
+        const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", user.uid)));
+        currentUser = snap.docs.length
+          ? snap.docs[0].data()
+          : { uid: user.uid, email: user.email, displayName: user.displayName || user.email, role: "client", category: "" };
+        renderAuthArea();
+      } catch (e) { console.warn("تعذر استعادة الجلسة", e); }
+    } else if (!user && currentUser) {
+      currentUser = null;
+      renderAuthArea();
+      document.getElementById("dashboard").classList.remove("open");
+    }
+  });
+}
 </script>
 </body>
 </html>
