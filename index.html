@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دارك | من أول خطوة.. لبيت أحلامك</title>
+<meta name="description" content="منصة دارك تربط أصحاب المنازل قيد الإنشاء بأفضل المقاولين ومقدمي الخدمات — من الأساس حتى التشطيب.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16283a;
+  --navy-2:#1e3550;
+  --navy-3:#0f1c2b;
+  --gold:#b98d4e;
+  --gold-2:#d4af6e;
+  --gold-soft:#f3ead9;
+  --bg:#f7f6f3;
+  --card:#ffffff;
+  --text:#22303f;
+  --muted:#6b7a89;
+  --radius:18px;
+  --shadow:0 10px 30px rgba(22,40,58,.08);
+  --shadow-lg:0 20px 50px rgba(22,40,58,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:1rem}
+.container{width:min(1200px,92%);margin-inline:auto}
+
+/* ===== Header ===== */
+header{position:fixed;inset-inline:0;top:0;z-index:100;transition:.3s;background:rgba(22,40,58,.0)}
+header.scrolled{background:rgba(22,40,58,.96);backdrop-filter:blur(12px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:52px;height:52px;border-radius:14px;background:#fff;padding:4px;box-shadow:var(--shadow)}
+.brand span{color:#fff;font-weight:900;font-size:1.5rem;letter-spacing:.5px}
+.brand span b{color:var(--gold-2)}
+.nav-links{display:flex;gap:26px;align-items:center}
+.nav-links a{color:#e8edf2;font-weight:500;font-size:.98rem;transition:.2s}
+.nav-links a:hover{color:var(--gold-2)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:14px;font-weight:700;font-size:1rem;transition:.25s}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;box-shadow:0 8px 20px rgba(185,141,78,.35)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(185,141,78,.45)}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)}
+.btn-outline:hover{border-color:var(--gold-2);color:var(--gold-2)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-2)}
+.menu-toggle{display:none;background:none;color:#fff;font-size:1.7rem}
+
+/* ===== Hero ===== */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;background:linear-gradient(160deg,var(--navy-3) 0%,var(--navy) 55%,var(--navy-2) 100%);overflow:hidden;padding:130px 0 70px}
+.hero::before{content:'';position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(185,141,78,.22),transparent 65%);top:-180px;left:-160px}
+.hero::after{content:'';position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(185,141,78,.14),transparent 65%);bottom:-200px;right:-120px}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center;position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(185,141,78,.15);border:1px solid rgba(185,141,78,.4);color:var(--gold-2);padding:8px 18px;border-radius:100px;font-weight:700;font-size:.9rem;margin-bottom:22px}
+.hero h1{color:#fff;font-size:clamp(2.1rem,4.5vw,3.4rem);font-weight:900;line-height:1.35;margin-bottom:18px}
+.hero h1 em{font-style:normal;color:var(--gold-2)}
+.hero p{color:#c3cfdb;font-size:1.15rem;max-width:540px;margin-bottom:32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+.hero-visual{position:relative;display:flex;justify-content:center}
+.hero-logo-card{background:#fff;border-radius:34px;padding:44px;box-shadow:var(--shadow-lg);transform:rotate(-3deg);transition:.4s;max-width:380px}
+.hero-logo-card:hover{transform:rotate(0deg) scale(1.02)}
+.hero-logo-card img{width:100%;border-radius:20px}
+.float-chip{position:absolute;background:#fff;border-radius:16px;padding:10px 18px;box-shadow:var(--shadow-lg);font-weight:700;color:var(--navy);font-size:.92rem;display:flex;align-items:center;gap:8px;animation:float 4s ease-in-out infinite}
+.float-chip i{font-style:normal}
+.chip1{top:6%;right:-4%}
+.chip2{bottom:14%;left:-6%;animation-delay:1.2s}
+.chip3{top:44%;left:-10%;animation-delay:2s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ===== Stats ===== */
+.stats{background:var(--gold);padding:0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:30px 10px;text-align:center;color:#fff;border-inline-start:1px solid rgba(255,255,255,.25)}
+.stat:first-child{border-inline-start:none}
+.stat b{display:block;font-size:2rem;font-weight:900}
+.stat span{font-size:.95rem;opacity:.92}
+
+/* ===== Sections ===== */
+section{padding:90px 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 54px}
+.sec-tag{display:inline-block;background:var(--gold-soft);color:var(--gold);font-weight:800;padding:7px 20px;border-radius:100px;font-size:.88rem;margin-bottom:14px}
+.sec-head h2{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:900;color:var(--navy);margin-bottom:12px}
+.sec-head p{color:var(--muted);font-size:1.06rem}
+
+/* ===== Categories ===== */
+.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.cat-card{background:var(--card);border-radius:var(--radius);padding:30px 22px;text-align:center;box-shadow:var(--shadow);transition:.3s;border:2px solid transparent;position:relative;overflow:hidden}
+.cat-card::after{content:'';position:absolute;inset-inline:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-2));transform:scaleX(0);transition:.3s}
+.cat-card:hover{transform:translateY(-8px);border-color:var(--gold-soft);box-shadow:var(--shadow-lg)}
+.cat-card:hover::after{transform:scaleX(1)}
+.cat-icon{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(135deg,var(--navy),var(--navy-2));display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 8px 18px rgba(22,40,58,.25)}
+.cat-card h3{color:var(--navy);font-size:1.08rem;font-weight:800;margin-bottom:6px}
+.cat-card p{color:var(--muted);font-size:.86rem}
+.cat-count{display:inline-block;margin-top:12px;font-size:.78rem;font-weight:700;color:var(--gold);background:var(--gold-soft);padding:4px 14px;border-radius:100px}
+
+/* ===== How it works ===== */
+.how{background:linear-gradient(160deg,var(--navy-3),var(--navy));position:relative}
+.how .sec-head h2{color:#fff}
+.how .sec-head p{color:#b9c6d3}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;position:relative}
+.step{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:34px 24px;text-align:center;transition:.3s}
+.step:hover{background:rgba(185,141,78,.12);border-color:rgba(185,141,78,.4);transform:translateY(-6px)}
+.step-num{width:56px;height:56px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;font-weight:900;font-size:1.35rem;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(185,141,78,.4)}
+.step h3{color:#fff;font-size:1.1rem;font-weight:800;margin-bottom:8px}
+.step p{color:#a9b8c6;font-size:.9rem}
+
+/* ===== Providers ===== */
+.providers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.pro-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:.3s}
+.pro-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.pro-cover{height:120px;background:linear-gradient(135deg,var(--navy),var(--navy-2));position:relative}
+.pro-cover::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(185,141,78,.35),transparent 55%)}
+.pro-avatar{width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,var(--gold),var(--gold-2));border:4px solid #fff;margin:-42px auto 0;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;font-weight:900;box-shadow:var(--shadow)}
+.pro-body{padding:20px 24px 26px;text-align:center}
+.pro-body h3{color:var(--navy);font-size:1.15rem;font-weight:800}
+.pro-cat{color:var(--gold);font-weight:700;font-size:.9rem;margin:4px 0 10px}
+.pro-meta{display:flex;justify-content:center;gap:16px;color:var(--muted);font-size:.85rem;margin-bottom:14px}
+.pro-meta b{color:var(--navy)}
+.stars{color:var(--gold);font-size:1.05rem;letter-spacing:2px}
+.pro-tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pro-tags span{background:var(--bg);color:var(--muted);font-size:.78rem;padding:4px 12px;border-radius:100px;font-weight:500}
+.pro-btn{margin-top:18px;width:100%;padding:11px;border-radius:12px;background:var(--navy);color:#fff;font-weight:700;transition:.25s}
+.pro-btn:hover{background:var(--gold)}
+
+/* ===== Forms (Post project / Join) ===== */
+.cta-section{background:linear-gradient(135deg,var(--gold-soft),#faf5ea)}
+.forms-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:start}
+.form-card{background:#fff;border-radius:22px;padding:38px 34px;box-shadow:var(--shadow-lg);border-top:5px solid var(--gold)}
+.form-card h3{color:var(--navy);font-size:1.4rem;font-weight:900;margin-bottom:6px}
+.form-card>p{color:var(--muted);font-size:.94rem;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:700;color:var(--navy);font-size:.9rem;margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:13px 16px;border:2px solid #e7e3da;border-radius:12px;background:#fbfaf7;transition:.2s;color:var(--text)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);background:#fff;box-shadow:0 0 0 4px rgba(185,141,78,.12)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.submit-btn{width:100%;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;font-weight:800;font-size:1.05rem;transition:.25s;box-shadow:0 8px 20px rgba(185,141,78,.3)}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(185,141,78,.4)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.form-note{margin-top:14px;text-align:center;font-size:.82rem;color:var(--muted)}
+
+/* ===== Toast ===== */
+.toast{position:fixed;bottom:26px;inset-inline-start:50%;transform:translateX(50%) translateY(120px);background:var(--navy);color:#fff;padding:16px 30px;border-radius:14px;box-shadow:var(--shadow-lg);font-weight:700;z-index:200;transition:.4s;display:flex;align-items:center;gap:10px}
+.toast.show{transform:translateX(50%) translateY(0)}
+.toast.success{border-inline-start:5px solid #4ade80}
+.toast.error{border-inline-start:5px solid #f87171}
+
+/* ===== Footer ===== */
+footer{background:var(--navy-3);color:#b9c6d3;padding:64px 0 0}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:44px}
+.footer-brand img{width:64px;border-radius:14px;background:#fff;padding:4px;margin-bottom:16px}
+.footer-brand h4{color:#fff;font-size:1.4rem;font-weight:900;margin-bottom:8px}
+.footer-brand p{font-size:.92rem;max-width:300px}
+footer h5{color:#fff;font-weight:800;margin-bottom:16px;font-size:1.02rem}
+footer ul{list-style:none}
+footer ul li{margin-bottom:10px}
+footer ul a{font-size:.92rem;transition:.2s}
+footer ul a:hover{color:var(--gold-2)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding:20px 0;text-align:center;font-size:.86rem}
+.footer-bottom b{color:var(--gold-2)}
+
+/* ===== Auth Modal ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,28,43,.7);backdrop-filter:blur(6px);z-index:150;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:22px;width:min(440px,100%);max-height:92vh;overflow-y:auto;padding:38px 34px;box-shadow:var(--shadow-lg);position:relative;border-top:5px solid var(--gold);animation:pop .3s}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{position:absolute;top:16px;left:18px;background:none;font-size:1.4rem;color:var(--muted)}
+.modal h3{color:var(--navy);font-size:1.4rem;font-weight:900;margin-bottom:4px;text-align:center}
+.modal>p{color:var(--muted);font-size:.9rem;text-align:center;margin-bottom:20px}
+.auth-tabs{display:flex;background:var(--bg);border-radius:12px;padding:5px;margin-bottom:20px}
+.auth-tabs button{flex:1;padding:10px;border-radius:9px;background:none;font-weight:700;color:var(--muted);transition:.2s}
+.auth-tabs button.active{background:var(--navy);color:#fff}
+.role-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.role-option{border:2px solid #e7e3da;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:.2s}
+.role-option.active{border-color:var(--gold);background:var(--gold-soft)}
+.role-option .r-icon{font-size:1.6rem}
+.role-option b{display:block;color:var(--navy);font-size:.95rem;margin-top:4px}
+
+/* ===== Dashboard ===== */
+.dashboard{display:none}
+.dashboard.open{display:block}
+.dash-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:30px}
+.dash-head h2{color:var(--navy);font-size:1.6rem;font-weight:900}
+.dash-head p{color:var(--muted)}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:30px}
+.dash-stat{background:#fff;border-radius:16px;padding:22px;box-shadow:var(--shadow);text-align:center;border-bottom:4px solid var(--gold)}
+.dash-stat b{display:block;font-size:1.8rem;font-weight:900;color:var(--navy)}
+.dash-stat span{color:var(--muted);font-size:.9rem}
+.dash-table-wrap{background:#fff;border-radius:18px;box-shadow:var(--shadow);overflow:hidden;overflow-x:auto}
+.dash-table{width:100%;border-collapse:collapse;min-width:760px}
+.dash-table th{background:var(--navy);color:#fff;padding:14px 16px;font-size:.88rem;text-align:right;font-weight:700;white-space:nowrap}
+.dash-table td{padding:14px 16px;border-bottom:1px solid #eee;font-size:.9rem;vertical-align:top}
+.dash-table tr:last-child td{border-bottom:none}
+.status-badge{display:inline-block;padding:4px 14px;border-radius:100px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.status-new{background:#e0f2fe;color:#0369a1}
+.dash-empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.dash-empty .big{font-size:2.6rem;margin-bottom:10px}
+.user-chip{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:.95rem}
+.user-chip .avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0}
+.logout-btn{background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 14px;font-size:.85rem;font-weight:700;transition:.2s}
+.logout-btn:hover{background:rgba(255,255,255,.22)}
+
+/* ===== Responsive ===== */
+@media(max-width:1024px){
+  .cats-grid{grid-template-columns:repeat(3,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .providers-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:820px){
+  .hero-grid{grid-template-columns:1fr;text-align:center}
+  .hero p{margin-inline:auto}
+  .hero-cta{justify-content:center}
+  .nav-links{position:fixed;inset-inline:0;top:76px;background:var(--navy-3);flex-direction:column;padding:26px;gap:18px;transform:translateY(-140%);transition:.35s;box-shadow:0 20px 40px rgba(0,0,0,.4)}
+  .nav-links.open{transform:translateY(0)}
+  .menu-toggle{display:block}
+  .nav-cta{display:none}
+  .forms-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .cats-grid{grid-template-columns:repeat(2,1fr)}
+  .providers-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  section{padding:64px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= Header ================= -->
+<header id="header">
+  <div class="container nav">
+    <a href="#" class="brand">
+      <img src="assets/logo.png" alt="شعار دارك">
+      <span>دا<b>رك</b></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#categories">التخصصات</a>
+      <a href="#how">كيف نعمل</a>
+      <a href="#providers">مقدمو الخدمة</a>
+      <a href="#post">اطلب خدمة</a>
+      <a href="#join">سجّل كمقدم خدمة</a>
+    </nav>
+    <a href="#post" class="btn btn-gold nav-cta">ابدأ مشروعك</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="القائمة">☰</button>
+  </div>
+</header>
+
+<!-- ================= Hero ================= -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="hero-badge">🏗️ منصة البناء والتشطيب الأولى</div>
+      <h1>من أول خطوة..<br>لـ <em>بيت أحلامك</em></h1>
+      <p>دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.</p>
+      <div class="hero-cta">
+        <a href="#post" class="btn btn-gold">📋 اطلب خدمة الآن</a>
+        <a href="#join" class="btn btn-outline">🤝 سجّل كمقدم خدمة</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="float-chip chip1"><i>🧱</i> مقاولون معتمدون</div>
+      <div class="float-chip chip2"><i>⚡</i> كهرباء وسباكة</div>
+      <div class="float-chip chip3"><i>🏠</i> منازل ذكية</div>
+      <div class="hero-logo-card">
+        <img src="assets/logo.png" alt="دارك — من أول خطوة لبيت أحلامك">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Stats ================= -->
+<div class="stats">
+  <div class="stats-grid">
+    <div class="stat"><b data-count="12">0</b><span>تخصصًا في البناء</span></div>
+    <div class="stat"><b data-count="500">0</b><span>مقدم خدمة</span></div>
+    <div class="stat"><b data-count="1200">0</b><span>مشروع مكتمل</span></div>
+    <div class="stat"><b data-count="98">0</b><span>% رضا العملاء</span></div>
+  </div>
+</div>
+
+<!-- ================= Categories ================= -->
+<section id="categories">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-tag">التخصصات</span>
+      <h2>كل ما يحتاجه بيتك في مكان واحد</h2>
+      <p>من الأساس حتى المفتاح — تصفح التخصصات واختر مقدم الخدمة المناسب لمشروعك</p>
+    </div>
+    <div class="cats-grid" id="catsGrid"></div>
+  </div>
+</section>
+
+<!-- ================= How it works ================= -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-tag">آلية العمل</span>
+      <h2>كيف تعمل منصة دارك؟</h2>
+      <p>أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>اطلب خدمتك</h3>
+        <p>حدّد التخصص وموقع المشروع وميزانيتك من خلال نموذج بسيط</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>استقبل العروض</h3>
+        <p>يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>قارن واختر</h3>
+        <p>قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>تابع حتى التسليم</h3>
+        <p>تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Providers ================= -->
+<section id="providers">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-tag">مقدمو الخدمة</span>
+      <h2>نخبة من أمهر الحرفيين والشركات</h2>
+      <p>مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع</p>
+    </div>
+    <div class="providers-grid" id="providersGrid"></div>
+  </div>
+</section>
+
+<!-- ================= Forms ================= -->
+<section class="cta-section" id="post">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-tag">ابدأ الآن</span>
+      <h2>اطلب خدمة أو انضم كمقدم خدمة</h2>
+      <p>سواء كنت تبني بيتك أو تملك مشروعًا في مجال المنازل — دارك مكانك</p>
+    </div>
+    <div class="forms-grid">
+
+      <!-- نموذج طلب خدمة -->
+      <div class="form-card">
+        <h3>📋 اطلب خدمة لمشروعك</h3>
+        <p>عبّئ البيانات وسيصلك عروض من مقدمي الخدمة في منطقتك</p>
+        <form id="requestForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>الاسم الكامل *</label>
+              <input type="text" name="name" required placeholder="مثال: محمد العتيبي">
+            </div>
+            <div class="form-group">
+              <label>رقم الجوال *</label>
+              <input type="tel" name="phone" required placeholder="05xxxxxxxx" pattern="[0-9+]{9,15}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>المدينة *</label>
+              <input type="text" name="city" required placeholder="مثال: الرياض">
+            </div>
+            <div class="form-group">
+              <label>التخصص المطلوب *</label>
+              <select name="category" required id="categorySelect">
+                <option value="">اختر التخصص…</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>الميزانية التقريبية (ر.س)</label>
+            <input type="number" name="budget" min="0" placeholder="اختياري">
+          </div>
+          <div class="form-group">
+            <label>تفاصيل المشروع *</label>
+            <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">إرسال الطلب 🚀</button>
+          <div class="form-note">بإرسالك الطلب أنت توافق على مشاركة بياناتك مع مقدمي الخدمة المؤهلين</div>
+        </form>
+      </div>
+
+      <!-- نموذج تسجيل مقدم خدمة -->
+      <div class="form-card" id="join">
+        <h3>🤝 سجّل كمقدم خدمة</h3>
+        <p>انضم لشبكة دارك وابدأ باستقبال مشاريع جديدة في تخصصك</p>
+        <form id="providerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>اسم المنشأة / الحرفي *</label>
+              <input type="text" name="business" required placeholder="مثال: مؤسسة البنيان">
+            </div>
+            <div class="form-group">
+              <label>رقم الجوال *</label>
+              <input type="tel" name="phone" required placeholder="05xxxxxxxx" pattern="[0-9+]{9,15}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>التخصص *</label>
+              <select name="category" required id="providerCategorySelect">
+                <option value="">اختر التخصص…</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>سنوات الخبرة *</label>
+              <input type="number" name="experience" min="0" max="60" required placeholder="مثال: 8">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>المدينة / نطاق العمل *</label>
+            <input type="text" name="city" required placeholder="مثال: جدة ومكة">
+          </div>
+          <div class="form-group">
+            <label>نبذة عن أعمالك</label>
+            <textarea name="bio" rows="3" placeholder="أبرز المشاريع السابقة، الضمانات، المميزات…"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">إرسال طلب الانضمام ✅</button>
+          <div class="form-note">سيتم مراجعة طلبك والتواصل معك خلال 48 ساعة</div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= Footer ================= -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="دارك">
+        <h4>دارك</h4>
+        <p>منصة تربط أصحاب المنازل قيد الإنشاء بأفضل مقدمي الخدمات — من أول خطوة.. لبيت أحلامك.</p>
+      </div>
+      <div>
+        <h5>التخصصات</h5>
+        <ul>
+          <li><a href="#categories">المقاولون</a></li>
+          <li><a href="#categories">مواد البناء</a></li>
+          <li><a href="#categories">الكهرباء والسباكة</a></li>
+          <li><a href="#categories">الديكور والأثاث</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>المنصة</h5>
+        <ul>
+          <li><a href="#how">كيف نعمل</a></li>
+          <li><a href="#providers">مقدمو الخدمة</a></li>
+          <li><a href="#post">اطلب خدمة</a></li>
+          <li><a href="#join">انضم إلينا</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>تواصل معنا</h5>
+        <ul>
+          <li><a href="/cdn-cgi/l/email-protection#c1a8afa7ae81a5a0b3a0aaefa0b1b1">📧 <span class="__cf_email__" data-cfemail="b6dfd8d0d9f6d2d7c4d7dd98d7c6c6">[email&#160;protected]</span></a></li>
+          <li><a href="tel:+966500000000">📞 0500 000 000</a></li>
+          <li><a href="#">📍 المملكة العربية السعودية</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      جميع الحقوق محفوظة © <span id="year"></span> — <b>دارك</b> | من أول خطوة.. لبيت أحلامك 🏠
+    </div>
+  </div>
+</footer>
+
+<!-- ================= نافذة تسجيل الدخول / إنشاء حساب ================= -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" id="authClose" aria-label="إغلاق">✕</button>
+    <h3>مرحبًا بك في دارك 🏠</h3>
+    <p>سجّل دخولك أو أنشئ حسابًا جديدًا</p>
+    <div class="auth-tabs">
+      <button type="button" class="active" data-tab="login">تسجيل الدخول</button>
+      <button type="button" data-tab="register">حساب جديد</button>
+    </div>
+    <form id="authForm">
+      <div id="registerFields" style="display:none">
+        <div class="form-group">
+          <label>الاسم الكامل / اسم المنشأة</label>
+          <input type="text" name="displayName" placeholder="مثال: محمد العتيبي">
+        </div>
+        <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px">نوع الحساب</label>
+        <div class="role-picker">
+          <div class="role-option active" data-role="client">
+            <div class="r-icon">🏠</div>
+            <b>صاحب مشروع</b>
+          </div>
+          <div class="role-option" data-role="provider">
+            <div class="r-icon">🛠️</div>
+            <b>مقدم خدمة</b>
+          </div>
+        </div>
+        <div class="form-group" id="regCategoryWrap" style="display:none">
+          <label>تخصصك</label>
+          <select name="category" id="regCategory">
+            <option value="">اختر التخصص…</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" name="email" required placeholder="you@email.com" dir="ltr" style="text-align:right">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right">
+      </div>
+      <button type="submit" class="submit-btn" id="authSubmit">دخول</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     إعداد Firebase
+     ============================================================
+     1) افتح https://console.firebase.google.com وأنشئ مشروعًا جديدًا
+     2) من Project Settings أضف Web App وانسخ بيانات firebaseConfig
+     3) فعّل Firestore Database من قائمة Build
+     4) استبدل القيم بالأسفل — وبمجرد ذلك ستُحفظ الطلبات في قاعدة
+        البيانات مباشرة. (بدون الإعداد يعمل التطبيق بوضع تجريبي
+        ويحفظ الطلبات في متصفح المستخدم فقط)
+     ============================================================ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+// ============ بيانات Firebase — مشروع دارك ============
+const firebaseConfig = {
+  apiKey: "AIzaSyBx9Mowie9zDbNH5ctGjtNKPqR88ffIMDU",
+  authDomain: "dark-a4382.firebaseapp.com",
+  projectId: "dark-a4382",
+  storageBucket: "dark-a4382.firebasestorage.app",
+  messagingSenderId: "384052348677",
+  appId: "1:384052348677:web:47606de2fe238bbd77996c"
+};
+const FIREBASE_READY = true;
+
+let db = null, auth = null;
+let addDocFn = null, collectionFn = null, serverTimestampFn = null;
+let getDocsFn = null, queryFn = null, whereFn = null;
+let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null;
+
+if (FIREBASE_READY) {
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const firestore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+    const app = initializeApp(firebaseConfig);
+    db = firestore.getFirestore(app);
+    addDocFn = firestore.addDoc;
+    collectionFn = firestore.collection;
+    serverTimestampFn = firestore.serverTimestamp;
+    getDocsFn = firestore.getDocs;
+    queryFn = firestore.query;
+    whereFn = firestore.where;
+    auth = authMod.getAuth(app);
+    createUserFn = authMod.createUserWithEmailAndPassword;
+    signInFn = authMod.signInWithEmailAndPassword;
+    signOutFn = authMod.signOut;
+    updateProfileFn = authMod.updateProfile;
+    console.log("✅ Firebase متصل");
+  } catch (e) {
+    console.warn("⚠️ تعذر الاتصال بـ Firebase — الوضع التجريبي", e);
+  }
+}
+
+// ============ التخصصات ============
+const CATEGORIES = [
+  { icon: "🏗️", name: "المقاولون", desc: "بناء وتشطيب متكامل", count: 120 },
+  { icon: "🧱", name: "مواد البناء", desc: "موردون وأسعار تنافسية", count: 85 },
+  { icon: "⚡", name: "الكهرباء", desc: "تأسيس وتشطيب وصيانة", count: 64 },
+  { icon: "🚰", name: "السباكة", desc: "تأسيس وتمديدات وأدوات صحية", count: 58 },
+  { icon: "🪵", name: "النجارة", desc: "أبواب وخزائن وأعمال خشبية", count: 42 },
+  { icon: "🏠", name: "المنازل الذكية", desc: "أتمتة وتحكم ذكي", count: 25 },
+  { icon: "🎨", name: "الديكور", desc: "تصميم داخلي وتنفيذ", count: 70 },
+  { icon: "🪟", name: "الألمنيوم والزجاج", desc: "نوافذ وواجهات ودروع", count: 38 },
+  { icon: "🛋️", name: "الأثاث", desc: "تفصيل وتوريد وتنسيق", count: 55 },
+  { icon: "🧹", name: "شركات التنظيف", desc: "تنظيف ما بعد البناء", count: 47 },
+  { icon: "🌴", name: "تنسيق الحدائق", desc: "لاندسكيب وأنسنة خارجية", count: 30 },
+  { icon: "📹", name: "الأمن والكاميرات", desc: "أنظمة مراقبة وحماية", count: 33 },
+];
+
+const catsGrid = document.getElementById("catsGrid");
+catsGrid.innerHTML = CATEGORIES.map(c => `
+  <div class="cat-card">
+    <div class="cat-icon">${c.icon}</div>
+    <h3>${c.name}</h3>
+    <p>${c.desc}</p>
+    <span class="cat-count">+${c.count} مقدم خدمة</span>
+  </div>
+`).join("");
+
+// تعبئة قوائم التخصص في النموذجين
+["categorySelect", "providerCategorySelect"].forEach(id => {
+  const sel = document.getElementById(id);
+  CATEGORIES.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.name;
+    opt.textContent = `${c.icon} ${c.name}`;
+    sel.appendChild(opt);
+  });
+});
+
+// ============ مقدمو خدمة مميزون (بيانات تعريفية) ============
+const PROVIDERS = [
+  { name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", icon: "🏗️", exp: 15, projects: 140, rating: 4.9, tags: ["إشراف هندسي", "ضمان 10 سنوات", "تسليم مفتاح"] },
+  { name: "الأمانة للكهرباء", cat: "الكهرباء", icon: "⚡", exp: 10, projects: 320, rating: 4.8, tags: ["تأسيس", "أتمتة", "صيانة"] },
+  { name: "اللمسة الذهبية للديكور", cat: "الديكور", icon: "🎨", exp: 8, projects: 95, rating: 4.7, tags: ["تصميم 3D", "تنفيذ", "تشطيبات فاخرة"] },
+  { name: "الخبراء للسباكة", cat: "السباكة", icon: "🚰", exp: 12, projects: 410, rating: 4.8, tags: ["تأسيس", "عزل", "كشف تسريبات"] },
+  { name: "روائع الألمنيوم والزجاج", cat: "الألمنيوم والزجاج", icon: "🪟", exp: 9, projects: 180, rating: 4.6, tags: ["واجهات", "دبل جلاس", "دروع"] },
+  { name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", icon: "🌴", exp: 7, projects: 88, rating: 4.9, tags: ["لاندسكيب", "شلالات", "إضاءة"] },
+];
+
+document.getElementById("providersGrid").innerHTML = PROVIDERS.map(p => `
+  <div class="pro-card">
+    <div class="pro-cover"></div>
+    <div class="pro-avatar">${p.icon}</div>
+    <div class="pro-body">
+      <h3>${p.name}</h3>
+      <div class="pro-cat">${p.cat}</div>
+      <div class="stars">${"★".repeat(Math.round(p.rating))} <span style="color:var(--muted);font-size:.85rem">${p.rating}</span></div>
+      <div class="pro-meta">
+        <span>خبرة <b>${p.exp}</b> سنة</span>
+        <span>•</span>
+        <span><b>${p.projects}</b> مشروعًا</span>
+      </div>
+      <div class="pro-tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>
+      <button class="pro-btn" onclick="document.querySelector('#post').scrollIntoView({behavior:'smooth'})">اطلب عرض سعر</button>
+    </div>
+  </div>
+`).join("");
+
+// ============ عدّاد الإحصائيات ============
+const counters = document.querySelectorAll("[data-count]");
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const el = en.target;
+    const target = +el.dataset.count;
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 60));
+    const t = setInterval(() => {
+      cur += step;
+      if (cur >= target) { cur = target; clearInterval(t); }
+      el.textContent = target === 98 ? cur : "+" + cur.toLocaleString("ar");
+    }, 24);
+    counterObs.unobserve(el);
+  });
+}, { threshold: .5 });
+counters.forEach(c => counterObs.observe(c));
+
+// ============ الهيدر والقائمة ============
+const header = document.getElementById("header");
+header.classList.add("scrolled");
+window.addEventListener("scroll", () => header.classList.toggle("scrolled", window.scrollY > 30 || true));
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+menuToggle.addEventListener("click", () => navLinks.classList.toggle("open"));
+navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => navLinks.classList.remove("open")));
+
+// ============ Toast ============
+function showToast(msg, type = "success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = (type === "success" ? "✅ " : "⚠️ ") + msg;
+  toast.className = "toast show " + type;
+  setTimeout(() => toast.classList.remove("show"), 4200);
+}
+
+// ============ حفظ البيانات (Firebase أو وضع تجريبي) ============
+async function saveToDB(collectionName, data) {
+  if (db && addDocFn) {
+    await addDocFn(collectionFn(db, collectionName), { ...data, createdAt: serverTimestampFn(), source: "darak-web" });
+    return "firebase";
+  }
+  // وضع تجريبي: حفظ محلي في المتصفح
+  const key = "darak_" + collectionName;
+  const list = JSON.parse(localStorage.getItem(key) || "[]");
+  list.push({ ...data, createdAt: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(list));
+  return "local";
+}
+
+function bindForm(formId, collectionName, successMsg) {
+  const form = document.getElementById(formId);
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = form.querySelector(".submit-btn");
+    btn.disabled = true;
+    btn.textContent = "جارٍ الإرسال…";
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+      const mode = await saveToDB(collectionName, data);
+      showToast(successMsg + (mode === "local" ? " (وضع تجريبي — اربط Firebase للحفظ السحابي)" : ""));
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      showToast("تعذر إرسال الطلب، حاول مرة أخرى", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = formId === "requestForm" ? "إرسال الطلب 🚀" : "إرسال طلب الانضمام ✅";
+    }
+  });
+}
+
+bindForm("requestForm", "service_requests", "تم استلام طلبك! سيتواصل معك مقدمو الخدمة قريبًا");
+bindForm("providerForm", "provider_applications", "تم استلام طلب انضمامك! سنراجعه ونتواصل معك خلال 48 ساعة");
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// ============================================================
+// نظام الحسابات وتسجيل الدخول
+// ============================================================
+let currentUser = null; // {uid, email, displayName, role: "client"|"provider", category}
+const authModal = document.getElementById("authModal");
+const authForm = document.getElementById("authForm");
+let authMode = "login";
+let selectedRole = "client";
+
+function openAuth() { authModal.classList.add("open"); }
+function closeAuth() { authModal.classList.remove("open"); }
+document.getElementById("authClose").addEventListener("click", closeAuth);
+authModal.addEventListener("click", e => { if (e.target === authModal) closeAuth(); });
+
+// التبويب: دخول / حساب جديد
+document.querySelectorAll(".auth-tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    authMode = btn.dataset.tab;
+    document.getElementById("registerFields").style.display = authMode === "register" ? "block" : "none";
+    document.getElementById("authSubmit").textContent = authMode === "register" ? "إنشاء الحساب ✅" : "دخول";
+  });
+});
+
+// اختيار نوع الحساب
+document.querySelectorAll(".role-option").forEach(opt => {
+  opt.addEventListener("click", () => {
+    document.querySelectorAll(".role-option").forEach(o => o.classList.remove("active"));
+    opt.classList.add("active");
+    selectedRole = opt.dataset.role;
+    document.getElementById("regCategoryWrap").style.display = selectedRole === "provider" ? "block" : "none";
+  });
+});
+
+// تعبئة تخصصات نموذج التسجيل
+const regCat = document.getElementById("regCategory");
+CATEGORIES.forEach(c => {
+  const o = document.createElement("option");
+  o.value = c.name;
+  o.textContent = `${c.icon} ${c.name}`;
+  regCat.appendChild(o);
+});
+
+// منطقة الحساب في الهيدر
+function renderAuthArea() {
+  const area = document.getElementById("authArea");
+  if (currentUser) {
+    const initial = (currentUser.displayName || "د").trim()[0];
+    area.innerHTML = `
+      <div class="user-chip">
+        <div class="avatar">${initial}</div>
+        <span>${currentUser.displayName || currentUser.email}</span>
+        <button class="logout-btn" id="logoutBtn">خروج</button>
+      </div>`;
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+  } else {
+    area.innerHTML = `<button class="btn btn-gold" id="loginBtn" style="padding:10px 22px">🔐 تسجيل الدخول</button>`;
+    document.getElementById("loginBtn").addEventListener("click", openAuth);
+  }
+}
+
+// إرسال نموذج الدخول / التسجيل
+authForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const fd = Object.fromEntries(new FormData(authForm).entries());
+  const btn = document.getElementById("authSubmit");
+  btn.disabled = true;
+  btn.textContent = "لحظات…";
+  try {
+    if (auth) {
+      // ===== وضع Firebase =====
+      if (authMode === "register") {
+        const cred = await createUserFn(auth, fd.email, fd.password);
+        if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
+        currentUser = {
+          uid: cred.user.uid,
+          email: fd.email,
+          displayName: fd.displayName || fd.email,
+          role: selectedRole,
+          category: selectedRole === "provider" ? fd.category : ""
+        };
+        await addDocFn(collectionFn(db, "users"), { ...currentUser, createdAt: serverTimestampFn() });
+      } else {
+        const cred = await signInFn(auth, fd.email, fd.password);
+        const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", cred.user.uid)));
+        currentUser = snap.docs.length
+          ? snap.docs[0].data()
+          : { uid: cred.user.uid, email: fd.email, displayName: cred.user.displayName || fd.email, role: "client", category: "" };
+      }
+    } else {
+      // ===== وضع تجريبي: حسابات محلية في المتصفح =====
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      if (authMode === "register") {
+        if (users.find(u => u.email === fd.email)) throw new Error("exists");
+        const profile = {
+          uid: "local_" + Date.now(),
+          email: fd.email,
+          password: fd.password,
+          displayName: fd.displayName || fd.email,
+          role: selectedRole,
+          category: selectedRole === "provider" ? fd.category : ""
+        };
+        users.push(profile);
+        localStorage.setItem("darak_users", JSON.stringify(users));
+        currentUser = { ...profile };
+        delete currentUser.password;
+      } else {
+        const u = users.find(u => u.email === fd.email && u.password === fd.password);
+        if (!u) throw new Error("wrong_credentials");
+        currentUser = { ...u };
+        delete currentUser.password;
+      }
+      localStorage.setItem("darak_session", JSON.stringify(currentUser));
+    }
+    closeAuth();
+    authForm.reset();
+    renderAuthArea();
+    showToast(`أهلًا بك ${currentUser.displayName} 👋`);
+    openDashboard();
+  } catch (err) {
+    console.error(err);
+    showToast(authMode === "register"
+      ? "تعذر إنشاء الحساب — البريد قد يكون مستخدمًا أو كلمة المرور ضعيفة"
+      : "بيانات الدخول غير صحيحة", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === "register" ? "إنشاء الحساب ✅" : "دخول";
+  }
+});
+
+// تسجيل الخروج
+async function logout() {
+  if (auth && signOutFn) await signOutFn(auth).catch(() => {});
+  currentUser = null;
+  localStorage.removeItem("darak_session");
+  renderAuthArea();
+  document.getElementById("dashboard").classList.remove("open");
+  showToast("تم تسجيل الخروج — نراك قريبًا");
+}
+
+// ============================================================
+// لوحة التحكم — العميل يشوف طلباته، ومقدم الخدمة يشوف عملاءه
+// ============================================================
+async function openDashboard() {
+  if (!currentUser) { openAuth(); return; }
+  const dash = document.getElementById("dashboard");
+  dash.classList.add("open");
+  const isProvider = currentUser.role === "provider";
+
+  document.getElementById("dashTitle").textContent = isProvider ? "لوحة مقدم الخدمة 🛠️" : "لوحة مشاريعي 🏠";
+  document.getElementById("dashSubtitle").textContent = isProvider
+    ? `طلبات العملاء الواردة في تخصصك${currentUser.category ? ` (${currentUser.category})` : ""}`
+    : "تابع طلباتك المرسلة وتفاصيلها من هنا";
+  document.getElementById("dashActionBtn").style.display = isProvider ? "none" : "inline-flex";
+  document.getElementById("statTotalLabel").textContent = isProvider ? "طلب عميل" : "طلباتي";
+
+  // جلب الطلبات
+  let rows = [];
+  if (db && getDocsFn) {
+    const col = collectionFn(db, "service_requests");
+    const q = isProvider && currentUser.category
+      ? queryFn(col, whereFn("category", "==", currentUser.category))
+      : queryFn(col, whereFn("ownerUid", "==", currentUser.uid));
+    const snap = await getDocsFn(q);
+    rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } else {
+    const all = JSON.parse(localStorage.getItem("darak_service_requests") || "[]");
+    rows = isProvider
+      ? all.filter(r => !currentUser.category || r.category === currentUser.category)
+      : all.filter(r => r.ownerUid === currentUser.uid);
+  }
+
+  // الإحصائيات
+  const ts = r => r.createdAt?.seconds ? r.createdAt.seconds * 1000 : new Date(r.createdAt || 0).getTime();
+  rows.sort((a, b) => ts(b) - ts(a));
+  document.getElementById("statTotal").textContent = rows.length;
+  const weekAgo = Date.now() - 7 * 864e5;
+  document.getElementById("statNew").textContent = rows.filter(r => ts(r) > weekAgo).length;
+  const budgets = rows.map(r => +r.budget || 0).filter(b => b > 0);
+  document.getElementById("statBudget").textContent = budgets.length
+    ? Math.round(budgets.reduce((a, b) => a + b, 0) / budgets.length).toLocaleString("ar")
+    : "—";
+
+  // الجدول
+  const content = document.getElementById("dashContent");
+  if (!rows.length) {
+    content.innerHTML = `<div class="dash-empty">
+      <div class="big">📭</div>
+      ${isProvider
+        ? "لا توجد طلبات في تخصصك حتى الآن — ستظهر هنا فور وصولها"
+        : "لم ترسل أي طلب بعد — ابدأ بطلب خدمة لمشروعك من الأسفل"}
+    </div>`;
+  } else {
+    content.innerHTML = `<table class="dash-table">
+      <thead><tr>
+        <th>العميل</th><th>الجوال</th><th>المدينة</th><th>التخصص</th><th>الميزانية</th><th>التفاصيل</th><th>الحالة</th>
+      </tr></thead>
+      <tbody>${rows.map(r => `<tr>
+        <td><b>${r.name || "—"}</b></td>
+        <td><a href="tel:${r.phone}" style="color:var(--gold);font-weight:700" dir="ltr">${r.phone || "—"}</a></td>
+        <td>${r.city || "—"}</td>
+        <td>${r.category || "—"}</td>
+        <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.س" : "—"}</td>
+        <td style="max-width:240px">${r.details || "—"}</td>
+        <td><span class="status-badge status-new">جديد</span></td>
+      </tr>`).join("")}</tbody>
+    </table>`;
+  }
+  dash.scrollIntoView({ behavior: "smooth" });
+}
+
+// استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
+const savedSession = localStorage.getItem("darak_session");
+if (savedSession && !auth) {
+  try { currentUser = JSON.parse(savedSession); } catch (e) {}
+}
+renderAuthArea();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4655f3c58dd6497fb7ddb85b68480db7"}' crossorigin="anonymous"></script>
+</body>
+</html>
