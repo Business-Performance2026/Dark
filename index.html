@@ -251,7 +251,7 @@ footer ul a:hover{color:var(--gold-2)}
       <a href="#post">اطلب خدمة</a>
       <a href="#join">سجّل كمقدم خدمة</a>
     </nav>
-    <a href="#post" class="btn btn-gold nav-cta">ابدأ مشروعك</a>
+    <div id="authArea" style="display:flex;align-items:center"></div>
     <button class="menu-toggle" id="menuToggle" aria-label="القائمة">☰</button>
   </div>
 </header>
@@ -436,6 +436,27 @@ footer ul a:hover{color:var(--gold-2)}
         </form>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- ================= لوحة التحكم (تظهر بعد تسجيل الدخول) ================= -->
+<section class="dashboard" id="dashboard">
+  <div class="container">
+    <div class="dash-head">
+      <div>
+        <h2 id="dashTitle">لوحة التحكم</h2>
+        <p id="dashSubtitle"></p>
+      </div>
+      <a href="#post" class="btn btn-gold" id="dashActionBtn">➕ طلب خدمة جديد</a>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat"><b id="statTotal">0</b><span id="statTotalLabel">إجمالي الطلبات</span></div>
+      <div class="dash-stat"><b id="statNew">0</b><span>جديدة هذا الأسبوع</span></div>
+      <div class="dash-stat"><b id="statBudget">—</b><span>متوسط الميزانية (ر.س)</span></div>
+    </div>
+    <div class="dash-table-wrap">
+      <div id="dashContent"></div>
     </div>
   </div>
 </section>
