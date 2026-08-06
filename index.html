@@ -409,10 +409,15 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="admin-tabs" id="adminTabs" style="display:none">
       <button class="active" data-atab="requests" type="button">📋 الطلبات</button>
       <button data-atab="users" type="button">👥 إدارة المستخدمين</button>
+      <button data-atab="quotes" type="button">💰 عروض الأسعار</button>
       <button data-atab="footer" type="button">⚙️ إعدادات الفوتر</button>
     </div>
     <div class="dash-table-wrap" id="requestsWrap">
       <div id="dashContent"></div>
+    </div>
+    <div class="dash-table-wrap" id="quotesWrap" style="margin-top:24px;display:none">
+      <h3 id="quotesTitle" style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem">💰 عروض الأسعار</h3>
+      <div id="quotesContent"></div>
     </div>
     <div class="dash-table-wrap" id="usersWrap" style="display:none">
       <div id="usersContent"></div>
@@ -444,6 +449,10 @@ footer ul a:hover{color:var(--gold-2)}
         </form>
       </div>
     </div>
+    <div class="dash-table-wrap" id="adminQuotesWrap" style="display:none;margin-top:24px">
+      <div id="adminQuotesStats" class="dash-stats" style="padding:20px 18px 0;margin-bottom:0"></div>
+      <div id="adminQuotesContent"></div>
+    </div>
   </div>
 </section>
 
@@ -471,7 +480,7 @@ footer ul a:hover{color:var(--gold-2)}
           <li><a href="#how" data-i18n="nav_how">كيف نعمل</a></li>
           <li><a href="#providers" data-i18n="nav_providers">مقدمو الخدمة</a></li>
           <li><a href="#" class="footer-request">اطلب خدمة</a></li>
-          <li><a href="#" class="footer-join">انضم كمقدم خدمة</a></li>
+          <li><a href="#" class="footer-join">انضم كشركة</a></li>
         </ul>
       </div>
       <div>
@@ -593,6 +602,30 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </div>
 
+<!-- ================= نافذة إرسال عرض سعر (الشركة) ================= -->
+<div class="modal-overlay" id="quoteModal">
+  <div class="modal" style="width:min(500px,100%)">
+    <button class="modal-close" id="quoteClose" aria-label="إغلاق">✕</button>
+    <h3 data-i18n="quote_modal_title">📄 إرسال عرض سعر</h3>
+    <p id="quoteFor" style="color:var(--gold);font-weight:700;font-size:.9rem;margin-bottom:12px"></p>
+    <form id="quoteForm">
+      <div class="form-group">
+        <label data-i18n="quote_file">ملف العرض (PDF) *</label>
+        <input type="file" id="quoteFile" accept="application/pdf" required style="padding:10px">
+      </div>
+      <div class="form-group">
+        <label data-i18n="quote_amount">قيمة العرض (ر.ع)</label>
+        <input type="number" id="quoteAmount" min="0" data-i18n-ph="ph_optional" placeholder="اختياري">
+      </div>
+      <div class="form-group">
+        <label data-i18n="quote_note">ملاحظة للعميل</label>
+        <textarea id="quoteNote" rows="2" placeholder="شروط، مدة التنفيذ، الضمان…"></textarea>
+      </div>
+      <button type="submit" class="submit-btn" id="quoteSubmit" data-i18n="quote_send">إرسال العرض 🚀</button>
+    </form>
+  </div>
+</div>
+
 <!-- ================= نافذة سبب الرفض / الإيقاف ================= -->
 <div class="modal-overlay" id="reasonModal">
   <div class="modal">
@@ -652,6 +685,7 @@ let db = null, auth = null;
 let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
 let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
+let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
 let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
 
 if (FIREBASE_READY) {
@@ -671,6 +705,11 @@ if (FIREBASE_READY) {
     updateDocFn = firestore.updateDoc;
     deleteDocFn = firestore.deleteDoc;
     setDocFn = firestore.setDoc;
+    const storageMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+    storage = storageMod.getStorage(app);
+    refFn = storageMod.ref;
+    uploadBytesFn = storageMod.uploadBytes;
+    getUrlFn = storageMod.getDownloadURL;
     auth = authMod.getAuth(app);
     createUserFn = authMod.createUserWithEmailAndPassword;
     signInFn = authMod.signInWithEmailAndPassword;
@@ -711,7 +750,7 @@ const I18N = {
     nav_cats: "التخصصات", nav_how: "كيف نعمل", nav_providers: "مقدمو الخدمة",
     hero_badge: "منصة البناء والتشطيب الأولى في سلطنة عمان", hero_t1: "من أول خطوة..", hero_t2: "لبيت أحلامك",
     hero_desc: "دارك تربطك بأفضل المقاولين ومقدمي الخدمات في مجال المنازل — من الأساس والخرسانة، حتى الديكور والأثاث والتنظيف. كل تخصصات البناء في منصة واحدة.",
-    btn_request: "📋 اطلب خدمة الآن", btn_join: "🤝 سجّل كمقدم خدمة",
+    btn_request: "📋 اطلب خدمة الآن", btn_join: "🤝 سجّل كشركة",
     stat_cats: "تخصصًا في البناء", stat_providers: "مقدم خدمة", stat_projects: "مشروع مكتمل", stat_satisfaction: "% رضا العملاء",
     cats_tag: "التخصصات", cats_title: "كل ما يحتاجه بيتك في مكان واحد", cats_sub: "12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف", provider_unit: "مقدم خدمة",
     how_tag: "آلية العمل", how_title: "كيف تعمل منصة دارك؟", how_sub: "أربع خطوات بسيطة تفصلك عن إنجاز مشروعك باحترافية",
@@ -719,14 +758,14 @@ const I18N = {
     s2t: "استقبل العروض", s2d: "يتواصل معك مقدمو الخدمة المؤهلون بعروض أسعار تنافسية",
     s3t: "قارن واختر", s3d: "قارن التقييمات والأعمال السابقة والأسعار واختر الأنسب",
     s4t: "تابع حتى التسليم", s4d: "تابع التنفيذ وقيّم مقدم الخدمة بعد اكتمال العمل",
-    pro_tag: "مقدمو الخدمة", pro_title: "نخبة من أمهر الحرفيين والشركات", pro_sub: "مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع",
+    pro_tag: "الشركات", pro_title: "نخبة من أمهر الحرفيين والشركات", pro_sub: "مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع",
     pro_btn: "اطلب عرض سعر", exp_unit: "سنة خبرة", proj_unit: "مشروعًا",
     dash_new_req: "➕ طلب خدمة جديد", st_new: "جديدة هذا الأسبوع", st_budget: "متوسط الميزانية (ر.ع)",
-    dash_admin: "لوحة الإدارة 👑", dash_provider: "لوحة مقدم الخدمة 🛠️", dash_client: "لوحة مشاريعي 🏠",
+    dash_admin: "لوحة الإدارة 👑", dash_provider: "لوحة الشركة 🛠️", dash_client: "لوحة مشاريعي 🏠",
     sub_admin: "جميع طلبات المنصة من كل التخصصات", sub_provider: "طلبات العملاء الواردة في تخصصك", sub_client: "تابع طلباتك المرسلة وتفاصيلها من هنا",
     total_admin: "كل الطلبات", total_provider: "طلب عميل", total_client: "طلباتي",
     th_client: "العميل", th_phone: "الجوال", th_city: "المدينة", th_cat: "التخصص", th_budget: "الميزانية", th_details: "التفاصيل", th_status: "الحالة", badge_new: "جديد",
-    role_client: "صاحب مشروع", role_provider: "مقدم خدمة",
+    role_client: "عميل", role_provider: "شركة",
     account_guest: "أهلًا بك في دارك", account_guest_sub: "سجّل دخولك أو أنشئ حسابًا لإدارة طلباتك",
     register_btn: "إنشاء حساب", login_go: "دخول", register_go: "إنشاء الحساب ✅",
     modal_welcome: "مرحبًا بك في دارك 🏠", modal_sub: "سجّل دخولك أو أنشئ حسابًا جديدًا",
@@ -738,7 +777,17 @@ const I18N = {
     forgot_need_email: "اكتب بريدك الإلكتروني أولًا في الخانة ثم اضغط نسيت كلمة المرور",
     forgot_sent: "تم إرسال رابط إعادة تعيين كلمة المرور لبريدك 📧",
     forgot_err: "تعذر الإرسال — تأكد من البريد أو أن الحساب موجود",
-    forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase"
+    forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase",
+    quotes_title: "💰 عروض الأسعار", q_sent_title: "💰 عروضي المرسلة",
+    q_company: "الشركة", q_client: "العميل", q_amount: "المبلغ", q_note: "ملاحظات", q_file: "الملف",
+    q_view: "📄 عرض", q_actions: "القرار", q_accept: "✅ موافق", q_reject: "⛔ رفض",
+    q_sent: "بانتظار ردك ⏳", q_waiting: "بانتظار رد العميل ⏳", q_accepted: "مقبول ✅", q_rejected: "مرفوض ⛔",
+    q_empty: "لا توجد عروض أسعار بعد", aq_comment: "تعليق العميل", q_send: "عرض سعر",
+    quote_modal_title: "📄 إرسال عرض سعر", quote_file: "ملف العرض (PDF) *", quote_amount: "قيمة العرض (ر.ع)",
+    quote_note: "ملاحظة للعميل", quote_send: "إرسال العرض 🚀", quote_uploading: "جارٍ رفع الملف…",
+    quote_done: "تم إرسال عرض السعر للعميل ✅", quote_err: "تعذر الإرسال — حاول مرة أخرى",
+    pdf_only: "اختر ملف PDF أولًا", comment_accept_title: "✅ موافقة على العرض — اكتب تعليقًا للشركة",
+    comment_reject_title: "⛔ رفض العرض — اكتب سبب الرفض", comment_sent: "تم إرسال ردك للشركة ✅"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -746,7 +795,7 @@ const I18N = {
     nav_cats: "Services", nav_how: "How it works", nav_providers: "Providers",
     hero_badge: "Oman's #1 building & finishing platform", hero_t1: "From the first step..", hero_t2: "to your dream home",
     hero_desc: "Darak connects you with the best contractors and home service providers — from foundations and concrete to décor, furniture and cleaning. Every building trade in one platform.",
-    btn_request: "📋 Request a service", btn_join: "🤝 Join as a provider",
+    btn_request: "📋 Request a service", btn_join: "🤝 Register a company",
     stat_cats: "Building trades", stat_providers: "Service providers", stat_projects: "Completed projects", stat_satisfaction: "% satisfaction",
     cats_tag: "Services", cats_title: "Everything your home needs in one place", cats_sub: "12 trades from foundation to handover — auto-scrolling, hover to pause", provider_unit: "providers",
     how_tag: "Process", how_title: "How does Darak work?", how_sub: "Four simple steps between you and a professional finish",
@@ -754,14 +803,14 @@ const I18N = {
     s2t: "Receive offers", s2d: "Qualified providers reach out with competitive quotes",
     s3t: "Compare & choose", s3d: "Compare ratings, past work and prices, then pick the best",
     s4t: "Track to handover", s4d: "Follow execution and rate the provider when done",
-    pro_tag: "Providers", pro_title: "Top craftsmen and companies", pro_sub: "Verified providers with real ratings from project owners",
+    pro_tag: "Companies", pro_title: "Top craftsmen and companies", pro_sub: "Verified providers with real ratings from project owners",
     pro_btn: "Request a quote", exp_unit: "yrs experience", proj_unit: "projects",
     dash_new_req: "➕ New service request", st_new: "New this week", st_budget: "Avg. budget (OMR)",
-    dash_admin: "Admin Dashboard 👑", dash_provider: "Provider Dashboard 🛠️", dash_client: "My Projects 🏠",
+    dash_admin: "Admin Dashboard 👑", dash_provider: "Company Dashboard 🛠️", dash_client: "My Projects 🏠",
     sub_admin: "All platform requests across every trade", sub_provider: "Incoming client requests in your trade", sub_client: "Track your submitted requests here",
     total_admin: "All requests", total_provider: "Client requests", total_client: "My requests",
     th_client: "Client", th_phone: "Phone", th_city: "City", th_cat: "Trade", th_budget: "Budget", th_details: "Details", th_status: "Status", badge_new: "New",
-    role_client: "Project owner", role_provider: "Service provider",
+    role_client: "Client", role_provider: "Company",
     account_guest: "Welcome to Darak", account_guest_sub: "Sign in or create an account to manage your requests",
     register_btn: "Create account", login_go: "Sign in", register_go: "Create account ✅",
     modal_welcome: "Welcome to Darak 🏠", modal_sub: "Sign in or create a new account",
@@ -773,7 +822,17 @@ const I18N = {
     forgot_need_email: "Enter your email in the field first, then tap Forgot password",
     forgot_sent: "Password reset link sent to your email 📧",
     forgot_err: "Could not send — check the email or that the account exists",
-    forgot_demo: "Password reset requires Firebase"
+    forgot_demo: "Password reset requires Firebase",
+    quotes_title: "💰 Price Quotes", q_sent_title: "💰 My Sent Quotes",
+    q_company: "Company", q_client: "Client", q_amount: "Amount", q_note: "Notes", q_file: "File",
+    q_view: "📄 View", q_actions: "Decision", q_accept: "✅ Accept", q_reject: "⛔ Reject",
+    q_sent: "Awaiting you ⏳", q_waiting: "Awaiting client ⏳", q_accepted: "Accepted ✅", q_rejected: "Rejected ⛔",
+    q_empty: "No price quotes yet", aq_comment: "Client comment", q_send: "Quote",
+    quote_modal_title: "📄 Send a Quote", quote_file: "Quote file (PDF) *", quote_amount: "Quote amount (OMR)",
+    quote_note: "Note to client", quote_send: "Send quote 🚀", quote_uploading: "Uploading file…",
+    quote_done: "Quote sent to the client ✅", quote_err: "Could not send — try again",
+    pdf_only: "Choose a PDF file first", comment_accept_title: "✅ Accept quote — write a comment to the company",
+    comment_reject_title: "⛔ Reject quote — write the reason", comment_sent: "Your response was sent to the company ✅"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -851,7 +910,7 @@ async function saveToDB(collectionName, data) {
   // وضع تجريبي: حفظ محلي في المتصفح
   const key = "darak_" + collectionName;
   const list = JSON.parse(localStorage.getItem(key) || "[]");
-  list.push({ ...data, createdAt: new Date().toISOString() });
+  list.push({ id: "req_" + Date.now(), ...data, createdAt: new Date().toISOString() });
   localStorage.setItem(key, JSON.stringify(list));
   return "local";
 }
@@ -913,7 +972,7 @@ function setRole(role) { document.querySelector(`.role-option[data-role="${role}
 
 function openRequestFlow() {
   if (currentUser?.role === "client") { openRequestModal(); }
-  else if (currentUser?.role === "provider") { showToast("أنت مسجل كمقدم خدمة — طلبات عملائك في لوحتك 👇"); openDashboard(); }
+  else if (currentUser?.role === "provider") { showToast("أنت مسجل كشركة — طلبات العملاء في لوحتك 👇"); openDashboard(); }
   else if (currentUser) { openDashboard(); }
   else { setAuthTab("register"); setRole("client"); openAuth(); }
 }
@@ -1121,6 +1180,7 @@ async function openDashboard() {
   if (!currentUser) { openAuth(); return; }
   const dash = document.getElementById("dashboard");
   dash.classList.add("open");
+  document.getElementById("quotesWrap").style.display = "none";
   const admin = isAdmin();
   const isProvider = currentUser.role === "provider" && !admin;
 
@@ -1174,6 +1234,8 @@ async function openDashboard() {
       ? all.filter(r => !currentUser.category || r.category === currentUser.category)
       : all.filter(r => r.ownerUid === currentUser.uid);
   }
+  rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
+  lastRequests = rows;
 
   // الإحصائيات
   const ts = r => r.createdAt?.seconds ? r.createdAt.seconds * 1000 : new Date(r.createdAt || 0).getTime();
@@ -1202,16 +1264,17 @@ async function openDashboard() {
       </tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td><b>${r.name || "—"}</b></td>
-        <td><a href="https://wa.me/${waNumber(r.phone)}" target="_blank" style="color:var(--gold);font-weight:700" dir="ltr">💬 ${r.phone || "—"}</a></td>
+        <td><span dir="ltr">${r.phone || "—"}</span></td>
         <td>${r.city || "—"}</td>
         <td>${r.category || "—"}</td>
         <td>${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td style="max-width:240px">${r.details || "—"}</td>
-        <td><span class="status-badge status-new">${t("badge_new")}</span></td>
+        <td><span class="status-badge status-new">${t("badge_new")}</span>${isProvider ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
     </table>`;
   }
-  dash.scrollIntoView({ behavior: "smooth" });
+  dash.loadQuotesSection();
+  scrollIntoView({ behavior: "smooth" });
 }
 
 // ============================================================
@@ -1225,8 +1288,11 @@ function switchAdminTab(tab) {
   document.getElementById("requestsWrap").style.display = tab === "requests" ? "block" : "none";
   document.getElementById("usersWrap").style.display = tab === "users" ? "block" : "none";
   document.getElementById("footerWrap").style.display = tab === "footer" ? "block" : "none";
+  document.getElementById("adminQuotesWrap").style.display = tab === "quotes" ? "block" : "none";
+  document.getElementById("quotesWrap").style.display = "none";
   if (tab === "users") loadUsersTable();
   if (tab === "footer") fillFooterForm();
+  if (tab === "quotes") loadAdminQuotes();
 }
 document.querySelectorAll("#adminTabs button").forEach(b => b.addEventListener("click", () => switchAdminTab(b.dataset.atab)));
 
@@ -1259,7 +1325,7 @@ async function loadUsersTable() {
   </tr></thead><tbody>${users.map(u => {
     const st = u.status || "approved";
     const [lbl, cls] = STATUS_LABELS[st] || STATUS_LABELS.approved;
-    const roleName = u.role === "provider" ? "🛠️ مقدم خدمة" : "🏠 صاحب مشروع";
+    const roleName = u.role === "provider" ? "🛠️ شركة" : "🏠 عميل";
     let btns = "";
     if (st !== "approved") btns += `<button class="action-btn action-approve" onclick="adminApprove('${u.uid}')">✅ تفعيل</button>`;
     if (st === "pending" && u.role === "provider") btns += `<button class="action-btn action-reject" onclick="adminReject('${u.uid}')">⛔ رفض</button>`;
@@ -1537,6 +1603,185 @@ document.getElementById("langToggle").addEventListener("click", () => {
   applyLang();
 });
 applyLang();
+
+// ============================================================
+// نظام عروض الأسعار — الشركة ترفع PDF والعميل يوافق أو يرفض بتعليق
+// ============================================================
+let lastRequests = [];
+
+window.openQuoteModal = function(requestId) {
+  const r = lastRequests.find(x => x.id === requestId);
+  if (!r) { showToast(t("quote_err"), "error"); return; }
+  document.getElementById("quoteModal").dataset.requestId = requestId;
+  document.getElementById("quoteFor").textContent = t("q_client") + ": " + (r.name || "—") + " • " + (r.category || "");
+  document.getElementById("quoteForm").reset();
+  document.getElementById("quoteModal").classList.add("open");
+};
+document.getElementById("quoteClose").addEventListener("click", () => document.getElementById("quoteModal").classList.remove("open"));
+document.getElementById("quoteModal").addEventListener("click", e => { if (e.target.id === "quoteModal") e.target.classList.remove("open"); });
+
+document.getElementById("quoteForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const file = document.getElementById("quoteFile").files[0];
+  if (!file || file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
+  const btn = document.getElementById("quoteSubmit");
+  const r = lastRequests.find(x => x.id === document.getElementById("quoteModal").dataset.requestId);
+  if (!r) { showToast(t("quote_err"), "error"); return; }
+  btn.disabled = true;
+  btn.textContent = t("quote_uploading");
+  try {
+    let pdfUrl = "";
+    const pdfName = file.name;
+    if (storage && refFn) {
+      const sref = refFn(storage, "quotes/" + Date.now() + "_" + file.name.replace(/[^\w.]/g, "_"));
+      await uploadBytesFn(sref, file);
+      pdfUrl = await getUrlFn(sref);
+    } else if (file.size < 700 * 1024) {
+      pdfUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+    }
+    const quote = {
+      requestId: r.id,
+      clientUid: r.ownerUid || "",
+      clientName: r.name || "",
+      category: r.category || "",
+      providerUid: currentUser?.uid || "",
+      providerName: currentUser?.displayName || "",
+      amount: document.getElementById("quoteAmount").value || "",
+      note: document.getElementById("quoteNote").value.trim(),
+      pdfUrl, pdfName,
+      status: "sent",
+      clientComment: ""
+    };
+    if (db && addDocFn) {
+      await addDocFn(collectionFn(db, "quotes"), { ...quote, createdAt: serverTimestampFn() });
+    } else {
+      const list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+      quote.id = "q_" + Date.now();
+      quote.createdAt = new Date().toISOString();
+      list.push(quote);
+      localStorage.setItem("darak_quotes", JSON.stringify(list));
+    }
+    document.getElementById("quoteModal").classList.remove("open");
+    showToast(t("quote_done"));
+    loadQuotesSection();
+  } catch (err) {
+    console.error(err);
+    showToast(t("quote_err"), "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t("quote_send");
+  }
+});
+
+async function fetchQuotes(field, value) {
+  if (db && getDocsFn) {
+    const snap = await getDocsFn(queryFn(collectionFn(db, "quotes"), whereFn(field, "==", value)));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return JSON.parse(localStorage.getItem("darak_quotes") || "[]").filter(q => q[field] === value);
+}
+const tsq = q => q.createdAt?.seconds ? q.createdAt.seconds * 1000 : new Date(q.createdAt || 0).getTime();
+
+async function loadQuotesSection() {
+  const wrap = document.getElementById("quotesWrap");
+  const box = document.getElementById("quotesContent");
+  if (!wrap || !box) return;
+  const isClient = currentUser?.role === "client";
+  const isProv = currentUser?.role === "provider";
+  if (!currentUser || isAdmin() || (!isClient && !isProv)) { wrap.style.display = "none"; return; }
+  const st = currentUser.status || "approved";
+  if (st !== "approved") { wrap.style.display = "none"; return; }
+  wrap.style.display = "";
+  document.getElementById("quotesTitle").textContent = isClient ? t("quotes_title") : t("q_sent_title");
+  box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
+  let quotes = [];
+  try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); }
+  quotes.sort((a, b) => tsq(b) - tsq(a));
+  if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
+  box.innerHTML = `<table class="dash-table"><thead><tr>
+    <th>${isClient ? t("q_company") : t("q_client")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${isClient ? t("q_actions") : t("aq_comment")}</th>
+  </tr></thead><tbody>${quotes.map(q => {
+    const stBadge = q.status === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
+      : q.status === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
+      : `<span class="status-badge status-pending">${t(isClient ? "q_sent" : "q_waiting")}</span>`;
+    const fileCell = q.pdfUrl ? `<a href="${q.pdfUrl}" target="_blank" style="color:var(--gold);font-weight:700">${t("q_view")}</a>` : (q.pdfName || "—");
+    const who = isClient ? (q.providerName || "—") : (q.clientName || "—");
+    const lastCell = isClient
+      ? (q.status === "sent"
+        ? `<button class="action-btn action-approve" onclick="decideQuote('${q.id}','accepted')">${t("q_accept")}</button> <button class="action-btn action-reject" onclick="decideQuote('${q.id}','rejected')">${t("q_reject")}</button>`
+        : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—"))
+      : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—");
+    return `<tr>
+      <td><b>${who}</b></td>
+      <td>${q.category || "—"}</td>
+      <td>${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
+      <td style="max-width:180px;font-size:.85rem">${q.note || "—"}</td>
+      <td>${fileCell}</td>
+      <td>${stBadge}</td>
+      <td style="white-space:nowrap">${lastCell}</td>
+    </tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+window.decideQuote = function(quoteId, decision) {
+  const title = decision === "accepted" ? t("comment_accept_title") : t("comment_reject_title");
+  openReasonModal(title, comment => updateQuoteDecision(quoteId, decision, comment));
+};
+
+async function updateQuoteDecision(quoteId, decision, comment) {
+  try {
+    if (db && updateDocFn) {
+      await updateDocFn(docFn(db, "quotes", quoteId), { status: decision, clientComment: comment });
+    } else {
+      const list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+      const q = list.find(x => x.id === quoteId);
+      if (q) { q.status = decision; q.clientComment = comment; localStorage.setItem("darak_quotes", JSON.stringify(list)); }
+    }
+    showToast(t("comment_sent"));
+    loadQuotesSection();
+  } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+}
+
+async function loadAdminQuotes() {
+  const box = document.getElementById("adminQuotesContent");
+  const statsBox = document.getElementById("adminQuotesStats");
+  box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
+  let quotes = [];
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "quotes")));
+      quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } else {
+      quotes = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+    }
+  } catch (e) { console.error(e); }
+  quotes.sort((a, b) => tsq(b) - tsq(a));
+  const acc = quotes.filter(q => q.status === "accepted").length;
+  const rej = quotes.filter(q => q.status === "rejected").length;
+  const pen = quotes.length - acc - rej;
+  statsBox.innerHTML = `
+    <div class="dash-stat"><b>${quotes.length}</b><span>إجمالي العروض</span></div>
+    <div class="dash-stat" style="border-color:#15803d"><b style="color:#15803d">${acc}</b><span>مقبولة ✅</span></div>
+    <div class="dash-stat" style="border-color:#b91c1c"><b style="color:#b91c1c">${rej}</b><span>مرفوضة ⛔</span></div>
+    <div class="dash-stat" style="border-color:#b45309"><b style="color:#b45309">${pen}</b><span>بانتظار الرد ⏳</span></div>`;
+  if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>لا توجد عروض أسعار بعد</div>'; return; }
+  box.innerHTML = `<table class="dash-table"><thead><tr>
+    <th>الشركة</th><th>العميل</th><th>التخصص</th><th>المبلغ</th><th>الملف</th><th>الحالة</th><th>تعليق العميل</th>
+  </tr></thead><tbody>${quotes.map(q => {
+    const stBadge = q.status === "accepted" ? '<span class="status-badge status-approved">مقبول ✅</span>'
+      : q.status === "rejected" ? '<span class="status-badge status-rejected">مرفوض ⛔</span>'
+      : '<span class="status-badge status-pending">بانتظار الرد ⏳</span>';
+    return `<tr>
+      <td><b>${q.providerName || "—"}</b></td>
+      <td>${q.clientName || "—"}</td>
+      <td>${q.category || "—"}</td>
+      <td>${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
+      <td>${q.pdfUrl ? `<a href="${q.pdfUrl}" target="_blank" style="color:var(--gold);font-weight:700">📄 عرض</a>` : "—"}</td>
+      <td>${stBadge}</td>
+      <td style="max-width:200px;font-size:.85rem">${q.clientComment || "—"}</td>
+    </tr>`;
+  }).join("")}</tbody></table>`;
+}
 
 // استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
 const savedSession = localStorage.getItem("darak_session");
