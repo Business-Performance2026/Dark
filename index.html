@@ -37,9 +37,12 @@ input,select,textarea{font-family:inherit;font-size:1rem}
 /* ===== Header ===== */
 header{position:fixed;inset-inline:0;top:0;z-index:100;transition:.3s;background:rgba(22,40,58,.0)}
 header.scrolled{background:rgba(22,40,58,.96);backdrop-filter:blur(12px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-.brand{display:flex;align-items:center;gap:12px}
-.brand img{width:52px;height:52px;border-radius:14px;background:#fff;padding:4px;box-shadow:var(--shadow)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:relative}
+.icon-btn{background:none;border:none;color:#fff;font-size:1.3rem;padding:6px 8px;cursor:pointer;position:relative;display:grid;place-items:center;line-height:1}
+.head-actions{display:flex;align-items:center;gap:6px}
+.brand-word{color:#fff;font-weight:900;font-size:1.35rem;letter-spacing:.5px}
+.brand{display:flex;align-items:center;gap:10px;position:absolute;left:50%;transform:translateX(-50%);text-decoration:none}
+.brand img{width:44px;height:44px;border-radius:14px;background:#fff;padding:4px;box-shadow:var(--shadow)}
 .brand span{color:#fff;font-weight:900;font-size:1.5rem;letter-spacing:.5px}
 .brand span b{color:var(--gold-2)}
 .nav-links{display:flex;gap:26px;align-items:center}
@@ -202,6 +205,7 @@ footer ul a:hover{color:var(--gold-2)}
 .status-badge{display:inline-block;padding:4px 14px;border-radius:100px;font-size:.78rem;font-weight:700;white-space:nowrap}
 .status-new{background:#e0f2fe;color:#0369a1}
 
+.co-loc{font-size:.68rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .q-group{border:1px solid #e6ddc9;border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
 .q-group-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:#faf6ee;font-weight:700;font-size:.92rem;color:var(--navy)}
 .q-count{background:var(--navy);color:#fff;border-radius:20px;padding:1px 10px;font-size:.8rem}
@@ -513,12 +517,18 @@ footer ul a:hover{color:var(--gold-2)}
 <!-- ================= Header ================= -->
 <header id="header">
   <div class="container nav">
+    <button class="icon-btn" id="searchToggle" type="button" aria-label="بحث">🔍</button>
     <a href="#" class="brand">
       <img src="assets/logo.png" alt="شعار دارك">
+      <span class="brand-word">دارك</span>
     </a>
-    <button class="lang-toggle" id="searchToggle" type="button" aria-label="بحث">🔍</button>
-    <button class="lang-toggle" id="langToggle" type="button">🌐</button>
-    <div id="authArea" style="display:flex;align-items:center"></div>
+    <div class="head-actions">
+      <div class="notif-wrap">
+        <button class="icon-btn" id="notifBtn" type="button" aria-label="الإشعارات">🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
+        <div class="notif-panel" id="notifPanel"></div>
+      </div>
+      <button class="icon-btn" id="langToggle" type="button" aria-label="اللغة">🌐</button>
+    </div>
   </div>
   <div class="container search-row" id="searchRow" style="display:none">
     <div class="search-box">
@@ -532,7 +542,7 @@ footer ul a:hover{color:var(--gold-2)}
 <section class="hero" id="heroSec" style="padding:56px 0 0;background:none;min-height:0"></section>
 
 <!-- ================= شريط الإعلانات ================= -->
-<section id="adsSec" style="padding-top:22px;padding-bottom:0">
+<section id="adsSec" style="padding-top:38px;padding-bottom:0">
   <div class="container">
     <div class="ad-slider" id="adSlider">
       <div class="ad-track" id="adTrack"></div>
@@ -567,7 +577,6 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_cats">الأقسام</h2>
       <div class="row-head-actions">
-        <a class="view-all" onclick="showView('cats')" data-i18n="view_all">عرض الكل</a>
       </div>
     </div>
     <div class="h-scroll" id="catChips"></div>
@@ -635,6 +644,7 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
         <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
+        <div class="form-group"><label data-i18n="cp_loc">موقع الشركة (المدينة / المنطقة)</label><input type="text" id="cpLoc" placeholder="مسقط — الخوض"></div>
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
         <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
         <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
@@ -652,10 +662,6 @@ footer ul a:hover{color:var(--gold-2)}
         <p id="dashSubtitle"></p>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="notif-wrap">
-          <button class="notif-btn" id="notifBtn" type="button" aria-label="الإشعارات">🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
-          <div class="notif-panel" id="notifPanel"></div>
-        </div>
         <button class="btn btn-gold" id="dashActionBtn" data-i18n="dash_new_req">➕ طلب خدمة جديد</button>
       </div>
     </div>
@@ -1067,6 +1073,7 @@ const I18N = {
     forgot_err: "تعذر الإرسال — تأكد من البريد أو أن الحساب موجود",
     forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase",
     quotes_title: "💰 عروض الأسعار", q_sent_title: "💰 عروضي المرسلة",
+    acc_suspended: "حسابك موقوف", acc_rejected: "تم رفض حسابك", reason_lbl: "السبب", no_reason: "غير محدد",
     q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة",
     q_empty_grp: "لا توجد عروض هنا",
     badge_expired: "منتهية ⏳", expired_hint: "انتهت مدة الطلب — يمكنك تقديم طلب جديد", req_expired: "انتهت صلاحية هذا الطلب (7 أيام)",
@@ -1093,7 +1100,7 @@ const I18N = {
     ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر",
     tab_companies: "الشركات", acc_profile: "ملف الشركة", acc_notif: "الإشعارات", acc_lang: "تغيير اللغة", acc_help: "مساعدة",
     acc_delete: "حذف حسابي", acc_delete_confirm: "متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع", acc_deleted: "تم حذف الحساب ✅",
-    cp_wa: "رقم الواتساب", cp_logo: "شعار الشركة (صورة)", emp_photo: "صورة المهندس (اختياري)",
+    cp_wa: "رقم الواتساب", cp_loc: "موقع الشركة (المدينة / المنطقة)", cp_logo: "شعار الشركة (صورة)", emp_photo: "صورة المهندس (اختياري)",
     ads_img: "صورة الإعلان (اختياري)", ads_img_set: "توجد صورة محفوظة",
     notif_title: "🔔 الإشعارات", notif_empty: "لا توجد إشعارات جديدة",
     n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
@@ -1135,6 +1142,7 @@ const I18N = {
     forgot_err: "Could not send — check the email or that the account exists",
     forgot_demo: "Password reset requires Firebase",
     quotes_title: "💰 Price Quotes", q_sent_title: "💰 My Sent Quotes",
+    acc_suspended: "Your account is suspended", acc_rejected: "Your account was rejected", reason_lbl: "Reason", no_reason: "Not specified",
     q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes",
     q_empty_grp: "No quotes here",
     badge_expired: "Expired ⏳", expired_hint: "Request expired — you can submit a new one", req_expired: "This request has expired (7 days)",
@@ -1161,7 +1169,7 @@ const I18N = {
     ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link",
     tab_companies: "Companies", acc_profile: "Company profile", acc_notif: "Notifications", acc_lang: "Change language", acc_help: "Help",
     acc_delete: "Delete my account", acc_delete_confirm: "Sure you want to permanently delete your account?", acc_deleted: "Account deleted ✅",
-    cp_wa: "WhatsApp number", cp_logo: "Company logo (image)", emp_photo: "Engineer photo (optional)",
+    cp_wa: "WhatsApp number", cp_loc: "Company location (city / area)", cp_logo: "Company logo (image)", emp_photo: "Engineer photo (optional)",
     ads_img: "Ad image (optional)", ads_img_set: "An image is saved",
     notif_title: "🔔 Notifications", notif_empty: "No new notifications",
     n_new_req: "📋 New request from {n} — {c}", n_new_quote: "💰 New quote from {p}",
@@ -1206,6 +1214,7 @@ function coCard(p) {
     <h4>${p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
     <div class="co-rate">★ ${p.rating || "5.0"} ${p.demo ? "" : " · ✅"}</div>
+    ${p.location ? `<div class="co-loc">📍 ${p.location}</div>` : ""}
   </div>`;
 }
 const proCard = coCard;
@@ -1397,6 +1406,7 @@ CATEGORIES.forEach(c => {
 // منطقة الحساب في الهيدر
 function renderAuthArea() {
   const area = document.getElementById("authArea");
+  if (!area) return;
   if (currentUser) {
       area.innerHTML = `
       <div class="user-chip">
@@ -1468,6 +1478,17 @@ authForm.addEventListener("submit", async e => {
         delete currentUser.password;
       }
       localStorage.setItem("darak_session", JSON.stringify(currentUser));
+    }
+    // فحص حالة الحساب — الموقوف/المرفوض تظهر له رسالة السبب ولا يدخل
+    const st0 = currentUser.status || "approved";
+    if (st0 === "suspended" || st0 === "rejected") {
+      const reason = currentUser.statusReason || t("no_reason");
+      if (auth && signOutFn) { try { await signOutFn(auth); } catch (e) {} }
+      localStorage.removeItem("darak_session");
+      currentUser = null;
+      closeAuth();
+      showToast("🚫 " + (st0 === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + reason, "error");
+      return;
     }
     closeAuth();
     authForm.reset();
@@ -1565,7 +1586,7 @@ async function openDashboard() {
     document.getElementById("statBudget").textContent = "—";
     document.getElementById("dashActionBtn").style.display = "none";
     document.getElementById("dashContent").innerHTML = `<div class="dash-empty"><div class="big">${icon}</div><h3 style="color:var(--navy);margin-bottom:8px">${title}</h3><p>${sub}</p></div>`;
-    dash.scrollIntoView({ behavior: "smooth" });
+    
     return;
   }
 
@@ -1634,7 +1655,7 @@ async function openDashboard() {
   }
   loadQuotesSection();
   buildNotifs();
-  dash.scrollIntoView({ behavior: "smooth" });
+  
 }
 
 // ============================================================
@@ -1903,7 +1924,7 @@ function showView(v) {
         el.style.display = on ? "" : "none";
         if (id === "catView" || id === "companyView" || id === "profilePage") el.classList.toggle("open", on);
       });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "auto" });
     } else {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
@@ -1931,10 +1952,10 @@ function showView(v) {
     av.classList.add("open");
     renderAccountView();
   }
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 window.showView = showView;
-document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => showView(tb.dataset.view)));
+document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => { if (tb.dataset.view === "companies") openCategory(""); else showView(tb.dataset.view); }));
 window.addEventListener("resize", () => {
   const ae = document.activeElement;
   if (ae && ["INPUT", "TEXTAREA", "SELECT"].includes(ae.tagName)) return;
@@ -1958,7 +1979,7 @@ function renderAccountView() {
       <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
       <p style="margin:8px 0 4px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
       <div class="acc-menu">
-        <button class="acc-item" onclick="showView('dash');setTimeout(()=>document.getElementById('notifBtn').click(),350)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
+        <button class="acc-item" onclick="document.getElementById('notifBtn').click()">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
@@ -2021,6 +2042,7 @@ window.openCategory = function(name) {
     ? cos.map(coCard).join("")
     : `<div class="dash-empty"><div class="big">🏢</div>${t("q_empty_co")}</div>`;
   showView("cat");
+  document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === "companies"));
 };
 window.goBackHome = function() { showView("home"); };
 window.openCompanyOf = function(nm) {
@@ -2059,6 +2081,7 @@ window.openCompany = async function(id) {
         <h2>${p.name} ${p.demo ? "" : '<span class="perm-badge" style="background:#15803d;color:#fff">✅</span>'}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
         <div class="co-rate2">★ ${p.rating || "5.0"}</div>
+        ${p.location ? `<div class="co-loc" style="font-size:.8rem">📍 ${p.location}</div>` : ""}
       </div>
       <button class="ad-cta" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button>
     </div>
@@ -2280,6 +2303,7 @@ function fillCompanyProfileForm() {
   document.getElementById("cpInsta").value = currentUser.insta || "";
   document.getElementById("cpWeb").value = currentUser.web || "";
   document.getElementById("cpMap").value = currentUser.map || "";
+  document.getElementById("cpLoc").value = currentUser.location || "";
   document.getElementById("cpBio").value = currentUser.bio || "";
   document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
 }
@@ -2291,6 +2315,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     insta: document.getElementById("cpInsta").value.trim(),
     web: document.getElementById("cpWeb").value.trim(),
     map: document.getElementById("cpMap").value.trim(),
+    location: document.getElementById("cpLoc").value.trim(),
     bio: document.getElementById("cpBio").value.trim(),
     services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
   };
@@ -2383,7 +2408,7 @@ async function loadLiveCompanies() {
     liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => ({
       id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), cat: u.category || "", catEn: u.category || "",
       icon: "🏢", rating: "5.0", phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
-      web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], demo: false
+      web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
     }));
     renderProviders();
   } catch (e) { console.error(e); }
@@ -2649,7 +2674,14 @@ window.deleteMyAccount = async function() {
 // استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
 const savedSession = localStorage.getItem("darak_session");
 if (savedSession && !auth) {
-  try { currentUser = JSON.parse(savedSession); } catch (e) {}
+  try {
+    const prof = JSON.parse(savedSession);
+    const st = prof.status || "approved";
+    if (st === "suspended" || st === "rejected") {
+      localStorage.removeItem("darak_session");
+      showToast("🚫 " + (st === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + (prof.statusReason || t("no_reason")), "error");
+    } else currentUser = prof;
+  } catch (e) {}
 }
 renderAuthArea();
 
@@ -2659,9 +2691,16 @@ if (auth && onAuthStateFn) {
     if (user && !currentUser) {
       try {
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", user.uid)));
-        currentUser = snap.docs.length
+        const prof = snap.docs.length
           ? snap.docs[0].data()
           : { uid: user.uid, email: user.email, displayName: user.displayName || user.email, role: "client", category: "" };
+        const st = prof.status || "approved";
+        if (st === "suspended" || st === "rejected") {
+          try { await signOutFn(auth); } catch (e) {}
+          showToast("🚫 " + (st === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + (prof.statusReason || t("no_reason")), "error");
+          return;
+        }
+        currentUser = prof;
         renderAuthArea();
       } catch (e) { console.warn("تعذر استعادة الجلسة", e); }
     } else if (!user && currentUser) {
