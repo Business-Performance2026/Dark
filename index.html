@@ -201,6 +201,18 @@ footer ul a:hover{color:var(--gold-2)}
 .dash-table tr:last-child td{border-bottom:none}
 .status-badge{display:inline-block;padding:4px 14px;border-radius:100px;font-size:.78rem;font-weight:700;white-space:nowrap}
 .status-new{background:#e0f2fe;color:#0369a1}
+
+.q-group{border:1px solid #e6ddc9;border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
+.q-group-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:#faf6ee;font-weight:700;font-size:.92rem;color:var(--navy)}
+.q-count{background:var(--navy);color:#fff;border-radius:20px;padding:1px 10px;font-size:.8rem}
+.q-group.closed .q-group-body{display:none}
+.q-group-body{padding:8px}
+.q-card{border:1px solid #eee3cd;border-radius:10px;margin-bottom:8px;padding:9px 12px;cursor:pointer;transition:.2s}
+.q-card:hover{border-color:var(--gold)}
+.q-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.9rem}
+.q-det{display:none;margin-top:8px;border-top:1px dashed #e6ddc9;padding-top:8px;font-size:.85rem;color:#444}
+.q-det div{margin-bottom:4px}
+.q-card.open .q-det{display:block}
 .dash-empty{text-align:center;padding:50px 20px;color:var(--muted)}
 .dash-empty .big{font-size:2.6rem;margin-bottom:10px}
 .user-chip{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:.95rem}
@@ -517,11 +529,7 @@ footer ul a:hover{color:var(--gold-2)}
 </header>
 
 <!-- ================= Hero ================= -->
-<section class="hero" id="heroSec">
-  <div class="container" style="text-align:center">
-    <p class="tagline" data-i18n="hero_badge">منصة البناء والتشطيب الأولى في سلطنة عمان</p>
-  </div>
-</section>
+<section class="hero" id="heroSec" style="padding:56px 0 0;background:none;min-height:0"></section>
 
 <!-- ================= شريط الإعلانات ================= -->
 <section id="adsSec" style="padding-top:22px;padding-bottom:0">
@@ -612,7 +620,15 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="form-card" style="text-align:center">
       <div id="accountContent"></div>
     </div>
-    <div class="dash-table-wrap" id="companyProfileWrap" style="display:none;margin-top:24px;text-align:start">
+    
+      </div>
+</section>
+
+<!-- ================= صفحة ملف الشركة ================= -->
+<section class="dashboard" id="profilePage" style="display:none">
+  <div class="container" style="max-width:560px">
+    <button class="btn btn-outline btn-sm" onclick="showView('account')" style="margin-bottom:14px" data-i18n="back">رجوع ←</button>
+<div class="dash-table-wrap" id="companyProfileWrap" style="display:none;margin-top:24px;text-align:start">
       <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
       <form id="cpForm" style="padding:6px 14px 14px">
         <div class="form-group"><label data-i18n="cp_logo">شعار الشركة (صورة)</label><input type="file" id="cpLogo" accept="image/*"></div>
@@ -624,8 +640,7 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
         <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ ملف الشركة 💾</button>
       </form>
-    </div>
-      </div>
+    </div>  </div>
 </section>
 
 <!-- ================= لوحة التحكم (تظهر بعد تسجيل الدخول) ================= -->
@@ -1052,6 +1067,9 @@ const I18N = {
     forgot_err: "تعذر الإرسال — تأكد من البريد أو أن الحساب موجود",
     forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase",
     quotes_title: "💰 عروض الأسعار", q_sent_title: "💰 عروضي المرسلة",
+    q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة",
+    q_empty_grp: "لا توجد عروض هنا",
+    badge_expired: "منتهية ⏳", expired_hint: "انتهت مدة الطلب — يمكنك تقديم طلب جديد", req_expired: "انتهت صلاحية هذا الطلب (7 أيام)",
     q_company: "الشركة", q_client: "العميل", q_amount: "المبلغ", q_note: "ملاحظات", q_file: "الملف",
     q_view: "📄 عرض", q_actions: "القرار", q_accept: "✅ موافق", q_reject: "⛔ رفض",
     q_sent: "بانتظار ردك ⏳", q_waiting: "بانتظار رد العميل ⏳", q_accepted: "مقبول ✅", q_rejected: "مرفوض ⛔",
@@ -1073,7 +1091,7 @@ const I18N = {
     emp_add: "إضافة ➕", emp_del: "حذف", emp_empty: "لا يوجد موظفون بعد", emp_added: "تمت إضافة الموظف ✅",
     ads_title: "🖼️ الشرائح الإعلانية (تتبدل تلقائيًا كل 3 ثوانٍ)", ads_save: "حفظ الإعلانات 💾", ads_saved: "تم حفظ الإعلانات ✅",
     ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر",
-    tab_companies: "الشركات", acc_profile: "📇 ملف الشركة", acc_notif: "الإشعارات", acc_lang: "تغيير اللغة", acc_help: "مساعدة",
+    tab_companies: "الشركات", acc_profile: "ملف الشركة", acc_notif: "الإشعارات", acc_lang: "تغيير اللغة", acc_help: "مساعدة",
     acc_delete: "حذف حسابي", acc_delete_confirm: "متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع", acc_deleted: "تم حذف الحساب ✅",
     cp_wa: "رقم الواتساب", cp_logo: "شعار الشركة (صورة)", emp_photo: "صورة المهندس (اختياري)",
     ads_img: "صورة الإعلان (اختياري)", ads_img_set: "توجد صورة محفوظة",
@@ -1117,6 +1135,9 @@ const I18N = {
     forgot_err: "Could not send — check the email or that the account exists",
     forgot_demo: "Password reset requires Firebase",
     quotes_title: "💰 Price Quotes", q_sent_title: "💰 My Sent Quotes",
+    q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes",
+    q_empty_grp: "No quotes here",
+    badge_expired: "Expired ⏳", expired_hint: "Request expired — you can submit a new one", req_expired: "This request has expired (7 days)",
     q_company: "Company", q_client: "Client", q_amount: "Amount", q_note: "Notes", q_file: "File",
     q_view: "📄 View", q_actions: "Decision", q_accept: "✅ Accept", q_reject: "⛔ Reject",
     q_sent: "Awaiting you ⏳", q_waiting: "Awaiting client ⏳", q_accepted: "Accepted ✅", q_rejected: "Rejected ⛔",
@@ -1138,7 +1159,7 @@ const I18N = {
     emp_add: "Add ➕", emp_del: "Delete", emp_empty: "No staff yet", emp_added: "Staff member added ✅",
     ads_title: "🖼️ Ad slides (auto-rotate every 3 seconds)", ads_save: "Save ads 💾", ads_saved: "Ads saved ✅",
     ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link",
-    tab_companies: "Companies", acc_profile: "📇 Company profile", acc_notif: "Notifications", acc_lang: "Change language", acc_help: "Help",
+    tab_companies: "Companies", acc_profile: "Company profile", acc_notif: "Notifications", acc_lang: "Change language", acc_help: "Help",
     acc_delete: "Delete my account", acc_delete_confirm: "Sure you want to permanently delete your account?", acc_deleted: "Account deleted ✅",
     cp_wa: "WhatsApp number", cp_logo: "Company logo (image)", emp_photo: "Engineer photo (optional)",
     ads_img: "Ad image (optional)", ads_img_set: "An image is saved",
@@ -1568,6 +1589,7 @@ async function openDashboard() {
       : all.filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
+  if (isProvider) rows = rows.filter(r => !isExpiredReq(r));
   lastRequests = rows;
 
   // الإحصائيات
@@ -1602,7 +1624,7 @@ async function openDashboard() {
         <td data-lbl="${t("th_cat")}">${r.category || "—"}</td>
         <td data-lbl="${t("th_budget")}">${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td data-lbl="${t("th_details")}" style="max-width:240px">${r.details || "—"}</td>
-        <td data-lbl="${t("th_status")}"><span class="status-badge status-new">${t("badge_new")}</span>${isProvider ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
+        <td data-lbl="${t("th_status")}">${isExpiredReq(r) && !isProvider ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>` : `<span class="status-badge status-new">${t("badge_new")}</span>`}${isProvider ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
     </table>`;
   }
@@ -1859,11 +1881,12 @@ const VIEW_MAP = {
   cats: ["categories"],
   cat: ["catView"],
   companies: ["catView"],
+  profile: ["profilePage"],
   company: ["companyView"],
   dash: ["dashboard"],
   account: ["accountView"]
 };
-const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers", "catView", "companyView", "dashboard", "accountView"];
+const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers", "catView", "companyView", "profilePage", "dashboard", "accountView"];
 function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
@@ -1872,20 +1895,20 @@ function showView(v) {
   const sr = document.getElementById("searchResults");
   if (sr) sr.style.display = "none";
   if (!isMobileView()) {
-    if (v === "cat" || v === "company") {
+    if (v === "cat" || v === "company" || v === "profile") {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const on = VIEW_MAP[v].includes(id);
         el.style.display = on ? "" : "none";
-        if (id === "catView" || id === "companyView") el.classList.toggle("open", on);
+        if (id === "catView" || id === "companyView" || id === "profilePage") el.classList.toggle("open", on);
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        if (id === "catView" || id === "companyView") { el.classList.remove("open"); el.style.display = "none"; }
+        if (id === "catView" || id === "companyView" || id === "profilePage") { el.classList.remove("open"); el.style.display = "none"; }
         else if (id !== "dashboard" && id !== "accountView") el.style.display = "";
       });
     }
@@ -1896,7 +1919,7 @@ function showView(v) {
     if (!el) return;
     const on = VIEW_MAP[v].includes(id);
     el.style.display = on ? "" : "none";
-    if (id === "catView" || id === "companyView") el.classList.toggle("open", on);
+    if (id === "catView" || id === "companyView" || id === "profilePage") el.classList.toggle("open", on);
   });
   if (v === "dash") {
     if (currentUser) { openDashboard(); }
@@ -1913,6 +1936,8 @@ function showView(v) {
 window.showView = showView;
 document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => showView(tb.dataset.view)));
 window.addEventListener("resize", () => {
+  const ae = document.activeElement;
+  if (ae && ["INPUT", "TEXTAREA", "SELECT"].includes(ae.tagName)) return;
   if (!isMobileView()) {
     ALL_VIEWS.forEach(id => {
       const el = document.getElementById(id);
@@ -1935,7 +1960,7 @@ function renderAccountView() {
       <div class="acc-menu">
         <button class="acc-item" onclick="showView('dash');setTimeout(()=>document.getElementById('notifBtn').click(),350)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
-        <button class="acc-item" onclick="window.location.href='mailto:m.alhinai11@gmail.com'">❓ <span>${t("acc_help")}</span></button>
+        <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
@@ -2055,10 +2080,17 @@ window.openCompany = async function(id) {
 
 // ---- نظام الإشعارات (شركة ← طلبات وردود | عميل ← عروض جديدة) ----
 let _lastQuotes = [];
+function _notifRead() {
+  try { return JSON.parse(localStorage.getItem("darak_notif_read_" + (currentUser?.uid || "")) || "[]"); } catch (e) { return []; }
+}
+function _notifMarkRead(key) {
+  const k = "darak_notif_read_" + (currentUser?.uid || "");
+  const arr = _notifRead();
+  if (!arr.includes(key)) { arr.push(key); localStorage.setItem(k, JSON.stringify(arr.slice(-200))); }
+}
 function updateNotifBadge() {
-  const items = collectNotifs();
-  const seen = +(localStorage.getItem("darak_notif_seen_" + (currentUser?.uid || "")) || 0);
-  const unread = items.filter(x => x.ts > seen).length;
+  const read = _notifRead();
+  const unread = collectNotifs().filter(x => !read.includes(x.key)).length;
   ["notifBadge", "notifBadgeAcc"].forEach(id => {
     const b = document.getElementById(id);
     if (!b) return;
@@ -2072,32 +2104,46 @@ function collectNotifs() {
   const isProv = currentUser.role === "provider";
   (lastRequests || []).forEach(r => {
     const ts = r.createdAt?.seconds ? r.createdAt.seconds * 1000 : new Date(r.createdAt || 0).getTime();
-    if (isProv) items.push({ ts, txt: t("n_new_req").replace("{n}", r.name || "—").replace("{c}", r.category || "") });
+    if (isProv) items.push({ ts, key: "req_" + (r.id || ts), target: "requestsWrap",
+      txt: t("n_new_req").replace("{n}", r.name || "—").replace("{c}", r.category || "") });
   });
   (_lastQuotes || []).forEach(q => {
     const ts = q.createdAt?.seconds ? q.createdAt.seconds * 1000 : new Date(q.createdAt || 0).getTime();
-    if (!isProv && q.status === "sent") items.push({ ts, txt: t("n_new_quote").replace("{p}", q.providerName || "—") });
-    if (isProv && q.status === "accepted") items.push({ ts, txt: t("n_quote_acc").replace("{c}", q.clientName || "—") });
-    if (isProv && q.status === "rejected") items.push({ ts, txt: t("n_quote_rej").replace("{c}", q.clientName || "—") });
+    if (!isProv && q.status === "sent") items.push({ ts, key: "qs_" + (q.id || ts), target: "quotesWrap",
+      txt: t("n_new_quote").replace("{p}", q.providerName || "—") });
+    if (isProv && q.status === "accepted") items.push({ ts, key: "qa_" + (q.id || ts), target: "quotesWrap",
+      txt: t("n_quote_acc").replace("{c}", q.clientName || "—") });
+    if (isProv && q.status === "rejected") items.push({ ts, key: "qr_" + (q.id || ts), target: "quotesWrap",
+      txt: t("n_quote_rej").replace("{c}", q.clientName || "—") });
   });
   items.sort((a, b) => b.ts - a.ts);
   return items.slice(0, 15);
 }
+window.openNotif = function(key, target) {
+  _notifMarkRead(key);
+  const p = document.getElementById("notifPanel");
+  if (p) p.classList.remove("open");
+  showView("dash");
+  setTimeout(() => {
+    const el = document.getElementById(target);
+    if (el) { el.style.display = ""; el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    updateNotifBadge();
+  }, 150);
+};
 function buildNotifs() {
   updateNotifBadge();
   const panel = document.getElementById("notifPanel");
   if (!panel) return;
-  const items = collectNotifs();
+  const read = _notifRead();
+  const items = collectNotifs().filter(x => !read.includes(x.key));
   panel.innerHTML = `<h4>${t("notif_title")}</h4>` + (items.length
-    ? items.map(x => `<div class="notif-item">${x.txt}<small>${x.ts ? new Date(x.ts).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB") : ""}</small></div>`).join("")
+    ? items.map(x => `<div class="notif-item" style="cursor:pointer" onclick="openNotif('${x.key}','${x.target}')">${x.txt}<small>${x.ts ? new Date(x.ts).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB") : ""}</small></div>`).join("")
     : `<div class="notif-item" style="text-align:center;color:var(--muted)">${t("notif_empty")}</div>`);
 }
 document.getElementById("notifBtn").addEventListener("click", e => {
   e.stopPropagation();
   buildNotifs();
   document.getElementById("notifPanel").classList.toggle("open");
-  localStorage.setItem("darak_notif_seen_" + (currentUser?.uid || ""), Date.now());
-  setTimeout(updateNotifBadge, 300);
 });
 document.addEventListener("click", e => {
   const p = document.getElementById("notifPanel");
@@ -2362,6 +2408,7 @@ let lastRequests = [];
 window.openQuoteModal = function(requestId) {
   const r = lastRequests.find(x => x.id === requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
+  if (isExpiredReq(r)) { showToast(t("req_expired"), "error"); return; }
   document.getElementById("quoteModal").dataset.requestId = requestId;
   document.getElementById("quoteFor").textContent = t("q_client") + ": " + (r.name || "—") + " • " + (r.category || "");
   document.getElementById("quoteForm").reset();
@@ -2431,6 +2478,8 @@ async function fetchQuotes(field, value) {
   return JSON.parse(localStorage.getItem("darak_quotes") || "[]").filter(q => q[field] === value);
 }
 const tsq = q => q.createdAt?.seconds ? q.createdAt.seconds * 1000 : new Date(q.createdAt || 0).getTime();
+const REQ_TTL = 7 * 24 * 60 * 60 * 1000;
+const isExpiredReq = r => { const t = tsq(r); return t && (Date.now() - t) > REQ_TTL; };
 
 async function loadQuotesSection() {
   const wrap = document.getElementById("quotesWrap");
@@ -2450,27 +2499,59 @@ async function loadQuotesSection() {
   _lastQuotes = quotes;
   updateNotifBadge();
   if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
+
+  if (isProv) {
+    const groups = [
+      { key: "sent",     icon: "📤", title: t("q_grp_sent"), list: quotes.filter(q => q.status === "sent") },
+      { key: "accepted", icon: "✅", title: t("q_grp_acc"),  list: quotes.filter(q => q.status === "accepted") },
+      { key: "rejected", icon: "⛔", title: t("q_grp_rej"),  list: quotes.filter(q => q.status === "rejected") }
+    ];
+    const stBadge2 = s => s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
+      : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
+      : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
+    box.innerHTML = groups.map(g => `
+      <div class="q-group">
+        <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
+          <span>${g.icon} ${g.title}</span><span class="q-count">${g.list.length}</span>
+        </div>
+        <div class="q-group-body">
+          ${g.list.length ? g.list.map(q => `
+            <div class="q-card" onclick="this.classList.toggle('open')">
+              <div class="q-card-head">
+                <b>${q.clientName || "—"}</b>
+                <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
+              </div>
+              <div class="q-det">
+                <div>🗂 ${q.category || "—"}</div>
+                ${q.createdAt ? `<div>📅 ${new Date(tsq(q)).toLocaleDateString("ar")}</div>` : ""}
+                ${q.note ? `<div>📝 ${q.note}</div>` : ""}
+                ${q.pdfUrl ? `<div>📄 <a href="${q.pdfUrl}" target="_blank" onclick="event.stopPropagation()" style="color:var(--gold);font-weight:700">${t("q_view")}</a></div>` : ""}
+                ${q.clientComment ? `<div>💬 ${t("aq_comment")}: ${q.clientComment}</div>` : ""}
+              </div>
+            </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
+        </div>
+      </div>`).join("");
+    return;
+  }
+
   box.innerHTML = `<table class="dash-table"><thead><tr>
-    <th>${isClient ? t("q_company") : t("q_client")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${isClient ? t("q_actions") : t("aq_comment")}</th>
+    <th>${t("q_company")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${t("q_actions")}</th>
   </tr></thead><tbody>${quotes.map(q => {
     const stBadge = q.status === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
       : q.status === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
-      : `<span class="status-badge status-pending">${t(isClient ? "q_sent" : "q_waiting")}</span>`;
+      : `<span class="status-badge status-pending">${t("q_sent")}</span>`;
     const fileCell = q.pdfUrl ? `<a href="${q.pdfUrl}" target="_blank" style="color:var(--gold);font-weight:700">${t("q_view")}</a>` : (q.pdfName || "—");
-    const who = isClient ? (q.providerName || "—") : (q.clientName || "—");
-    const lastCell = isClient
-      ? (q.status === "sent"
-        ? `<button class="action-btn action-approve" onclick="decideQuote('${q.id}','accepted')">${t("q_accept")}</button> <button class="action-btn action-reject" onclick="decideQuote('${q.id}','rejected')">${t("q_reject")}</button>`
-        : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—"))
+    const lastCell = q.status === "sent"
+      ? `<button class="action-btn action-approve" onclick="decideQuote('${q.id}','accepted')">${t("q_accept")}</button> <button class="action-btn action-reject" onclick="decideQuote('${q.id}','rejected')">${t("q_reject")}</button>`
       : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—");
     return `<tr>
-      <td data-lbl="${isClient ? t("q_company") : t("q_client")}"><b>${who}</b></td>
+      <td data-lbl="${t("q_company")}"><b>${q.providerName || "—"}</b></td>
       <td data-lbl="${t("th_cat")}">${q.category || "—"}</td>
       <td data-lbl="${t("q_amount")}">${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
       <td data-lbl="${t("q_note")}" style="max-width:180px;font-size:.85rem">${q.note || "—"}</td>
       <td data-lbl="${t("q_file")}">${fileCell}</td>
       <td data-lbl="${t("th_status")}">${stBadge}</td>
-      <td data-lbl="${isClient ? t("q_actions") : t("aq_comment")}" style="white-space:nowrap">${lastCell}</td>
+      <td data-lbl="${t("q_actions")}" style="white-space:nowrap">${lastCell}</td>
     </tr>`;
   }).join("")}</tbody></table>`;
 }
@@ -2535,12 +2616,19 @@ async function loadAdminQuotes() {
   }).join("")}</tbody></table>`;
 }
 
+window.openHelpWa = async function() {
+  try {
+    const f = await getFooterSettings();
+    const num = (f.phone || "").replace(/\D/g, "");
+    window.open("https://wa.me/" + (num.length === 8 ? "968" + num : num), "_blank");
+  } catch (e) { window.open("https://wa.me/96890000000", "_blank"); }
+};
+
 window.toggleCompanyProfile = function() {
   const w = document.getElementById("companyProfileWrap");
-  if (!w) return;
-  const open = w.style.display !== "none";
-  w.style.display = open ? "none" : "";
-  if (!open) { fillCompanyProfileForm(); w.scrollIntoView({ behavior: "smooth" }); }
+  if (w) w.style.display = "";
+  fillCompanyProfileForm();
+  showView("profile");
 };
 
 window.deleteMyAccount = async function() {
