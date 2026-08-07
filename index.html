@@ -658,6 +658,47 @@ footer ul a:hover{color:var(--gold-2)}
     </div>  </div>
 </section>
 
+<!-- ================= صفحة إضافة/تعديل مهندس ================= -->
+<section class="dashboard" id="empPage" style="display:none">
+  <div class="container" style="max-width:560px">
+    <button class="btn btn-outline btn-sm" onclick="showView('dash')" style="margin-bottom:14px" data-i18n="back">رجوع ←</button>
+    <div class="dash-table-wrap" style="text-align:start">
+      <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="emp_form_title">👷 بيانات المهندس</h3>
+      <form id="empForm" style="padding:6px 18px">
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="emp_name">الاسم *</label><input type="text" id="empName" required></div>
+          <div class="form-group"><label data-i18n="emp_job">المسمى الوظيفي *</label><input type="text" id="empJob" required placeholder="مهندس مدني"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="emp_hours">أيام وأوقات الدوام</label>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <select id="empDayFrom" style="flex:1;min-width:80px"></select>
+              <span style="font-size:.85rem;color:var(--muted)" data-i18n="emp_to">إلى</span>
+              <select id="empDayTo" style="flex:1;min-width:80px"></select>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+              <input type="time" id="empTimeFrom" value="08:00" style="flex:1">
+              <span style="font-size:.85rem;color:var(--muted)" data-i18n="emp_to2">إلى</span>
+              <input type="time" id="empTimeTo" value="17:00" style="flex:1">
+            </div>
+          </div>
+          <div class="form-group"><label data-i18n="emp_perm">الصلاحية</label>
+            <select id="empPerm">
+              <option value="viewer" data-i18n="emp_perm1">مشاهدة الطلبات فقط</option>
+              <option value="quotes" data-i18n="emp_perm2">إرسال عروض الأسعار</option>
+              <option value="manager" data-i18n="emp_perm3">صلاحية كاملة</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label data-i18n="emp_photo">صورة المهندس (اختياري)</label><input type="file" id="empPhoto" accept="image/*" style="padding:10px"></div>
+        <input type="hidden" id="empEditId">
+        <button type="submit" class="submit-btn" id="empSubmitBtn" data-i18n="emp_add">إضافة ➕</button>
+        <button type="button" class="submit-btn" id="empCancelBtn" style="display:none;background:var(--muted);margin-top:8px" data-i18n="emp_cancel">إلغاء التعديل ✕</button>
+      </form>
+    </div>
+  </div>
+</section>
+
 <!-- ================= لوحة التحكم (تظهر بعد تسجيل الدخول) ================= -->
 <section class="dashboard" id="dashboard">
   <div class="container">
@@ -691,37 +732,7 @@ footer ul a:hover{color:var(--gold-2)}
     </div>
 <div class="dash-table-wrap" id="employeesWrap" style="display:none;margin-top:24px">
       <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="emp_title">👷 المهندسون والموظفون</h3>
-      <form id="empForm" style="padding:6px 18px">
-        <div class="form-row">
-          <div class="form-group"><label data-i18n="emp_name">الاسم *</label><input type="text" id="empName" required></div>
-          <div class="form-group"><label data-i18n="emp_job">المسمى الوظيفي *</label><input type="text" id="empJob" required placeholder="مهندس مدني"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label data-i18n="emp_hours">أيام وأوقات الدوام</label>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-              <select id="empDayFrom" style="flex:1;min-width:80px"></select>
-              <span style="font-size:.85rem;color:var(--muted)" data-i18n="emp_to">إلى</span>
-              <select id="empDayTo" style="flex:1;min-width:80px"></select>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
-              <input type="time" id="empTimeFrom" value="08:00" style="flex:1">
-              <span style="font-size:.85rem;color:var(--muted)" data-i18n="emp_to2">إلى</span>
-              <input type="time" id="empTimeTo" value="17:00" style="flex:1">
-            </div>
-          </div>
-          <div class="form-group"><label data-i18n="emp_perm">الصلاحية</label>
-            <select id="empPerm">
-              <option value="viewer" data-i18n="emp_perm1">مشاهدة الطلبات فقط</option>
-              <option value="quotes" data-i18n="emp_perm2">إرسال عروض الأسعار</option>
-              <option value="manager" data-i18n="emp_perm3">صلاحية كاملة</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group"><label data-i18n="emp_photo">صورة المهندس (اختياري)</label><input type="file" id="empPhoto" accept="image/*" style="padding:10px"></div>
-        <input type="hidden" id="empEditId">
-        <button type="submit" class="submit-btn" id="empSubmitBtn" data-i18n="emp_add">إضافة ➕</button>
-        <button type="button" class="submit-btn" id="empCancelBtn" style="display:none;background:var(--muted);margin-top:8px" data-i18n="emp_cancel">إلغاء التعديل ✕</button>
-      </form>
+      <div style="padding:6px 18px 14px"><button class="btn btn-gold btn-sm" onclick="openEmpPage()" data-i18n="emp_add_btn">➕ إضافة مهندس</button></div>
       <div id="empList"></div>
     </div>
     <div class="dash-table-wrap" id="usersWrap" style="display:none">
@@ -1000,7 +1011,10 @@ let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
 let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
 
+let firebaseReadyResolve;
+const firebaseReady = new Promise(res => { firebaseReadyResolve = res; });
 if (FIREBASE_READY) {
+  (async () => {
   try {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
     const firestore = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
@@ -1033,7 +1047,9 @@ if (FIREBASE_READY) {
   } catch (e) {
     console.warn("⚠️ تعذر الاتصال بـ Firebase — الوضع التجريبي", e);
   }
-}
+  firebaseReadyResolve();
+  })();
+} else firebaseReadyResolve();
 
 // ============ التخصصات ============
 const CATEGORIES = [
@@ -1118,7 +1134,7 @@ const I18N = {
     ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر",
     tab_companies: "الشركات", acc_profile: "ملف الشركة", acc_notif: "الإشعارات", acc_lang: "تغيير اللغة", acc_help: "مساعدة",
     acc_delete: "حذف حسابي", acc_delete_confirm: "متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع", acc_deleted: "تم حذف الحساب ✅",
-    cp_wa: "رقم الواتساب", cp_name_ar: "اسم الشركة (عربي)", cp_name_en: "اسم الشركة (إنجليزي)", cp_loc: "موقع الشركة (المدينة / المنطقة)", cp_logo: "شعار الشركة (صورة)", emp_edit: "✏️ تعديل", emp_save: "حفظ التعديل 💾", emp_updated: "تم تحديث المهندس ✅", emp_cancel: "إلغاء التعديل ✕", emp_to: "إلى", emp_to2: "إلى", emp_photo: "صورة المهندس (اختياري)",
+    cp_wa: "رقم الواتساب", cp_name_ar: "اسم الشركة (عربي)", cp_name_en: "اسم الشركة (إنجليزي)", cp_loc: "موقع الشركة (المدينة / المنطقة)", cp_logo: "شعار الشركة (صورة)", emp_add_btn: "➕ إضافة مهندس", emp_form_title: "👷 بيانات المهندس", emp_edit: "✏️ تعديل", emp_save: "حفظ التعديل 💾", emp_updated: "تم تحديث المهندس ✅", emp_cancel: "إلغاء التعديل ✕", emp_to: "إلى", emp_to2: "إلى", emp_photo: "صورة المهندس (اختياري)",
     ads_img: "صورة الإعلان (اختياري)", ads_img_set: "توجد صورة محفوظة",
     notif_title: "🔔 الإشعارات", notif_empty: "لا توجد إشعارات جديدة",
     n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
@@ -1187,7 +1203,7 @@ const I18N = {
     ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link",
     tab_companies: "Companies", acc_profile: "Company profile", acc_notif: "Notifications", acc_lang: "Change language", acc_help: "Help",
     acc_delete: "Delete my account", acc_delete_confirm: "Sure you want to permanently delete your account?", acc_deleted: "Account deleted ✅",
-    cp_wa: "WhatsApp number", cp_name_ar: "Company name (Arabic)", cp_name_en: "Company name (English)", cp_loc: "Company location (city / area)", cp_logo: "Company logo (image)", emp_edit: "✏️ Edit", emp_save: "Save changes 💾", emp_updated: "Engineer updated ✅", emp_cancel: "Cancel edit ✕", emp_to: "to", emp_to2: "to", emp_photo: "Engineer photo (optional)",
+    cp_wa: "WhatsApp number", cp_name_ar: "Company name (Arabic)", cp_name_en: "Company name (English)", cp_loc: "Company location (city / area)", cp_logo: "Company logo (image)", emp_add_btn: "➕ Add engineer", emp_form_title: "👷 Engineer details", emp_edit: "✏️ Edit", emp_save: "Save changes 💾", emp_updated: "Engineer updated ✅", emp_cancel: "Cancel edit ✕", emp_to: "to", emp_to2: "to", emp_photo: "Engineer photo (optional)",
     ads_img: "Ad image (optional)", ads_img_set: "An image is saved",
     notif_title: "🔔 Notifications", notif_empty: "No new notifications",
     n_new_req: "📋 New request from {n} — {c}", n_new_quote: "💰 New quote from {p}",
@@ -1213,7 +1229,7 @@ let liveCompanies = [];
 function allCompanies() { return [...liveCompanies]; }
 function coCard(p) {
   return `
-  <div class="co-card" onclick="openCompany('${p.id}')">
+  <div class="co-card" data-open="${p.id}" data-kind="co">
     ${p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="">` : `<div class="co-logo">${p.icon || "🏢"}</div>`}
     <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
@@ -1227,7 +1243,7 @@ function renderProviders() {
 }
 function engCard(e) {
   return `
-  <div class="eng-card" onclick="openCompanyOf('${(e.company || e.companyName || "").replace(/'/g, "")}')">
+  <div class="eng-card" data-open="${encodeURIComponent(e.company || e.companyName || "")}" data-kind="eng">
     <div class="eng-top">
       ${e.photo ? `<img class="eng-ava-img" src="${e.photo}" alt="">` : '<div class="eng-ava">👷</div>'}
       <div><h4>${e.name}</h4><div class="eng-job">${e.job || e.title || ""}</div></div>
@@ -1239,6 +1255,23 @@ let liveEngineers = [];
 function renderEngineers() {
   document.getElementById("engineerRow").innerHTML = [...liveEngineers].map(engCard).join("");
 }
+
+// نقر موثوق داخل الصفوف المتحركة (يعمل مع السحب والتحريك التلقائي)
+function bindRowClicks(id) {
+  const el = document.getElementById(id);
+  if (!el || el._clicksBound) return;
+  el._clicksBound = true;
+  let sx = 0, sy = 0;
+  el.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; });
+  el.addEventListener("pointerup", e => {
+    if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) return; // كان سحبًا مو نقرة
+    const card = e.target.closest("[data-open]");
+    if (!card) return;
+    if (card.dataset.kind === "eng") openCompanyOf(decodeURIComponent(card.dataset.open));
+    else openCompany(card.dataset.open);
+  });
+}
+["companyRow", "engineerRow", "searchPros", "catViewGrid"].forEach(bindRowClicks);
 
 // تطبيق اللغة على كل الواجهة
 function applyLang() {
@@ -1911,11 +1944,12 @@ const VIEW_MAP = {
   cat: ["catView"],
   companies: ["catView"],
   profile: ["profilePage"],
+  emp: ["empPage"],
   company: ["companyView"],
   dash: ["dashboard"],
   account: ["accountView"]
 };
-const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers", "catView", "companyView", "profilePage", "dashboard", "accountView"];
+const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers", "catView", "companyView", "empPage", "profilePage", "dashboard", "accountView"];
 function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
@@ -1924,20 +1958,20 @@ function showView(v) {
   const sr = document.getElementById("searchResults");
   if (sr) sr.style.display = "none";
   if (!isMobileView()) {
-    if (v === "cat" || v === "company" || v === "profile") {
+    if (v === "cat" || v === "company" || v === "profile" || v === "emp") {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const on = VIEW_MAP[v].includes(id);
         el.style.display = on ? "" : "none";
-        if (id === "catView" || id === "companyView" || id === "profilePage") el.classList.toggle("open", on);
+        if (id === "catView" || id === "companyView" || id === "profilePage" || id === "empPage") el.classList.toggle("open", on);
       });
       window.scrollTo({ top: 0, behavior: "auto" });
     } else {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        if (id === "catView" || id === "companyView" || id === "profilePage") { el.classList.remove("open"); el.style.display = "none"; }
+        if (id === "catView" || id === "companyView" || id === "profilePage" || id === "empPage") { el.classList.remove("open"); el.style.display = "none"; }
         else if (id !== "dashboard" && id !== "accountView") el.style.display = "";
       });
     }
@@ -1948,7 +1982,7 @@ function showView(v) {
     if (!el) return;
     const on = VIEW_MAP[v].includes(id);
     el.style.display = on ? "" : "none";
-    if (id === "catView" || id === "companyView" || id === "profilePage") el.classList.toggle("open", on);
+    if (id === "catView" || id === "companyView" || id === "profilePage" || id === "empPage") el.classList.toggle("open", on);
   });
   if (v === "dash") {
     if (currentUser) { openDashboard(); }
@@ -1964,7 +1998,10 @@ function showView(v) {
 }
 window.showView = showView;
 document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => { if (tb.dataset.view === "companies") openCategory(""); else showView(tb.dataset.view); }));
+let _lastW = window.innerWidth;
 window.addEventListener("resize", () => {
+  if (window.innerWidth === _lastW) return; // تغيّر الارتفاع فقط (شريط المتصفح) — لا نعيد الرسم
+  _lastW = window.innerWidth;
   const ae = document.activeElement;
   if (ae && ["INPUT", "TEXTAREA", "SELECT"].includes(ae.tagName)) return;
   if (!isMobileView()) {
@@ -2390,6 +2427,7 @@ document.getElementById("empForm").addEventListener("submit", async e => {
     }
     resetEmpForm();
     loadEmployees(); loadLiveEngineers();
+    showView("dash");
   } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
 });
 const WEEK_DAYS = ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
@@ -2411,7 +2449,12 @@ function resetEmpForm() {
   document.getElementById("empSubmitBtn").textContent = t("emp_add");
   document.getElementById("empCancelBtn").style.display = "none";
 }
-document.getElementById("empCancelBtn").addEventListener("click", resetEmpForm);
+document.getElementById("empCancelBtn").addEventListener("click", () => { resetEmpForm(); showView("dash"); });
+window.openEmpPage = function() {
+  resetEmpForm();
+  fillDaySelects();
+  showView("emp");
+};
 window.editEmployee = function(id) {
   const x = (_lastEmps || []).find(v => v.id === id);
   if (!x) return;
@@ -2426,7 +2469,7 @@ window.editEmployee = function(id) {
   _empEditPhoto = x.photo || "";
   document.getElementById("empSubmitBtn").textContent = t("emp_save");
   document.getElementById("empCancelBtn").style.display = "";
-  document.getElementById("empForm").scrollIntoView({ behavior: "smooth", block: "center" });
+  showView("emp");
 };
 let _lastEmps = [];
 async function loadEmployees() {
@@ -2463,12 +2506,19 @@ window.deleteEmployee = async function(id) {
 };
 
 // ---- دمج الشركات المسجلة والمهندسين من قاعدة البيانات في الصفحة الرئيسية ----
+function withTimeout(promise, ms) {
+  return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+}
+
 async function loadLiveCompanies() {
+  renderProviders();
   try {
     let users = [];
     if (db && getDocsFn) {
-      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "provider")));
-      users = snap.docs.map(d => d.data());
+      try {
+        const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "provider"))), 9000);
+        users = snap.docs.map(d => d.data());
+      } catch (e) { console.warn("تعذر تحميل الشركات", e); }
     } else {
       users = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.role === "provider");
     }
@@ -2481,10 +2531,13 @@ async function loadLiveCompanies() {
   } catch (e) { console.error(e); }
 }
 async function loadLiveEngineers() {
+  renderEngineers();
   try {
     if (db && getDocsFn) {
-      const snap = await getDocsFn(queryFn(collectionFn(db, "employees")));
-      liveEngineers = snap.docs.map(d => d.data());
+      try {
+        const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "employees"))), 9000);
+        liveEngineers = snap.docs.map(d => d.data());
+      } catch (e) { console.warn("تعذر تحميل المهندسين", e); }
     } else {
       liveEngineers = JSON.parse(localStorage.getItem("darak_employees") || "[]");
     }
@@ -2753,6 +2806,7 @@ if (savedSession && !auth) {
 renderAuthArea();
 
 // استعادة جلسة Firebase تلقائيًا (يبقى المستخدم مسجلًا حتى بعد تحديث الصفحة)
+firebaseReady.then(() => {
 if (auth && onAuthStateFn) {
   onAuthStateFn(auth, async user => {
     if (user && !currentUser) {
@@ -2777,14 +2831,18 @@ if (auth && onAuthStateFn) {
     }
   });
 }
-
-// تشغيل الميزات الجديدة بعد تعريف كل شيء
+});
+// تشغيل الميزات الجديدة بعد تعريف كل شيء — فورًا ثم إعادة التحميل عند اتصال Firebase
 startAutoRows();
 renderAds();
 restartAdTimer();
-loadAds();
-loadLiveCompanies();
-loadLiveEngineers();
+function bootData() {
+  loadAds();
+  loadLiveCompanies();
+  loadLiveEngineers();
+}
+bootData();
+firebaseReady.then(() => { bootData(); });
 </script>
 </body>
 </html>
