@@ -367,11 +367,14 @@ footer ul a:hover{color:var(--gold-2)}
 .co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
 .co-grid .co-card{width:auto}
 /* صفحة الشركة */
-.co-hero{background:linear-gradient(135deg,var(--navy),#2c4a6b);border-radius:24px;padding:28px 24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px}
-.co-hero .co-big-logo{width:88px;height:88px;border-radius:22px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:2.4rem;flex:0 0 auto}
-.co-hero h2{font-size:1.3rem}
-.co-hero .co-sub{color:var(--gold);font-weight:700;font-size:.9rem;margin-top:4px}
-.co-hero .co-rate2{margin-top:6px;color:#fbbf24;font-weight:700;font-size:.86rem}
+.co-hero{background:linear-gradient(135deg,#f8f1e0,#efe2c6);border-radius:24px;padding:26px 22px;color:var(--navy);display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px;border:1.5px solid #eadfc6}
+.co-quote-btn{background:var(--gold);color:#fff;border:none;padding:11px 26px;border-radius:14px;font-weight:800;font-size:.92rem;cursor:pointer;font-family:inherit;box-shadow:0 6px 16px rgba(185,141,78,.4);transition:.2s}
+.co-quote-btn:hover{background:#a67c3d;transform:translateY(-1px)}
+.co-hero-btm{width:100%;display:flex;justify-content:flex-end;margin-top:8px}
+.co-hero .co-big-logo{width:88px;height:88px;border-radius:22px;background:#fff;display:grid;place-items:center;font-size:2.4rem;flex:0 0 auto;box-shadow:0 4px 12px rgba(22,40,58,.08)}
+.co-hero h2{font-size:1.35rem;color:var(--navy);font-weight:800}
+.co-hero .co-sub{color:#a67c3d;font-weight:700;font-size:.9rem;margin-top:4px}
+.co-hero .co-rate2{margin-top:6px;color:#d99a1f;font-weight:800;font-size:.9rem}
 .co-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
 .co-actions a,.co-actions button{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:30px;font-weight:700;font-size:.84rem;text-decoration:none;border:none;cursor:pointer;font-family:inherit}
 .co-link{background:#fff;color:var(--navy);border:1.5px solid #e5ddcf}
@@ -1105,7 +1108,7 @@ const I18N = {
     notif_title: "🔔 الإشعارات", notif_empty: "لا توجد إشعارات جديدة",
     n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
     n_quote_acc: "✅ {c} وافق على عرضك", n_quote_rej: "⛔ {c} رفض عرضك",
-    co_whatsapp: "واتساب"
+    co_send_msg: "أرسل رسالة"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -1174,7 +1177,7 @@ const I18N = {
     notif_title: "🔔 Notifications", notif_empty: "No new notifications",
     n_new_req: "📋 New request from {n} — {c}", n_new_quote: "💰 New quote from {p}",
     n_quote_acc: "✅ {c} accepted your quote", n_quote_rej: "⛔ {c} rejected your quote",
-    co_whatsapp: "WhatsApp"
+    co_send_msg: "Send a message"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -1493,6 +1496,8 @@ authForm.addEventListener("submit", async e => {
     closeAuth();
     authForm.reset();
     renderAuthArea();
+    renderAccountView();
+    updateNotifBadge();
     showToast(`أهلًا بك ${currentUser.displayName} 👋`);
     openDashboard();
   } catch (err) {
@@ -1530,6 +1535,8 @@ async function logout() {
   currentUser = null;
   localStorage.removeItem("darak_session");
   renderAuthArea();
+  renderAccountView();
+  updateNotifBadge();
   document.getElementById("dashboard").classList.remove("open");
   showToast("تم تسجيل الخروج — نراك قريبًا");
 }
@@ -2050,6 +2057,9 @@ window.openCompanyOf = function(nm) {
   if (p) openCompany(p.id); else goBackHome();
 };
 
+const WA_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#25D366" style="flex:0 0 auto"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.1-.198.05-.371-.025-.52-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+const IG_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#E1306C" style="flex:0 0 auto"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>';
+
 window.openCompany = async function(id) {
   const p = allCompanies().find(x => x.id === id);
   if (!p) return;
@@ -2067,9 +2077,9 @@ window.openCompany = async function(id) {
   const waNum = (p.whatsapp || p.phone || "").replace(/\D/g, "");
   const waFull = waNum.length === 8 ? "968" + waNum : waNum;
   const links = [
-    waFull ? `<a class="co-link" href="https://wa.me/${waFull}" target="_blank" style="border-color:#22c55e;color:#16a34a">💬 ${t("co_whatsapp")} <span dir="ltr">${p.whatsapp || p.phone}</span></a>` : "",
+    waFull ? `<a class="co-link" href="https://wa.me/${waFull}" target="_blank" style="border-color:#25D366;color:#16a34a">${WA_SVG} ${t("co_send_msg")}</a>` : "",
     p.phone ? `<a class="co-link" href="tel:${p.phone}" dir="ltr">📞 ${p.phone}</a>` : "",
-    p.insta ? `<a class="co-link" href="${p.insta}" target="_blank">📸 ${t("co_insta")}</a>` : "",
+    p.insta ? `<a class="co-link" href="${p.insta}" target="_blank">${IG_SVG} ${t("co_insta")}</a>` : "",
     p.web ? `<a class="co-link" href="${p.web}" target="_blank">🌐 ${t("co_web")}</a>` : "",
     p.map ? `<a class="co-link" href="${p.map}" target="_blank">📍 ${t("co_map")}</a>` : ""
   ].join("");
@@ -2078,12 +2088,12 @@ window.openCompany = async function(id) {
     <div class="co-hero">
       ${p.logo ? `<img src="${p.logo}" alt="" style="width:88px;height:88px;border-radius:22px;object-fit:cover;flex:0 0 auto">` : `<div class="co-big-logo">${p.icon || "🏢"}</div>`}
       <div style="flex:1;min-width:200px">
-        <h2>${p.name} ${p.demo ? "" : '<span class="perm-badge" style="background:#15803d;color:#fff">✅</span>'}</h2>
+        <h2>${p.name}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
         <div class="co-rate2">★ ${p.rating || "5.0"}</div>
-        ${p.location ? `<div class="co-loc" style="font-size:.8rem">📍 ${p.location}</div>` : ""}
+        ${p.location ? `<div class="co-loc" style="font-size:.85rem;color:#7a6a4d">📍 ${p.location}</div>` : ""}
       </div>
-      <button class="ad-cta" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button>
+      <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
     </div>
     <div class="co-actions">${links}</div>
     ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
