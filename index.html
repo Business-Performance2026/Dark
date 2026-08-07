@@ -366,6 +366,23 @@ footer ul a:hover{color:var(--gold-2)}
 .svc-chip{display:inline-block;background:#faf6ee;border:1px solid #eadfc8;color:var(--gold);font-weight:700;font-size:.78rem;padding:6px 14px;border-radius:30px;margin:0 0 8px 8px}
 .perm-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;background:#eef3f8;color:var(--navy)}
 
+
+/* ===== تعديلات الهاتف: هيرو مدمج وثبات الارتفاعات ===== */
+.hero{min-height:0;padding:118px 0 12px}
+.tagline{color:var(--gold);font-size:.82rem;font-weight:600;margin-bottom:12px}
+.btn-sm{padding:8px 16px;font-size:.8rem;border-radius:12px}
+.view-all{font-size:.76rem;font-weight:500}
+.ad-slide{height:150px;min-height:0;overflow:hidden}
+.ad-slide h3{font-size:1.05rem}
+.ad-slide p{font-size:.78rem}
+.ad-slide .ad-cta{padding:7px 16px;font-size:.75rem;margin-top:2px}
+@media(max-width:820px){
+  .hero{padding:104px 0 8px}
+  .ad-slide{height:132px}
+  .btn-sm{padding:7px 13px;font-size:.74rem}
+  .tagline{font-size:.76rem}
+}
+
 </style>
 </head>
 <body>
@@ -377,10 +394,11 @@ footer ul a:hover{color:var(--gold-2)}
       <img src="assets/logo.png" alt="شعار دارك">
       <span>دا<b>رك</b></span>
     </a>
+    <button class="lang-toggle" id="searchToggle" type="button" aria-label="بحث">🔍</button>
     <button class="lang-toggle" id="langToggle" type="button">🌐 EN</button>
     <div id="authArea" style="display:flex;align-items:center"></div>
   </div>
-  <div class="container search-row">
+  <div class="container search-row" id="searchRow" style="display:none">
     <div class="search-box">
       <span>🔍</span>
       <input type="text" id="searchInput" data-i18n-ph="search_placeholder" placeholder="ابحث عن خدمة أو شركة…">
@@ -390,15 +408,11 @@ footer ul a:hover{color:var(--gold-2)}
 
 <!-- ================= Hero ================= -->
 <section class="hero" id="heroSec">
-  <div class="container hero-grid hero-single">
-    <div class="hero-center">
-      <div class="hero-badge" data-i18n="hero_badge">منصة البناء والتشطيب الأولى في سلطنة عمان</div>
-      <h1><span data-i18n="hero_t1">من أول خطوة..</span><br><em data-i18n="hero_t2">لبيت أحلامك</em></h1>
-      
-      <div class="hero-cta">
-        <button class="btn btn-gold" id="btnRequestService" data-i18n="btn_request">📋 اطلب خدمة الآن</button>
-        <button class="btn btn-outline" id="btnJoinProvider" data-i18n="btn_join">🤝 سجّل كمقدم خدمة</button>
-      </div>
+  <div class="container" style="text-align:center">
+    <p class="tagline" data-i18n="hero_badge">منصة البناء والتشطيب الأولى في سلطنة عمان</p>
+    <div class="hero-cta" style="justify-content:center;gap:8px;margin-bottom:6px">
+      <button class="btn btn-gold btn-sm" id="btnRequestService" data-i18n="btn_request">📋 اطلب خدمة الآن</button>
+      <button class="btn btn-outline btn-sm" id="btnJoinProvider" data-i18n="btn_join">🤝 سجّل كشركة</button>
     </div>
   </div>
 </section>
@@ -431,8 +445,6 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_cats">الأقسام</h2>
       <div class="row-head-actions">
-        <button class="row-arrow" data-rowbtn="catChips" data-dir="1" aria-label="›">›</button>
-        <button class="row-arrow" data-rowbtn="catChips" data-dir="-1" aria-label="‹">‹</button>
         <a class="view-all" onclick="showView('cats')" data-i18n="view_all">عرض الكل</a>
       </div>
     </div>
@@ -447,8 +459,6 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_companies">الشركات</h2>
       <div class="row-head-actions">
-        <button class="row-arrow" data-rowbtn="companyRow" data-dir="1" aria-label="›">›</button>
-        <button class="row-arrow" data-rowbtn="companyRow" data-dir="-1" aria-label="‹">‹</button>
         <a class="view-all" onclick="openCategory('')" data-i18n="view_all">عرض الكل</a>
       </div>
     </div>
@@ -462,8 +472,6 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_engineers">المهندسون</h2>
       <div class="row-head-actions">
-        <button class="row-arrow" data-rowbtn="engineerRow" data-dir="1" aria-label="›">›</button>
-        <button class="row-arrow" data-rowbtn="engineerRow" data-dir="-1" aria-label="‹">‹</button>
       </div>
     </div>
     <div class="h-scroll cards-row" id="engineerRow"></div>
@@ -1244,7 +1252,7 @@ function renderAuthArea() {
       </div>`;
     document.getElementById("logoutBtn").addEventListener("click", logout);
   } else {
-    area.innerHTML = `<button class="btn btn-gold" id="loginBtn" style="padding:10px 22px">🔐 ${t("login")}</button>`;
+    area.innerHTML = `<button class="btn btn-gold btn-sm" id="loginBtn">🔐 ${t("login")}</button>`;
     document.getElementById("loginBtn").addEventListener("click", openAuth);
   }
 }
@@ -1735,20 +1743,28 @@ function showView(v) {
     if (v === "cat" || v === "company") {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.style.display = VIEW_MAP[v].includes(id) ? "" : "none";
+        if (!el) return;
+        const on = VIEW_MAP[v].includes(id);
+        el.style.display = on ? "" : "none";
+        if (id === "catView" || id === "companyView") el.classList.toggle("open", on);
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       ALL_VIEWS.forEach(id => {
         const el = document.getElementById(id);
-        if (el && id !== "dashboard" && id !== "accountView") el.style.display = "";
+        if (!el) return;
+        if (id === "catView" || id === "companyView") { el.classList.remove("open"); el.style.display = "none"; }
+        else if (id !== "dashboard" && id !== "accountView") el.style.display = "";
       });
     }
     return;
   }
   ALL_VIEWS.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = VIEW_MAP[v].includes(id) ? "" : "none";
+    if (!el) return;
+    const on = VIEW_MAP[v].includes(id);
+    el.style.display = on ? "" : "none";
+    if (id === "catView" || id === "companyView") el.classList.toggle("open", on);
   });
   if (v === "dash") {
     if (currentUser) { openDashboard(); }
@@ -1814,6 +1830,12 @@ document.getElementById("searchInput").addEventListener("input", e => {
 });
 
 // --- زر تبديل اللغة ---
+document.getElementById("searchToggle").addEventListener("click", () => {
+  const row = document.getElementById("searchRow");
+  const open = row.style.display !== "none";
+  row.style.display = open ? "none" : "";
+  if (!open) document.getElementById("searchInput").focus();
+});
 document.getElementById("langToggle").addEventListener("click", () => {
   LANG = LANG === "ar" ? "en" : "ar";
   localStorage.setItem("darak_lang", LANG);
