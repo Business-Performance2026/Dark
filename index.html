@@ -606,6 +606,7 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_engineers">المهندسون</h2>
       <div class="row-head-actions">
+        <a class="view-all" onclick="openAllEngineers()" data-i18n="view_all">عرض الكل</a>
       </div>
     </div>
     <div class="h-scroll cards-row" id="engineerRow"></div>
@@ -1243,7 +1244,7 @@ function renderProviders() {
 }
 function engCard(e) {
   return `
-  <div class="eng-card" data-open="${encodeURIComponent(e.company || e.companyName || "")}" data-kind="eng">
+  <div class="eng-card" data-open="${encodeURIComponent(e.company || e.companyName || "")}" data-uid="${e.companyUid || ""}" data-kind="eng">
     <div class="eng-top">
       ${e.photo ? `<img class="eng-ava-img" src="${e.photo}" alt="">` : '<div class="eng-ava">👷</div>'}
       <div><h4>${e.name}</h4><div class="eng-job">${e.job || e.title || ""}</div></div>
@@ -1267,8 +1268,10 @@ function bindRowClicks(id) {
     if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) return; // كان سحبًا مو نقرة
     const card = e.target.closest("[data-open]");
     if (!card) return;
-    if (card.dataset.kind === "eng") openCompanyOf(decodeURIComponent(card.dataset.open));
-    else openCompany(card.dataset.open);
+    if (card.dataset.kind === "eng") {
+      if (card.dataset.uid && allCompanies().find(x => x.uid === card.dataset.uid)) openCompany("u_" + card.dataset.uid);
+      else openCompanyOf(decodeURIComponent(card.dataset.open));
+    } else openCompany(card.dataset.open);
   });
 }
 ["companyRow", "engineerRow", "searchPros", "catViewGrid"].forEach(bindRowClicks);
@@ -1652,6 +1655,12 @@ async function openDashboard() {
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
   if (isProvider) rows = rows.filter(r => !isExpiredReq(r));
+  // إخفاء الطلبات التي صار لها عرض سعر — الشركة: يبقى في «عروضي المرسلة» | العميل: يبقى في «عروض الأسعار»
+  try {
+    const qs = await fetchQuotes(isProvider ? "providerUid" : "clientUid", currentUser.uid);
+    const quoted = new Set(qs.map(x => x.requestId));
+    if (!admin) rows = rows.filter(r => !quoted.has(r.id));
+  } catch (e) { console.warn(e); }
   lastRequests = rows;
 
   // الإحصائيات
@@ -2088,6 +2097,13 @@ window.openCategory = function(name) {
     : `<div class="dash-empty"><div class="big">🏢</div>${t("q_empty_co")}</div>`;
   showView("cat");
   document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === "companies"));
+};
+window.openAllEngineers = function() {
+  document.getElementById("catViewTitle").textContent = t("secs_engineers");
+  document.getElementById("catViewGrid").innerHTML = liveEngineers.length
+    ? liveEngineers.map(engCard).join("")
+    : `<div class="dash-empty"><div class="big">👷</div>${t("emp_empty")}</div>`;
+  showView("cat");
 };
 window.goBackHome = function() { showView("home"); };
 window.openCompanyOf = function(nm) {
