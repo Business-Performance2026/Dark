@@ -432,6 +432,29 @@ footer ul a:hover{color:var(--gold-2)}
   .ad-slide{height:126px}
 }
 
+
+/* ===== Phase 14 ===== */
+.tagline{color:#000 !important}
+#adsSec{padding-top:2px !important}
+/* جرس الإشعارات */
+.notif-wrap{position:relative}
+.notif-btn{position:relative;width:40px;height:40px;border-radius:12px;background:#fff;border:1.5px solid #e5ddcf;font-size:1.1rem;cursor:pointer;display:grid;place-items:center}
+.notif-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#b91c1c;color:#fff;font-size:.66rem;font-weight:800;min-width:18px;height:18px;border-radius:10px;display:grid;place-items:center;padding:0 4px}
+.notif-panel{position:absolute;top:48px;inset-inline-end:0;width:min(320px,86vw);background:#fff;border-radius:16px;box-shadow:0 16px 40px rgba(22,40,58,.22);z-index:300;display:none;overflow:hidden}
+.notif-panel.open{display:block}
+.notif-panel h4{padding:12px 16px;color:var(--navy);font-size:.92rem;border-bottom:1px solid #f0ece4}
+.notif-item{padding:11px 16px;font-size:.82rem;color:var(--navy);border-bottom:1px solid #f6f2ea;line-height:1.6}
+.notif-item small{display:block;color:var(--muted);font-size:.7rem;margin-top:2px}
+/* قائمة حسابي */
+.acc-menu{display:flex;flex-direction:column;gap:8px;margin-top:16px;text-align:start}
+.acc-item{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #f0ece4;border-radius:14px;padding:12px 16px;font-family:inherit;font-size:.9rem;font-weight:700;color:var(--navy);cursor:pointer;transition:.2s;width:100%;position:relative}
+.acc-item:hover{border-color:var(--gold)}
+.acc-item.danger{color:#b91c1c}
+.acc-item.danger:hover{border-color:#b91c1c}
+/* شعار الشركة في البطاقة */
+.co-logo-img{width:64px;height:64px;border-radius:18px;object-fit:cover;margin:0 auto 10px;display:block}
+.eng-ava-img{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+
 </style>
 </head>
 <body>
@@ -550,7 +573,24 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="form-card" style="text-align:center">
       <div id="accountContent"></div>
     </div>
-  </div>
+    <div class="dash-table-wrap" id="companyProfileWrap" style="display:none;margin-top:24px;text-align:start">
+      <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
+      <form id="cpForm" style="padding:6px 18px 18px">
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" placeholder="9XXXXXXX"></div>
+          <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
+          <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
+        </div>
+        <div class="form-group"><label data-i18n="cp_logo">شعار الشركة (صورة)</label><input type="file" id="cpLogo" accept="image/*" style="padding:10px"></div>
+        <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
+        <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
+        <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ ملف الشركة 💾</button>
+      </form>
+    </div>
+      </div>
 </section>
 
 <!-- ================= لوحة التحكم (تظهر بعد تسجيل الدخول) ================= -->
@@ -561,7 +601,13 @@ footer ul a:hover{color:var(--gold-2)}
         <h2 id="dashTitle">لوحة التحكم</h2>
         <p id="dashSubtitle"></p>
       </div>
-      <button class="btn btn-gold" id="dashActionBtn" data-i18n="dash_new_req">➕ طلب خدمة جديد</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="notif-wrap">
+          <button class="notif-btn" id="notifBtn" type="button" aria-label="الإشعارات">🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
+          <div class="notif-panel" id="notifPanel"></div>
+        </div>
+        <button class="btn btn-gold" id="dashActionBtn" data-i18n="dash_new_req">➕ طلب خدمة جديد</button>
+      </div>
     </div>
     <div class="dash-stats">
       <div class="dash-stat"><b id="statTotal">0</b><span id="statTotalLabel">إجمالي الطلبات</span></div>
@@ -582,23 +628,7 @@ footer ul a:hover{color:var(--gold-2)}
       <h3 id="quotesTitle" style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem">💰 عروض الأسعار</h3>
       <div id="quotesContent"></div>
     </div>
-    <div class="dash-table-wrap" id="companyProfileWrap" style="display:none;margin-top:24px">
-      <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
-      <form id="cpForm" style="padding:6px 18px 18px">
-        <div class="form-row">
-          <div class="form-group"><label data-i18n="cp_phone2">هاتف إضافي</label><input type="tel" id="cpPhone2" placeholder="9XXXXXXX"></div>
-          <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
-          <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
-        </div>
-        <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
-        <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
-        <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ ملف الشركة 💾</button>
-      </form>
-    </div>
-    <div class="dash-table-wrap" id="employeesWrap" style="display:none;margin-top:24px">
+<div class="dash-table-wrap" id="employeesWrap" style="display:none;margin-top:24px">
       <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="emp_title">👷 المهندسون والموظفون</h3>
       <form id="empForm" style="padding:6px 18px">
         <div class="form-row">
@@ -615,6 +645,7 @@ footer ul a:hover{color:var(--gold-2)}
             </select>
           </div>
         </div>
+        <div class="form-group"><label data-i18n="emp_photo">صورة المهندس (اختياري)</label><input type="file" id="empPhoto" accept="image/*" style="padding:10px"></div>
         <button type="submit" class="submit-btn" data-i18n="emp_add">إضافة ➕</button>
       </form>
       <div id="empList"></div>
@@ -708,7 +739,7 @@ footer ul a:hover{color:var(--gold-2)}
 <!-- ================= شريط التبويب السفلي (وضع التطبيق) ================= -->
 <nav class="tabbar" id="tabbar">
   <button class="tab active" data-view="home" type="button"><span class="tab-icon">🏠</span><span data-i18n="tab_home">الرئيسية</span></button>
-  <button class="tab" data-view="cats" type="button"><span class="tab-icon">🧱</span><span data-i18n="tab_cats">التخصصات</span></button>
+  <button class="tab" data-view="companies" type="button"><span class="tab-icon">🏢</span><span data-i18n="tab_companies">الشركات</span></button>
   <button class="tab" data-view="dash" type="button"><span class="tab-icon">📋</span><span data-i18n="tab_dash">طلباتي</span></button>
   <button class="tab" data-view="account" type="button"><span class="tab-icon">👤</span><span data-i18n="tab_account">حسابي</span></button>
 </nav>
@@ -1006,7 +1037,15 @@ const I18N = {
     emp_perm: "الصلاحية", emp_perm1: "مشاهدة الطلبات فقط", emp_perm2: "إرسال عروض الأسعار", emp_perm3: "صلاحية كاملة",
     emp_add: "إضافة ➕", emp_del: "حذف", emp_empty: "لا يوجد موظفون بعد", emp_added: "تمت إضافة الموظف ✅",
     ads_title: "🖼️ الشرائح الإعلانية (تتبدل تلقائيًا كل 3 ثوانٍ)", ads_save: "حفظ الإعلانات 💾", ads_saved: "تم حفظ الإعلانات ✅",
-    ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر"
+    ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر",
+    tab_companies: "الشركات", acc_notif: "الإشعارات", acc_lang: "تغيير اللغة", acc_help: "مساعدة",
+    acc_delete: "حذف حسابي", acc_delete_confirm: "متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع", acc_deleted: "تم حذف الحساب ✅",
+    cp_wa: "رقم الواتساب", cp_logo: "شعار الشركة (صورة)", emp_photo: "صورة المهندس (اختياري)",
+    ads_img: "صورة الإعلان (اختياري)", ads_img_set: "توجد صورة محفوظة",
+    notif_title: "🔔 الإشعارات", notif_empty: "لا توجد إشعارات جديدة",
+    n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
+    n_quote_acc: "✅ {c} وافق على عرضك", n_quote_rej: "⛔ {c} رفض عرضك",
+    co_whatsapp: "واتساب"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -1063,7 +1102,15 @@ const I18N = {
     emp_perm: "Permission", emp_perm1: "View requests only", emp_perm2: "Send quotations", emp_perm3: "Full access",
     emp_add: "Add ➕", emp_del: "Delete", emp_empty: "No staff yet", emp_added: "Staff member added ✅",
     ads_title: "🖼️ Ad slides (auto-rotate every 3 seconds)", ads_save: "Save ads 💾", ads_saved: "Ads saved ✅",
-    ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link"
+    ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link",
+    tab_companies: "Companies", acc_notif: "Notifications", acc_lang: "Change language", acc_help: "Help",
+    acc_delete: "Delete my account", acc_delete_confirm: "Sure you want to permanently delete your account?", acc_deleted: "Account deleted ✅",
+    cp_wa: "WhatsApp number", cp_logo: "Company logo (image)", emp_photo: "Engineer photo (optional)",
+    ads_img: "Ad image (optional)", ads_img_set: "An image is saved",
+    notif_title: "🔔 Notifications", notif_empty: "No new notifications",
+    n_new_req: "📋 New request from {n} — {c}", n_new_quote: "💰 New quote from {p}",
+    n_quote_acc: "✅ {c} accepted your quote", n_quote_rej: "⛔ {c} rejected your quote",
+    co_whatsapp: "WhatsApp"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -1099,7 +1146,7 @@ function allCompanies() { return [...liveCompanies, ...PROVIDERS]; }
 function coCard(p) {
   return `
   <div class="co-card" onclick="openCompany('${p.id}')">
-    <div class="co-logo">${p.icon || "🏢"}</div>
+    ${p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="">` : `<div class="co-logo">${p.icon || "🏢"}</div>`}
     <h4>${p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
     <div class="co-rate">★ ${p.rating || "5.0"} ${p.demo ? "" : " · ✅"}</div>
@@ -1111,9 +1158,9 @@ function renderProviders() {
 }
 function engCard(e) {
   return `
-  <div class="eng-card" onclick="openCompanyOf('${(e.company || "").replace(/'/g, "")}')">
+  <div class="eng-card" onclick="openCompanyOf('${(e.company || e.companyName || "").replace(/'/g, "")}')">
     <div class="eng-top">
-      <div class="eng-ava">👷</div>
+      ${e.photo ? `<img class="eng-ava-img" src="${e.photo}" alt="">` : '<div class="eng-ava">👷</div>'}
       <div><h4>${e.name}</h4><div class="eng-job">${e.job || e.title || ""}</div></div>
     </div>
     <div class="eng-meta">🏢 ${e.company || e.companyName || "—"}<br>🕐 ${e.hours || "—"}</div>
@@ -1525,12 +1572,11 @@ async function openDashboard() {
     </table>`;
   }
   if (isProvider) {
-    document.getElementById("companyProfileWrap").style.display = "";
     document.getElementById("employeesWrap").style.display = "";
-    fillCompanyProfileForm();
     loadEmployees();
   }
   loadQuotesSection();
+  buildNotifs();
   dash.scrollIntoView({ behavior: "smooth" });
 }
 
@@ -1777,6 +1823,7 @@ const VIEW_MAP = {
   home: ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers"],
   cats: ["categories"],
   cat: ["catView"],
+  companies: ["catView"],
   company: ["companyView"],
   dash: ["dashboard"],
   account: ["accountView"]
@@ -1847,12 +1894,21 @@ function renderAccountView() {
   if (currentUser) {
     const roleName = (currentUser.role === "provider" ? "🛠️ " : "🏠 ") + t(currentUser.role === "provider" ? "role_provider" : "role_client");
     box.innerHTML = `
-      <div class="pro-avatar" style="margin:0 auto 14px">${(currentUser.displayName || "د").trim()[0]}</div>
       <h3 style="color:var(--navy)">${currentUser.displayName || ""}</h3>
       <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
-      <p style="margin:8px 0 18px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
-      <button class="submit-btn" onclick="showView('dash')" style="margin-bottom:10px">📋 ${t("tab_dash")}</button>
-      <button class="submit-btn" style="background:#f3f4f6;color:var(--muted)" onclick="logout()">${t("logout")}</button>`;
+      <p style="margin:8px 0 4px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
+      <div class="acc-menu">
+        <button class="acc-item" onclick="showView('dash');setTimeout(()=>document.getElementById('notifBtn').click(),350)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
+        <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
+        <button class="acc-item" onclick="window.location.href='mailto:m.alhinai11@gmail.com'">❓ <span>${t("acc_help")}</span></button>
+        <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
+        <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
+        <button class="acc-item danger" onclick="deleteMyAccount()">🗑️ <span>${t("acc_delete")}</span></button>
+      </div>`;
+    const cpw = document.getElementById("companyProfileWrap");
+    if (cpw) cpw.style.display = currentUser.role === "provider" ? "" : "none";
+    if (currentUser.role === "provider") fillCompanyProfileForm();
+    updateNotifBadge();
   } else {
     box.innerHTML = `
       <div style="font-size:2.4rem">👤</div>
@@ -1926,9 +1982,11 @@ window.openCompany = async function(id) {
   }
   if (!team.length) team = DEMO_ENGINEERS.filter(e => e.company === p.name);
   const svcs = Array.isArray(p.services) ? p.services : [];
+  const waNum = (p.whatsapp || p.phone || "").replace(/\D/g, "");
+  const waFull = waNum.length === 8 ? "968" + waNum : waNum;
   const links = [
+    waFull ? `<a class="co-link" href="https://wa.me/${waFull}" target="_blank" style="border-color:#22c55e;color:#16a34a">💬 ${t("co_whatsapp")} <span dir="ltr">${p.whatsapp || p.phone}</span></a>` : "",
     p.phone ? `<a class="co-link" href="tel:${p.phone}" dir="ltr">📞 ${p.phone}</a>` : "",
-    p.phone2 ? `<a class="co-link" href="tel:${p.phone2}" dir="ltr">📞 ${p.phone2}</a>` : "",
     p.insta ? `<a class="co-link" href="${p.insta}" target="_blank">📸 ${t("co_insta")}</a>` : "",
     p.web ? `<a class="co-link" href="${p.web}" target="_blank">🌐 ${t("co_web")}</a>` : "",
     p.map ? `<a class="co-link" href="${p.map}" target="_blank">📍 ${t("co_map")}</a>` : ""
@@ -1936,7 +1994,7 @@ window.openCompany = async function(id) {
   document.getElementById("companyProfile").innerHTML = `
     <button class="btn btn-outline" onclick="goBackHome()" style="margin-bottom:16px">${t("back")}</button>
     <div class="co-hero">
-      <div class="co-big-logo">${p.icon || "🏢"}</div>
+      ${p.logo ? `<img src="${p.logo}" alt="" style="width:88px;height:88px;border-radius:22px;object-fit:cover;flex:0 0 auto">` : `<div class="co-big-logo">${p.icon || "🏢"}</div>`}
       <div style="flex:1;min-width:200px">
         <h2>${p.name} ${p.demo ? "" : '<span class="perm-badge" style="background:#15803d;color:#fff">✅</span>'}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
@@ -1949,7 +2007,7 @@ window.openCompany = async function(id) {
     ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip">${s}</span>`).join("")}</div>` : ""}
     <div class="co-block"><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3efe7">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;color:#fff;flex:0 0 auto">👷</div>
+        ${e.photo ? `<img src="${e.photo}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 auto">` : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;color:#fff;flex:0 0 auto">👷</div>'}
         <div style="flex:1"><b style="font-size:.88rem;color:var(--navy)">${e.name}</b>
           <div style="font-size:.76rem;color:var(--gold);font-weight:700">${e.job || ""}</div>
           <div style="font-size:.74rem;color:var(--muted)">🕐 ${e.hours || "—"}</div>
@@ -1959,6 +2017,57 @@ window.openCompany = async function(id) {
     </div>`;
   showView("company");
 };
+
+// ---- نظام الإشعارات (شركة ← طلبات وردود | عميل ← عروض جديدة) ----
+let _lastQuotes = [];
+function updateNotifBadge() {
+  const items = collectNotifs();
+  const seen = +(localStorage.getItem("darak_notif_seen_" + (currentUser?.uid || "")) || 0);
+  const unread = items.filter(x => x.ts > seen).length;
+  ["notifBadge", "notifBadgeAcc"].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.style.display = unread ? "grid" : "none";
+    b.textContent = unread;
+  });
+}
+function collectNotifs() {
+  const items = [];
+  if (!currentUser) return items;
+  const isProv = currentUser.role === "provider";
+  (lastRequests || []).forEach(r => {
+    const ts = r.createdAt?.seconds ? r.createdAt.seconds * 1000 : new Date(r.createdAt || 0).getTime();
+    if (isProv) items.push({ ts, txt: t("n_new_req").replace("{n}", r.name || "—").replace("{c}", r.category || "") });
+  });
+  (_lastQuotes || []).forEach(q => {
+    const ts = q.createdAt?.seconds ? q.createdAt.seconds * 1000 : new Date(q.createdAt || 0).getTime();
+    if (!isProv && q.status === "sent") items.push({ ts, txt: t("n_new_quote").replace("{p}", q.providerName || "—") });
+    if (isProv && q.status === "accepted") items.push({ ts, txt: t("n_quote_acc").replace("{c}", q.clientName || "—") });
+    if (isProv && q.status === "rejected") items.push({ ts, txt: t("n_quote_rej").replace("{c}", q.clientName || "—") });
+  });
+  items.sort((a, b) => b.ts - a.ts);
+  return items.slice(0, 15);
+}
+function buildNotifs() {
+  updateNotifBadge();
+  const panel = document.getElementById("notifPanel");
+  if (!panel) return;
+  const items = collectNotifs();
+  panel.innerHTML = `<h4>${t("notif_title")}</h4>` + (items.length
+    ? items.map(x => `<div class="notif-item">${x.txt}<small>${x.ts ? new Date(x.ts).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB") : ""}</small></div>`).join("")
+    : `<div class="notif-item" style="text-align:center;color:var(--muted)">${t("notif_empty")}</div>`);
+}
+document.getElementById("notifBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  buildNotifs();
+  document.getElementById("notifPanel").classList.toggle("open");
+  localStorage.setItem("darak_notif_seen_" + (currentUser?.uid || ""), Date.now());
+  setTimeout(updateNotifBadge, 300);
+});
+document.addEventListener("click", e => {
+  const p = document.getElementById("notifPanel");
+  if (p && p.classList.contains("open") && !p.contains(e.target) && e.target.id !== "notifBtn") p.classList.remove("open");
+});
 
 // ---- تحريك تلقائي كل 3 ثوانٍ + تحكم يدوي بالسحب والأسهم ----
 const _rowState = {};
@@ -2008,7 +2117,7 @@ function renderAds() {
   const dots = document.getElementById("adDots");
   if (!track) return;
   track.innerHTML = ADS.map((a, i) => `
-    <div class="ad-slide"><h3>${a.h}</h3><p>${a.p}</p>
+    <div class="ad-slide" style="${a.img ? `background-image:linear-gradient(rgba(22,40,58,.72),rgba(22,40,58,.72)),url('${a.img}');background-size:cover;background-position:center` : ""}"><h3>${a.h}</h3><p>${a.p}</p>
     <button class="ad-cta" onclick="adGo(${i})">${a.btn || "✨"}</button></div>`).join("");
   dots.innerHTML = ADS.map((_, i) => `<button class="ad-dot" onclick="adTo(${i})" aria-label="${i + 1}"></button>`).join("");
   adApply();
@@ -2047,6 +2156,7 @@ function fillAdsForm() {
         <div class="form-group"><label>${t("ads_btn")}</label><input type="text" id="adB${i}" value="${(a.btn || "").replace(/"/g, "&quot;")}"></div>
         <div class="form-group"><label>${t("ads_link")}</label><input type="text" id="adL${i}" dir="ltr" value="${a.link || ""}" placeholder="join / request / cats / https://..."></div>
       </div>
+      <div class="form-group"><label>${t("ads_img")}</label><input type="file" id="adImg${i}" accept="image/*" style="padding:10px">${a.img ? `<small style="color:#15803d">✅ ${t("ads_img_set")}</small>` : ""}</div>
     </div>`).join("");
 }
 document.getElementById("adsForm").addEventListener("submit", async e => {
@@ -2055,19 +2165,37 @@ document.getElementById("adsForm").addEventListener("submit", async e => {
     h: document.getElementById("adH" + i).value.trim(),
     p: document.getElementById("adP" + i).value.trim(),
     btn: document.getElementById("adB" + i).value.trim(),
-    link: document.getElementById("adL" + i).value.trim()
+    link: document.getElementById("adL" + i).value.trim(),
+    img: ADS[i]?.img || ""
   }));
   try {
+    for (let i = 0; i < ADS.length; i++) {
+      const f = document.getElementById("adImg" + i).files[0];
+      if (f) ADS[i].img = await uploadImage(f, "ads");
+    }
     if (db && setDocFn) await setDocFn(docFn(db, "settings", "ads"), { slides: ADS });
     else localStorage.setItem("darak_ads", JSON.stringify(ADS));
     showToast(t("ads_saved")); renderAds(); restartAdTimer();
   } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
 });
 
+async function uploadImage(file, folder) {
+  if (!file) return "";
+  if (storage && refFn) {
+    const sref = refFn(storage, folder + "/" + Date.now() + "_" + file.name.replace(/[^\w.]/g, "_"));
+    await uploadBytesFn(sref, file);
+    return await getUrlFn(sref);
+  }
+  if (file.size < 700 * 1024) {
+    return await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+  }
+  return "";
+}
+
 // ---- ملف الشركة (تعدله الشركة من لوحتها) ----
 function fillCompanyProfileForm() {
   if (!currentUser) return;
-  document.getElementById("cpPhone2").value = currentUser.phone2 || "";
+  document.getElementById("cpWhatsApp").value = currentUser.whatsapp || currentUser.phone || "";
   document.getElementById("cpInsta").value = currentUser.insta || "";
   document.getElementById("cpWeb").value = currentUser.web || "";
   document.getElementById("cpMap").value = currentUser.map || "";
@@ -2076,8 +2204,9 @@ function fillCompanyProfileForm() {
 }
 document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
+  const logoFile = document.getElementById("cpLogo").files[0];
   const data = {
-    phone2: document.getElementById("cpPhone2").value.trim(),
+    whatsapp: document.getElementById("cpWhatsApp").value.trim(),
     insta: document.getElementById("cpInsta").value.trim(),
     web: document.getElementById("cpWeb").value.trim(),
     map: document.getElementById("cpMap").value.trim(),
@@ -2085,6 +2214,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
   };
   try {
+    if (logoFile) data.logo = await uploadImage(logoFile, "logos");
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
@@ -2112,6 +2242,8 @@ document.getElementById("empForm").addEventListener("submit", async e => {
   };
   if (!emp.name || !emp.job) return;
   try {
+    const photoFile = document.getElementById("empPhoto").files[0];
+    if (photoFile) emp.photo = await uploadImage(photoFile, "engineers");
     if (db && addDocFn) {
       await addDocFn(collectionFn(db, "employees"), { ...emp, createdAt: serverTimestampFn() });
     } else {
@@ -2169,7 +2301,7 @@ async function loadLiveCompanies() {
     }
     liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => ({
       id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), cat: u.category || "", catEn: u.category || "",
-      icon: "🏢", rating: "5.0", phone: u.phone || "", phone2: u.phone2 || "", insta: u.insta || "",
+      icon: "🏢", rating: "5.0", phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
       web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], demo: false
     }));
     renderProviders();
@@ -2280,6 +2412,8 @@ async function loadQuotesSection() {
   let quotes = [];
   try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); }
   quotes.sort((a, b) => tsq(b) - tsq(a));
+  _lastQuotes = quotes;
+  updateNotifBadge();
   if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
   box.innerHTML = `<table class="dash-table"><thead><tr>
     <th>${isClient ? t("q_company") : t("q_client")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${isClient ? t("q_actions") : t("aq_comment")}</th>
@@ -2365,6 +2499,21 @@ async function loadAdminQuotes() {
     </tr>`;
   }).join("")}</tbody></table>`;
 }
+
+window.deleteMyAccount = async function() {
+  if (!currentUser) return;
+  if (!confirm(t("acc_delete_confirm"))) return;
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await deleteDocFn(docFn(db, "users", snap.docs[0].id));
+    }
+    const list = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.uid !== currentUser.uid);
+    localStorage.setItem("darak_users", JSON.stringify(list));
+    showToast(t("acc_deleted"));
+    logout();
+  } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+};
 
 // استعادة الجلسة في الوضع التجريبي + بناء زر الدخول
 const savedSession = localStorage.getItem("darak_session");
