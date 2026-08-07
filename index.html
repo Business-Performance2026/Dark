@@ -304,6 +304,68 @@ footer ul a:hover{color:var(--gold-2)}
   .footer-grid{grid-template-columns:1fr}
   section{padding:64px 0}
 }
+
+/* ===== صفوف متحركة (أقسام/شركات/مهندسون) ===== */
+.row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.row-title{font-size:1.3rem;color:var(--navy);font-weight:800;position:relative;padding-inline-start:14px}
+.row-title::before{content:"";position:absolute;inset-inline-start:0;top:15%;height:70%;width:5px;border-radius:6px;background:var(--gold)}
+.row-head-actions{display:flex;align-items:center;gap:8px}
+.row-arrow{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);background:#fff;color:var(--gold);font-size:1.1rem;font-weight:800;cursor:pointer;display:grid;place-items:center;transition:.2s}
+.row-arrow:hover{background:var(--gold);color:#fff}
+.view-all{color:var(--gold);font-weight:700;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+.h-scroll{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;padding:6px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.h-scroll::-webkit-scrollbar{display:none}
+/* أيقونات الأقسام الدائرية */
+.cat-chip{flex:0 0 auto;width:92px;text-align:center;cursor:pointer}
+.cat-chip .chip-ico{width:76px;height:76px;margin:0 auto 8px;border-radius:50%;background:#fff;border:2px solid #eee;display:grid;place-items:center;font-size:1.9rem;transition:.25s;box-shadow:0 4px 12px rgba(22,40,58,.06)}
+.cat-chip:hover .chip-ico{border-color:var(--gold);transform:translateY(-3px)}
+.cat-chip span{font-size:.8rem;font-weight:700;color:var(--navy);display:block;line-height:1.3}
+/* بطاقة شركة مدمجة */
+.co-card{flex:0 0 auto;width:170px;background:#fff;border-radius:18px;padding:16px 12px;text-align:center;cursor:pointer;border:1.5px solid #f0ece4;transition:.25s;box-shadow:0 4px 14px rgba(22,40,58,.05)}
+.co-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 10px 22px rgba(185,141,78,.18)}
+.co-card .co-logo{width:64px;height:64px;margin:0 auto 10px;border-radius:18px;background:linear-gradient(135deg,var(--navy),#25425f);display:grid;place-items:center;font-size:1.7rem;color:#fff}
+.co-card h4{font-size:.85rem;color:var(--navy);margin-bottom:4px;line-height:1.35;min-height:2.3em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.co-card .co-cat{font-size:.74rem;color:var(--gold);font-weight:700}
+.co-card .co-rate{font-size:.76rem;color:#f59e0b;margin-top:5px;font-weight:700}
+/* بطاقة مهندس */
+.eng-card{flex:0 0 auto;width:190px;background:#fff;border-radius:18px;padding:16px 14px;border:1.5px solid #f0ece4;box-shadow:0 4px 14px rgba(22,40,58,.05);cursor:pointer;transition:.25s}
+.eng-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.eng-card .eng-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.eng-card .eng-ava{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;font-size:1.2rem;color:#fff;flex:0 0 auto}
+.eng-card h4{font-size:.86rem;color:var(--navy)}
+.eng-card .eng-job{font-size:.74rem;color:var(--gold);font-weight:700}
+.eng-card .eng-meta{font-size:.74rem;color:var(--muted);line-height:1.6}
+/* شريط الإعلانات */
+.ad-slider{position:relative;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(22,40,58,.14)}
+.ad-track{display:flex;transition:transform .6s ease}
+.ad-slide{flex:0 0 100%;min-height:170px;padding:28px 26px;display:flex;flex-direction:column;justify-content:center;gap:8px;color:#fff}
+.ad-slide:nth-child(odd){background:linear-gradient(120deg,var(--navy) 20%,#2c4a6b)}
+.ad-slide:nth-child(even){background:linear-gradient(120deg,#8a683a,var(--gold))}
+.ad-slide h3{font-size:1.35rem;font-weight:800}
+.ad-slide p{font-size:.9rem;opacity:.92;max-width:520px}
+.ad-slide .ad-cta{align-self:flex-start;margin-top:6px;background:#fff;color:var(--navy);border:none;padding:9px 20px;border-radius:30px;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit}
+.ad-dots{position:absolute;bottom:12px;inset-inline-start:18px;display:flex;gap:6px}
+.ad-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:.3s;border:none;padding:0}
+.ad-dot.on{background:#fff;width:22px;border-radius:6px}
+/* شبكة شركات صفحة القسم */
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.co-grid .co-card{width:auto}
+/* صفحة الشركة */
+.co-hero{background:linear-gradient(135deg,var(--navy),#2c4a6b);border-radius:24px;padding:28px 24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+.co-hero .co-big-logo{width:88px;height:88px;border-radius:22px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:2.4rem;flex:0 0 auto}
+.co-hero h2{font-size:1.3rem}
+.co-hero .co-sub{color:var(--gold);font-weight:700;font-size:.9rem;margin-top:4px}
+.co-hero .co-rate2{margin-top:6px;color:#fbbf24;font-weight:700;font-size:.86rem}
+.co-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.co-actions a,.co-actions button{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:30px;font-weight:700;font-size:.84rem;text-decoration:none;border:none;cursor:pointer;font-family:inherit}
+.co-link{background:#fff;color:var(--navy);border:1.5px solid #e5ddcf}
+.co-link:hover{border-color:var(--gold);color:var(--gold)}
+.co-block{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;border:1.5px solid #f0ece4}
+.co-block h3{color:var(--navy);font-size:1.02rem;margin-bottom:10px}
+.co-block p{color:var(--muted);font-size:.9rem;line-height:1.8}
+.svc-chip{display:inline-block;background:#faf6ee;border:1px solid #eadfc8;color:var(--gold);font-weight:700;font-size:.78rem;padding:6px 14px;border-radius:30px;margin:0 0 8px 8px}
+.perm-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;background:#eef3f8;color:var(--navy)}
+
 </style>
 </head>
 <body>
@@ -341,6 +403,16 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </section>
 
+<!-- ================= شريط الإعلانات ================= -->
+<section id="adsSec" style="padding-top:22px;padding-bottom:0">
+  <div class="container">
+    <div class="ad-slider" id="adSlider">
+      <div class="ad-track" id="adTrack"></div>
+      <div class="ad-dots" id="adDots"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= نتائج البحث ================= -->
 <section id="searchResults" style="display:none;padding-top:26px">
   <div class="container">
@@ -354,32 +426,62 @@ footer ul a:hover{color:var(--gold-2)}
 </section>
 
 <!-- ================= Categories ================= -->
-<section id="categories">
+<section id="categories" style="padding-top:26px;padding-bottom:10px">
   <div class="container">
-    <div class="sec-head" style="margin-bottom:30px">
-      <span class="sec-tag" data-i18n="cats_tag">التخصصات</span>
-      <h2 data-i18n="cats_title">كل ما يحتاجه بيتك في مكان واحد</h2>
-      <p data-i18n="cats_sub">12 تخصصًا من الأساس حتى المفتاح — تتحرك تلقائيًا، مرّر عليها للإيقاف</p>
+    <div class="row-head">
+      <h2 class="row-title" data-i18n="secs_cats">الأقسام</h2>
+      <div class="row-head-actions">
+        <button class="row-arrow" data-rowbtn="catChips" data-dir="1" aria-label="›">›</button>
+        <button class="row-arrow" data-rowbtn="catChips" data-dir="-1" aria-label="‹">‹</button>
+        <a class="view-all" onclick="showView('cats')" data-i18n="view_all">عرض الكل</a>
+      </div>
     </div>
-  </div>
-  <div class="marquee">
-    <div class="marquee-track" id="catsGrid"></div>
+    <div class="h-scroll" id="catChips"></div>
   </div>
 </section>
 
 
 <!-- ================= Providers ================= -->
-<section id="providers">
+<section id="providers" style="padding-top:22px;padding-bottom:10px">
   <div class="container">
-    <div class="sec-head">
-      <span class="sec-tag" data-i18n="pro_tag">مقدمو الخدمة</span>
-      <h2 data-i18n="pro_title">نخبة من أمهر الحرفيين والشركات</h2>
-      <p data-i18n="pro_sub">مقدمو خدمة موثّقون بتقييمات حقيقية من أصحاب المشاريع</p>
+    <div class="row-head">
+      <h2 class="row-title" data-i18n="secs_companies">الشركات</h2>
+      <div class="row-head-actions">
+        <button class="row-arrow" data-rowbtn="companyRow" data-dir="1" aria-label="›">›</button>
+        <button class="row-arrow" data-rowbtn="companyRow" data-dir="-1" aria-label="‹">‹</button>
+        <a class="view-all" onclick="openCategory('')" data-i18n="view_all">عرض الكل</a>
+      </div>
     </div>
-    <div class="marquee">
-      <div class="marquee-track pro-track" id="providersGrid"></div>
-    </div>
+    <div class="h-scroll cards-row" id="companyRow"></div>
   </div>
+</section>
+
+<!-- ================= المهندسون ================= -->
+<section id="engineers" style="padding-top:14px;padding-bottom:20px">
+  <div class="container">
+    <div class="row-head">
+      <h2 class="row-title" data-i18n="secs_engineers">المهندسون</h2>
+      <div class="row-head-actions">
+        <button class="row-arrow" data-rowbtn="engineerRow" data-dir="1" aria-label="›">›</button>
+        <button class="row-arrow" data-rowbtn="engineerRow" data-dir="-1" aria-label="‹">‹</button>
+      </div>
+    </div>
+    <div class="h-scroll cards-row" id="engineerRow"></div>
+  </div>
+</section>
+
+<!-- ================= صفحة قسم (شركات التخصص) ================= -->
+<section class="dashboard" id="catView" style="display:none">
+  <div class="container">
+    <button class="btn btn-outline" onclick="goBackHome()" style="margin-bottom:16px" data-i18n="back">رجوع ←</button>
+    <h2 id="catViewTitle" class="row-title" style="margin-bottom:18px"></h2>
+    <div class="co-grid" id="catViewGrid"></div>
+  </div>
+</section>
+
+<!-- ================= صفحة الشركة ================= -->
+<section class="dashboard" id="companyView" style="display:none">
+  <div class="container" id="companyProfile"></div>
 </section>
 
 <!-- ================= حسابي (تبويب التطبيق) ================= -->
@@ -410,6 +512,7 @@ footer ul a:hover{color:var(--gold-2)}
       <button class="active" data-atab="requests" type="button">📋 الطلبات</button>
       <button data-atab="users" type="button">👥 إدارة المستخدمين</button>
       <button data-atab="quotes" type="button">💰 عروض الأسعار</button>
+      <button data-atab="ads" type="button">🖼️ الإعلانات</button>
       <button data-atab="footer" type="button">⚙️ إعدادات الفوتر</button>
     </div>
     <div class="dash-table-wrap" id="requestsWrap">
@@ -418,6 +521,43 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="dash-table-wrap" id="quotesWrap" style="margin-top:24px;display:none">
       <h3 id="quotesTitle" style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem">💰 عروض الأسعار</h3>
       <div id="quotesContent"></div>
+    </div>
+    <div class="dash-table-wrap" id="companyProfileWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
+      <form id="cpForm" style="padding:6px 18px 18px">
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="cp_phone2">هاتف إضافي</label><input type="tel" id="cpPhone2" placeholder="9XXXXXXX"></div>
+          <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
+          <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
+        </div>
+        <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
+        <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
+        <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ ملف الشركة 💾</button>
+      </form>
+    </div>
+    <div class="dash-table-wrap" id="employeesWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="emp_title">👷 المهندسون والموظفون</h3>
+      <form id="empForm" style="padding:6px 18px">
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="emp_name">الاسم *</label><input type="text" id="empName" required></div>
+          <div class="form-group"><label data-i18n="emp_job">المسمى الوظيفي *</label><input type="text" id="empJob" required placeholder="مهندس مدني"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="emp_hours">أوقات الدوام المتوفرة</label><input type="text" id="empHours" placeholder="السبت–الخميس 8ص–5م"></div>
+          <div class="form-group"><label data-i18n="emp_perm">الصلاحية</label>
+            <select id="empPerm">
+              <option value="viewer" data-i18n="emp_perm1">مشاهدة الطلبات فقط</option>
+              <option value="quotes" data-i18n="emp_perm2">إرسال عروض الأسعار</option>
+              <option value="manager" data-i18n="emp_perm3">صلاحية كاملة</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" data-i18n="emp_add">إضافة ➕</button>
+      </form>
+      <div id="empList"></div>
     </div>
     <div class="dash-table-wrap" id="usersWrap" style="display:none">
       <div id="usersContent"></div>
@@ -452,6 +592,13 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="dash-table-wrap" id="adminQuotesWrap" style="display:none;margin-top:24px">
       <div id="adminQuotesStats" class="dash-stats" style="padding:20px 18px 0;margin-bottom:0"></div>
       <div id="adminQuotesContent"></div>
+    </div>
+    <div class="dash-table-wrap" id="adminAdsWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy)" data-i18n="ads_title">🖼️ الشرائح الإعلانية (تتبدل تلقائيًا كل 3 ثوانٍ)</h3>
+      <form id="adsForm" style="padding:6px 18px 18px">
+        <div id="adsFields"></div>
+        <button type="submit" class="submit-btn" data-i18n="ads_save">حفظ الإعلانات 💾</button>
+      </form>
     </div>
   </div>
 </section>
@@ -787,7 +934,19 @@ const I18N = {
     quote_note: "ملاحظة للعميل", quote_send: "إرسال العرض 🚀", quote_uploading: "جارٍ رفع الملف…",
     quote_done: "تم إرسال عرض السعر للعميل ✅", quote_err: "تعذر الإرسال — حاول مرة أخرى",
     pdf_only: "اختر ملف PDF أولًا", comment_accept_title: "✅ موافقة على العرض — اكتب تعليقًا للشركة",
-    comment_reject_title: "⛔ رفض العرض — اكتب سبب الرفض", comment_sent: "تم إرسال ردك للشركة ✅"
+    comment_reject_title: "⛔ رفض العرض — اكتب سبب الرفض", comment_sent: "تم إرسال ردك للشركة ✅",
+    secs_cats: "الأقسام", secs_companies: "الشركات", secs_engineers: "المهندسون", view_all: "عرض الكل",
+    back: "رجوع ←", all_cos: "كل الشركات", q_empty_co: "لا توجد شركات في هذا القسم بعد",
+    co_about: "نبذة عن الشركة", co_services: "خدماتنا", co_team: "فريق المهندسين", co_quote: "📄 اطلب عرض سعر",
+    co_insta: "إنستجرام", co_web: "الموقع الإلكتروني", co_map: "الخريطة", co_no_eng: "لم تُضف بيانات المهندسين بعد",
+    cp_title: "📇 ملف الشركة (يظهر للعملاء في صفحتك)", cp_phone2: "هاتف إضافي", cp_insta: "رابط إنستجرام",
+    cp_web: "الموقع الإلكتروني", cp_map: "رابط خريطة جوجل", cp_bio: "نبذة عن الشركة",
+    cp_services: "خدمات الشركة (افصل بينها بفاصلة ،)", cp_save: "حفظ ملف الشركة 💾", cp_saved: "تم حفظ ملف الشركة ✅",
+    emp_title: "👷 المهندسون والموظفون", emp_name: "الاسم", emp_job: "المسمى الوظيفي", emp_hours: "أوقات الدوام",
+    emp_perm: "الصلاحية", emp_perm1: "مشاهدة الطلبات فقط", emp_perm2: "إرسال عروض الأسعار", emp_perm3: "صلاحية كاملة",
+    emp_add: "إضافة ➕", emp_del: "حذف", emp_empty: "لا يوجد موظفون بعد", emp_added: "تمت إضافة الموظف ✅",
+    ads_title: "🖼️ الشرائح الإعلانية (تتبدل تلقائيًا كل 3 ثوانٍ)", ads_save: "حفظ الإعلانات 💾", ads_saved: "تم حفظ الإعلانات ✅",
+    ads_slide: "الشريحة", ads_head: "العنوان", ads_text: "النص", ads_btn: "نص الزر", ads_link: "رابط الزر"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -832,46 +991,77 @@ const I18N = {
     quote_note: "Note to client", quote_send: "Send quote 🚀", quote_uploading: "Uploading file…",
     quote_done: "Quote sent to the client ✅", quote_err: "Could not send — try again",
     pdf_only: "Choose a PDF file first", comment_accept_title: "✅ Accept quote — write a comment to the company",
-    comment_reject_title: "⛔ Reject quote — write the reason", comment_sent: "Your response was sent to the company ✅"
+    comment_reject_title: "⛔ Reject quote — write the reason", comment_sent: "Your response was sent to the company ✅",
+    secs_cats: "Sections", secs_companies: "Companies", secs_engineers: "Engineers", view_all: "View all",
+    back: "← Back", all_cos: "All companies", q_empty_co: "No companies in this section yet",
+    co_about: "About the company", co_services: "Our services", co_team: "Engineering team", co_quote: "📄 Request a quote",
+    co_insta: "Instagram", co_web: "Website", co_map: "Map", co_no_eng: "No engineers added yet",
+    cp_title: "📇 Company profile (shown to clients on your page)", cp_phone2: "Extra phone", cp_insta: "Instagram link",
+    cp_web: "Website", cp_map: "Google Maps link", cp_bio: "About the company",
+    cp_services: "Company services (separate with a comma ,)", cp_save: "Save company profile 💾", cp_saved: "Company profile saved ✅",
+    emp_title: "👷 Engineers & staff", emp_name: "Name", emp_job: "Job title", emp_hours: "Working hours",
+    emp_perm: "Permission", emp_perm1: "View requests only", emp_perm2: "Send quotations", emp_perm3: "Full access",
+    emp_add: "Add ➕", emp_del: "Delete", emp_empty: "No staff yet", emp_added: "Staff member added ✅",
+    ads_title: "🖼️ Ad slides (auto-rotate every 3 seconds)", ads_save: "Save ads 💾", ads_saved: "Ads saved ✅",
+    ads_slide: "Slide", ads_head: "Title", ads_text: "Text", ads_btn: "Button text", ads_link: "Button link"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
 
-const catsGrid = document.getElementById("catsGrid");
 function renderCats() {
-  catsGrid.innerHTML = [...CATEGORIES, ...CATEGORIES].map(c => `
-  <div class="cat-card" onclick="pickCategory('${c.name}')" style="cursor:pointer">
-    <div class="cat-icon">${c.icon}</div>
-    <h3>${LANG === "en" ? c.en : c.name}</h3>
-    <p>${LANG === "en" ? c.enDesc : c.desc}</p>
-    <span class="cat-count">+${c.count} ${t("provider_unit")}</span>
+  document.getElementById("catChips").innerHTML = CATEGORIES.map(c => `
+  <div class="cat-chip" onclick="openCategory('${c.name}')">
+    <div class="chip-ico">${c.icon}</div>
+    <span>${LANG === "en" ? c.en : c.name}</span>
   </div>`).join("");
 }
 
 // ============ مقدمو خدمة مميزون (بيانات تعريفية) ============
 const PROVIDERS = [
-  { name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", catEn: "Contractors", icon: "🏗️", exp: 15, projects: 140, rating: 4.9, tags: ["إشراف هندسي", "ضمان 10 سنوات", "تسليم مفتاح"] },
-  { name: "الأمانة للكهرباء", cat: "الكهرباء", catEn: "Electrical", icon: "⚡", exp: 10, projects: 320, rating: 4.8, tags: ["تأسيس", "أتمتة", "صيانة"] },
-  { name: "اللمسة الذهبية للديكور", cat: "الديكور", catEn: "Interior Design", icon: "🎨", exp: 8, projects: 95, rating: 4.7, tags: ["تصميم 3D", "تنفيذ", "تشطيبات فاخرة"] },
-  { name: "الخبراء للسباكة", cat: "السباكة", catEn: "Plumbing", icon: "🚰", exp: 12, projects: 410, rating: 4.8, tags: ["تأسيس", "عزل", "كشف تسريبات"] },
-  { name: "روائع الألمنيوم والزجاج", cat: "الألمنيوم والزجاج", catEn: "Aluminum & Glass", icon: "🪟", exp: 9, projects: 180, rating: 4.6, tags: ["واجهات", "دبل جلاس", "دروع"] },
-  { name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", catEn: "Landscaping", icon: "🌴", exp: 7, projects: 88, rating: 4.9, tags: ["لاندسكيب", "شلالات", "إضاءة"] },
+  { id: "demo0", name: "مؤسسة البنيان للمقاولات", cat: "المقاولون", catEn: "Contractors", icon: "🏗️", rating: 4.9, phone: "94123456", insta: "https://instagram.com", web: "https://example.com", map: "https://maps.google.com", bio: "مؤسسة عمانية متخصصة في البناء والتشطيب من الأساس حتى تسليم المفتاح، بخبرة تتجاوز 15 عامًا وإشراف هندسي كامل.", services: ["بناء فلل", "إشراف هندسي", "تسليم مفتاح", "ترميم"], demo: true },
+  { id: "demo1", name: "الأمانة للكهرباء", cat: "الكهرباء", catEn: "Electrical", icon: "⚡", rating: 4.8, phone: "95234567", insta: "https://instagram.com", web: "https://example.com", map: "https://maps.google.com", bio: "تأسيس وتشطيب الأعمال الكهربائية للمنازل والمنشآت، وأنظمة الأتمتة والصيانة الدورية.", services: ["تأسيس كهرباء", "أتمتة منزلية", "صيانة", "كاميرات"], demo: true },
+  { id: "demo2", name: "اللمسة الذهبية للديكور", cat: "الديكور", catEn: "Interior Design", icon: "🎨", rating: 4.7, phone: "96345678", insta: "https://instagram.com", web: "https://example.com", map: "https://maps.google.com", bio: "تصميم وتنفيذ الديكورات الداخلية الفاخرة بتصاميم ثلاثية الأبعاد قبل التنفيذ.", services: ["تصميم 3D", "تنفيذ ديكور", "تشطيبات فاخرة"], demo: true },
+  { id: "demo3", name: "الخبراء للسباكة", cat: "السباكة", catEn: "Plumbing", icon: "🚰", rating: 4.8, phone: "97456789", insta: "https://instagram.com", web: "", map: "https://maps.google.com", bio: "جميع أعمال السباكة والعزل وكشف التسريبات بأحدث الأجهزة مع الضمان.", services: ["تأسيس سباكة", "عزل أسطح", "كشف تسريبات"], demo: true },
+  { id: "demo4", name: "روائع الألمنيوم والزجاج", cat: "الألمنيوم والزجاج", catEn: "Aluminum & Glass", icon: "🪟", rating: 4.6, phone: "98567890", insta: "https://instagram.com", web: "https://example.com", map: "", bio: "تصنيع وتركيب واجهات الألمنيوم والدبل جلاس والدروع الزجاجية بجودة عالية.", services: ["واجهات", "دبل جلاس", "دروع زجاج"], demo: true },
+  { id: "demo5", name: "الواحة لتنسيق الحدائق", cat: "تنسيق الحدائق", catEn: "Landscaping", icon: "🌴", rating: 4.9, phone: "99678901", insta: "https://instagram.com", web: "", map: "https://maps.google.com", bio: "تصميم وتنسيق الحدائق المنزلية، شلالات ونوافير وإضاءة خارجية وأنظمة ري أوتوماتيكية.", services: ["لاندسكيب", "شلالات", "إضاءة خارجية", "أنظمة ري"], demo: true },
 ];
 
-function proCard(p) {
+// مهندسون تعريفيون (يُدمجون مع مهندسي الشركات المسجلين)
+const DEMO_ENGINEERS = [
+  { id: "de0", name: "م. سالم البلوشي", job: "مهندس مدني", company: "مؤسسة البنيان للمقاولات", hours: "السبت–الخميس 8ص–5م", perm: "manager" },
+  { id: "de1", name: "م. أحمد الحارثي", job: "مهندس كهرباء", company: "الأمانة للكهرباء", hours: "السبت–الخميس 9ص–6م", perm: "quotes" },
+  { id: "de2", name: "م. يوسف العبري", job: "مهندس تصميم داخلي", company: "اللمسة الذهبية للديكور", hours: "الأحد–الخميس 10ص–7م", perm: "viewer" },
+  { id: "de3", name: "م. خالد الهنائي", job: "مهندس ميكانيكا", company: "الخبراء للسباكة", hours: "السبت–الأربعاء 8ص–4م", perm: "quotes" },
+];
+
+let liveCompanies = [];
+function allCompanies() { return [...liveCompanies, ...PROVIDERS]; }
+function coCard(p) {
   return `
-  <div class="pro-card">
-    <div class="pro-avatar" style="margin-top:20px">${p.icon}</div>
-    <div class="pro-body" style="padding:12px 12px 16px">
-      <h3 style="font-size:.95rem">${p.name}</h3>
-      <div class="pro-cat">${LANG === "en" ? p.catEn : p.cat}</div>
-      <div class="stars" style="margin-top:6px">${"★".repeat(Math.round(p.rating))} <span style="color:var(--muted);font-size:.82rem">${p.rating}</span></div>
-      <button class="pro-btn" style="margin-top:12px" onclick="darakRequestFlow()">${t("pro_btn")}</button>
-    </div>
+  <div class="co-card" onclick="openCompany('${p.id}')">
+    <div class="co-logo">${p.icon || "🏢"}</div>
+    <h4>${p.name}</h4>
+    <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
+    <div class="co-rate">★ ${p.rating || "5.0"} ${p.demo ? "" : " · ✅"}</div>
   </div>`;
 }
+const proCard = coCard;
 function renderProviders() {
-  document.getElementById("providersGrid").innerHTML = [...PROVIDERS, ...PROVIDERS].map(proCard).join("");
+  document.getElementById("companyRow").innerHTML = allCompanies().map(coCard).join("");
+}
+function engCard(e) {
+  return `
+  <div class="eng-card" onclick="openCompanyOf('${(e.company || "").replace(/'/g, "")}')">
+    <div class="eng-top">
+      <div class="eng-ava">👷</div>
+      <div><h4>${e.name}</h4><div class="eng-job">${e.job || e.title || ""}</div></div>
+    </div>
+    <div class="eng-meta">🏢 ${e.company || e.companyName || "—"}<br>🕐 ${e.hours || "—"}</div>
+  </div>`;
+}
+let liveEngineers = [];
+function renderEngineers() {
+  document.getElementById("engineerRow").innerHTML = [...liveEngineers, ...DEMO_ENGINEERS].map(engCard).join("");
 }
 
 // تطبيق اللغة على كل الواجهة
@@ -883,6 +1073,7 @@ function applyLang() {
   document.getElementById("langToggle").textContent = LANG === "ar" ? "🌐 EN" : "🌐 ع";
   renderCats();
   renderProviders();
+  renderEngineers();
   renderAuthArea();
   const dash = document.getElementById("dashboard");
   if (dash.classList.contains("open")) openDashboard();
@@ -1181,6 +1372,8 @@ async function openDashboard() {
   const dash = document.getElementById("dashboard");
   dash.classList.add("open");
   document.getElementById("quotesWrap").style.display = "none";
+  document.getElementById("companyProfileWrap").style.display = "none";
+  document.getElementById("employeesWrap").style.display = "none";
   const admin = isAdmin();
   const isProvider = currentUser.role === "provider" && !admin;
 
@@ -1273,8 +1466,14 @@ async function openDashboard() {
       </tr>`).join("")}</tbody>
     </table>`;
   }
-  dash.loadQuotesSection();
-  scrollIntoView({ behavior: "smooth" });
+  if (isProvider) {
+    document.getElementById("companyProfileWrap").style.display = "";
+    document.getElementById("employeesWrap").style.display = "";
+    fillCompanyProfileForm();
+    loadEmployees();
+  }
+  loadQuotesSection();
+  dash.scrollIntoView({ behavior: "smooth" });
 }
 
 // ============================================================
@@ -1293,6 +1492,8 @@ function switchAdminTab(tab) {
   if (tab === "users") loadUsersTable();
   if (tab === "footer") fillFooterForm();
   if (tab === "quotes") loadAdminQuotes();
+  document.getElementById("adminAdsWrap").style.display = tab === "ads" ? "block" : "none";
+  if (tab === "ads") fillAdsForm();
 }
 document.querySelectorAll("#adminTabs button").forEach(b => b.addEventListener("click", () => switchAdminTab(b.dataset.atab)));
 
@@ -1515,12 +1716,14 @@ window.pickCategory = function(name) {
 // --- التبويبات السفلية (موبايل) ---
 let currentView = "home";
 const VIEW_MAP = {
-  home: ["heroSec", "categories", "providers"],
+  home: ["heroSec", "adsSec", "categories", "providers", "engineers"],
   cats: ["categories"],
+  cat: ["catView"],
+  company: ["companyView"],
   dash: ["dashboard"],
   account: ["accountView"]
 };
-const ALL_VIEWS = ["heroSec", "categories", "providers", "dashboard", "accountView"];
+const ALL_VIEWS = ["heroSec", "adsSec", "categories", "providers", "engineers", "catView", "companyView", "dashboard", "accountView"];
 function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
@@ -1528,7 +1731,21 @@ function showView(v) {
   document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === v));
   const sr = document.getElementById("searchResults");
   if (sr) sr.style.display = "none";
-  if (!isMobileView()) return;
+  if (!isMobileView()) {
+    if (v === "cat" || v === "company") {
+      ALL_VIEWS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = VIEW_MAP[v].includes(id) ? "" : "none";
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      ALL_VIEWS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && id !== "dashboard" && id !== "accountView") el.style.display = "";
+      });
+    }
+    return;
+  }
   ALL_VIEWS.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = VIEW_MAP[v].includes(id) ? "" : "none";
@@ -1603,6 +1820,299 @@ document.getElementById("langToggle").addEventListener("click", () => {
   applyLang();
 });
 applyLang();
+
+// ============================================================
+// الصفحات الجديدة: قسم ← شركاته ← صفحة الشركة + تحريك الصفوف + الإعلانات
+// ============================================================
+function permName(v) { return v === "manager" ? t("emp_perm3") : v === "quotes" ? t("emp_perm2") : t("emp_perm1"); }
+
+window.openCategory = function(name) {
+  const cos = allCompanies().filter(p => !name || p.cat === name || p.catEn === name);
+  document.getElementById("catViewTitle").textContent = name ? (t("secs_companies") + " — " + name) : t("all_cos");
+  document.getElementById("catViewGrid").innerHTML = cos.length
+    ? cos.map(coCard).join("")
+    : `<div class="dash-empty"><div class="big">🏢</div>${t("q_empty_co")}</div>`;
+  showView("cat");
+};
+window.goBackHome = function() { showView("home"); };
+window.openCompanyOf = function(nm) {
+  const p = allCompanies().find(x => x.name === nm);
+  if (p) openCompany(p.id); else goBackHome();
+};
+
+window.openCompany = async function(id) {
+  const p = allCompanies().find(x => x.id === id);
+  if (!p) return;
+  let team = [];
+  if (p.uid && db && getDocsFn) {
+    try {
+      const s = await getDocsFn(queryFn(collectionFn(db, "employees"), whereFn("companyUid", "==", p.uid)));
+      team = s.docs.map(d => d.data());
+    } catch (e) { console.error(e); }
+  } else if (p.uid) {
+    team = JSON.parse(localStorage.getItem("darak_employees") || "[]").filter(x => x.companyUid === p.uid);
+  }
+  if (!team.length) team = DEMO_ENGINEERS.filter(e => e.company === p.name);
+  const svcs = Array.isArray(p.services) ? p.services : [];
+  const links = [
+    p.phone ? `<a class="co-link" href="tel:${p.phone}" dir="ltr">📞 ${p.phone}</a>` : "",
+    p.phone2 ? `<a class="co-link" href="tel:${p.phone2}" dir="ltr">📞 ${p.phone2}</a>` : "",
+    p.insta ? `<a class="co-link" href="${p.insta}" target="_blank">📸 ${t("co_insta")}</a>` : "",
+    p.web ? `<a class="co-link" href="${p.web}" target="_blank">🌐 ${t("co_web")}</a>` : "",
+    p.map ? `<a class="co-link" href="${p.map}" target="_blank">📍 ${t("co_map")}</a>` : ""
+  ].join("");
+  document.getElementById("companyProfile").innerHTML = `
+    <button class="btn btn-outline" onclick="goBackHome()" style="margin-bottom:16px">${t("back")}</button>
+    <div class="co-hero">
+      <div class="co-big-logo">${p.icon || "🏢"}</div>
+      <div style="flex:1;min-width:200px">
+        <h2>${p.name} ${p.demo ? "" : '<span class="perm-badge" style="background:#15803d;color:#fff">✅</span>'}</h2>
+        <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
+        <div class="co-rate2">★ ${p.rating || "5.0"}</div>
+      </div>
+      <button class="ad-cta" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button>
+    </div>
+    <div class="co-actions">${links}</div>
+    ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
+    ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip">${s}</span>`).join("")}</div>` : ""}
+    <div class="co-block"><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3efe7">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;color:#fff;flex:0 0 auto">👷</div>
+        <div style="flex:1"><b style="font-size:.88rem;color:var(--navy)">${e.name}</b>
+          <div style="font-size:.76rem;color:var(--gold);font-weight:700">${e.job || ""}</div>
+          <div style="font-size:.74rem;color:var(--muted)">🕐 ${e.hours || "—"}</div>
+        </div>
+        <span class="perm-badge">${permName(e.perm)}</span>
+      </div>`).join("") : `<p>${t("co_no_eng")}</p>`}
+    </div>`;
+  showView("company");
+};
+
+// ---- تحريك تلقائي كل 3 ثوانٍ + تحكم يدوي بالسحب والأسهم ----
+const _rowState = {};
+function startAutoRows() {
+  ["catChips", "companyRow", "engineerRow"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || _rowState[id]) return;
+    _rowState[id] = { paused: false };
+    const st = _rowState[id];
+    el.addEventListener("pointerdown", () => { st.paused = true; });
+    el.addEventListener("pointerup", () => setTimeout(() => { st.paused = false; }, 2500));
+    el.addEventListener("mouseenter", () => { st.paused = true; });
+    el.addEventListener("mouseleave", () => { st.paused = false; });
+    setInterval(() => {
+      if (st.paused || !el.isConnected) return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 0) return;
+      const rtl = document.documentElement.dir === "rtl";
+      if (Math.abs(el.scrollLeft) >= max - 10) el.scrollTo({ left: 0, behavior: "smooth" });
+      else el.scrollBy({ left: (rtl ? -1 : 1) * 200, behavior: "smooth" });
+    }, 3000);
+  });
+}
+document.querySelectorAll("[data-rowbtn]").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById(b.dataset.rowbtn);
+  if (!el) return;
+  const rtl = document.documentElement.dir === "rtl";
+  el.scrollBy({ left: (rtl ? -1 : 1) * (+b.dataset.dir) * 240, behavior: "smooth" });
+}));
+
+// ---- شريط الإعلانات (يتبدل كل 3 ثوانٍ — يديره الأدمن) ----
+const DEFAULT_ADS = [
+  { h: "سجّل شركتك في دارك 🤝", p: "انضم لأول منصة بناء وتشطيب في سلطنة عمان واستقبل طلبات العملاء مباشرة في لوحتك", btn: "سجّل كشركة", link: "join" },
+  { h: "اطلب عرض سعر رسمي 📄", p: "استلم كوتيشن PDF من الشركات، وافق أو ارفض بتعليق — كل شي داخل المنصة بدون واتساب", btn: "اطلب خدمة الآن", link: "request" },
+  { h: "من أول خطوة.. لبيت أحلامك ✨", p: "12 تخصصًا من الأساس حتى المفتاح مع شركات موثقة في كل المجالات", btn: "استكشف الأقسام", link: "cats" }
+];
+let ADS = DEFAULT_ADS, adIdx = 0, adTimer = null;
+function adApply() {
+  const sign = document.documentElement.dir === "rtl" ? 1 : -1;
+  const track = document.getElementById("adTrack");
+  if (track) track.style.transform = `translateX(${sign * adIdx * 100}%)`;
+  document.querySelectorAll(".ad-dot").forEach((d, i) => d.classList.toggle("on", i === adIdx));
+}
+function renderAds() {
+  const track = document.getElementById("adTrack");
+  const dots = document.getElementById("adDots");
+  if (!track) return;
+  track.innerHTML = ADS.map((a, i) => `
+    <div class="ad-slide"><h3>${a.h}</h3><p>${a.p}</p>
+    <button class="ad-cta" onclick="adGo(${i})">${a.btn || "✨"}</button></div>`).join("");
+  dots.innerHTML = ADS.map((_, i) => `<button class="ad-dot" onclick="adTo(${i})" aria-label="${i + 1}"></button>`).join("");
+  adApply();
+}
+function restartAdTimer() {
+  clearInterval(adTimer);
+  adTimer = setInterval(() => { adIdx = (adIdx + 1) % ADS.length; adApply(); }, 3000);
+}
+window.adTo = function(i) { adIdx = i; adApply(); restartAdTimer(); };
+window.adGo = function(i) {
+  const l = ADS[i]?.link || "";
+  if (l === "join") openJoinFlow();
+  else if (l === "request") darakRequestFlow();
+  else if (l === "cats") showView("cats");
+  else if (l) window.open(l, "_blank");
+};
+async function loadAds() {
+  if (db && getDocsFn) {
+    try {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "settings")));
+      const d = snap.docs.find(x => x.id === "ads");
+      if (d && Array.isArray(d.data().slides) && d.data().slides.length) ADS = d.data().slides;
+    } catch (e) { console.error(e); }
+  } else {
+    try { const s = JSON.parse(localStorage.getItem("darak_ads") || "null"); if (s?.length) ADS = s; } catch (e) {}
+  }
+  renderAds(); restartAdTimer();
+}
+function fillAdsForm() {
+  document.getElementById("adsFields").innerHTML = ADS.map((a, i) => `
+    <div style="border:1px solid #eee;border-radius:14px;padding:12px;margin-bottom:12px">
+      <b style="color:var(--gold);font-size:.85rem">${t("ads_slide")} ${i + 1}</b>
+      <div class="form-group" style="margin-top:8px"><label>${t("ads_head")}</label><input type="text" id="adH${i}" value="${(a.h || "").replace(/"/g, "&quot;")}"></div>
+      <div class="form-group"><label>${t("ads_text")}</label><input type="text" id="adP${i}" value="${(a.p || "").replace(/"/g, "&quot;")}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>${t("ads_btn")}</label><input type="text" id="adB${i}" value="${(a.btn || "").replace(/"/g, "&quot;")}"></div>
+        <div class="form-group"><label>${t("ads_link")}</label><input type="text" id="adL${i}" dir="ltr" value="${a.link || ""}" placeholder="join / request / cats / https://..."></div>
+      </div>
+    </div>`).join("");
+}
+document.getElementById("adsForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  ADS = ADS.map((_, i) => ({
+    h: document.getElementById("adH" + i).value.trim(),
+    p: document.getElementById("adP" + i).value.trim(),
+    btn: document.getElementById("adB" + i).value.trim(),
+    link: document.getElementById("adL" + i).value.trim()
+  }));
+  try {
+    if (db && setDocFn) await setDocFn(docFn(db, "settings", "ads"), { slides: ADS });
+    else localStorage.setItem("darak_ads", JSON.stringify(ADS));
+    showToast(t("ads_saved")); renderAds(); restartAdTimer();
+  } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
+});
+
+// ---- ملف الشركة (تعدله الشركة من لوحتها) ----
+function fillCompanyProfileForm() {
+  if (!currentUser) return;
+  document.getElementById("cpPhone2").value = currentUser.phone2 || "";
+  document.getElementById("cpInsta").value = currentUser.insta || "";
+  document.getElementById("cpWeb").value = currentUser.web || "";
+  document.getElementById("cpMap").value = currentUser.map || "";
+  document.getElementById("cpBio").value = currentUser.bio || "";
+  document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
+}
+document.getElementById("cpForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const data = {
+    phone2: document.getElementById("cpPhone2").value.trim(),
+    insta: document.getElementById("cpInsta").value.trim(),
+    web: document.getElementById("cpWeb").value.trim(),
+    map: document.getElementById("cpMap").value.trim(),
+    bio: document.getElementById("cpBio").value.trim(),
+    services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
+  };
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
+    }
+    Object.assign(currentUser, data);
+    localStorage.setItem("darak_session", JSON.stringify(currentUser));
+    const list = JSON.parse(localStorage.getItem("darak_users") || "[]");
+    const u = list.find(x => x.uid === currentUser.uid);
+    if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(list)); }
+    showToast(t("cp_saved"));
+    loadLiveCompanies();
+  } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
+});
+
+// ---- المهندسون والموظفون ----
+document.getElementById("empForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const emp = {
+    companyUid: currentUser?.uid || "",
+    companyName: currentUser?.displayName || "",
+    name: document.getElementById("empName").value.trim(),
+    job: document.getElementById("empJob").value.trim(),
+    hours: document.getElementById("empHours").value.trim(),
+    perm: document.getElementById("empPerm").value
+  };
+  if (!emp.name || !emp.job) return;
+  try {
+    if (db && addDocFn) {
+      await addDocFn(collectionFn(db, "employees"), { ...emp, createdAt: serverTimestampFn() });
+    } else {
+      const list = JSON.parse(localStorage.getItem("darak_employees") || "[]");
+      emp.id = "emp_" + Date.now();
+      list.push(emp);
+      localStorage.setItem("darak_employees", JSON.stringify(list));
+    }
+    e.target.reset();
+    showToast(t("emp_added"));
+    loadEmployees(); loadLiveEngineers();
+  } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
+});
+async function loadEmployees() {
+  const box = document.getElementById("empList");
+  if (!box || !currentUser) return;
+  let emps = [];
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "employees"), whereFn("companyUid", "==", currentUser.uid)));
+      emps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } else {
+      emps = JSON.parse(localStorage.getItem("darak_employees") || "[]").filter(x => x.companyUid === currentUser.uid);
+    }
+  } catch (e) { console.error(e); }
+  box.innerHTML = emps.length
+    ? `<table class="dash-table" style="margin:0 18px 18px;width:calc(100% - 36px)"><thead><tr><th>${t("emp_name")}</th><th>${t("emp_job")}</th><th>${t("emp_hours")}</th><th>${t("emp_perm")}</th><th></th></tr></thead><tbody>${emps.map(x => `
+      <tr><td><b>${x.name}</b></td><td>${x.job || "—"}</td><td>${x.hours || "—"}</td>
+      <td><span class="perm-badge">${permName(x.perm)}</span></td>
+      <td><button class="action-btn action-reject" onclick="deleteEmployee('${x.id}')">${t("emp_del")}</button></td></tr>`).join("")}</tbody></table>`
+    : `<div class="dash-empty"><div class="big">👷</div>${t("emp_empty")}</div>`;
+}
+window.deleteEmployee = async function(id) {
+  try {
+    if (db && deleteDocFn) {
+      await deleteDocFn(docFn(db, "employees", id));
+    } else {
+      let list = JSON.parse(localStorage.getItem("darak_employees") || "[]");
+      list = list.filter(x => x.id !== id);
+      localStorage.setItem("darak_employees", JSON.stringify(list));
+    }
+    loadEmployees(); loadLiveEngineers();
+  } catch (e) { console.error(e); }
+};
+
+// ---- دمج الشركات المسجلة والمهندسين من قاعدة البيانات في الصفحة الرئيسية ----
+async function loadLiveCompanies() {
+  try {
+    let users = [];
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "provider")));
+      users = snap.docs.map(d => d.data());
+    } else {
+      users = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.role === "provider");
+    }
+    liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => ({
+      id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), cat: u.category || "", catEn: u.category || "",
+      icon: "🏢", rating: "5.0", phone: u.phone || "", phone2: u.phone2 || "", insta: u.insta || "",
+      web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], demo: false
+    }));
+    renderProviders();
+  } catch (e) { console.error(e); }
+}
+async function loadLiveEngineers() {
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "employees")));
+      liveEngineers = snap.docs.map(d => d.data());
+    } else {
+      liveEngineers = JSON.parse(localStorage.getItem("darak_employees") || "[]");
+    }
+    renderEngineers();
+  } catch (e) { console.error(e); }
+}
 
 // ============================================================
 // نظام عروض الأسعار — الشركة ترفع PDF والعميل يوافق أو يرفض بتعليق
@@ -1808,6 +2318,14 @@ if (auth && onAuthStateFn) {
     }
   });
 }
+
+// تشغيل الميزات الجديدة بعد تعريف كل شيء
+startAutoRows();
+renderAds();
+restartAdTimer();
+loadAds();
+loadLiveCompanies();
+loadLiveEngineers();
 </script>
 </body>
 </html>
