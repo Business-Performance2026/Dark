@@ -2177,7 +2177,6 @@ window.openCompany = async function(id) {
           <div style="font-size:.76rem;color:var(--gold);font-weight:700">${e.job || ""}</div>
           <div style="font-size:.74rem;color:var(--muted)">🕐 ${e.hours || "—"}</div>
         </div>
-        <span class="perm-badge">${permName(e.perm)}</span>
       </div>`).join("") : `<p>${t("co_no_eng")}</p>`}
     </div>`;
   showView("company");
