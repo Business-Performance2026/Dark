@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.darakom.twa",
+        "sha256_cert_fingerprints": ["64:14:DC:3E:52:B6:D2:53:5D:E4:1F:07:AE:5C:6F:3F:15:0A:9A:97:B2:59:EC:7C:29:65:44:0D:3E:9A:91:BE"]
+      }
+    }]
 
