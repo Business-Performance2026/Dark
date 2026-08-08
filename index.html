@@ -2301,9 +2301,14 @@ function renderAds() {
   const track = document.getElementById("adTrack");
   const dots = document.getElementById("adDots");
   if (!track) return;
-  track.innerHTML = ADS.map((a, i) => `
+  track.innerHTML = ADS.map((a, i) => {
+    const imgOnly = a.img && !a.h && !a.p && !a.btn;
+    if (imgOnly) return `
+    <div class="ad-slide ad-slide-img" style="background-image:url('${a.img}');background-size:cover;background-position:center;min-height:0;padding:0;${a.link ? "cursor:pointer" : ""}" ${a.link ? `onclick="adGo(${i})"` : ""}><img src="${a.img}" alt="" style="width:100%;display:block;border-radius:0"></div>`;
+    return `
     <div class="ad-slide" style="${a.img ? `background-image:linear-gradient(rgba(22,40,58,.72),rgba(22,40,58,.72)),url('${a.img}');background-size:cover;background-position:center` : ""}"><h3>${a.h}</h3><p>${a.p}</p>
-    <button class="ad-cta" onclick="adGo(${i})">${a.btn || "✨"}</button></div>`).join("");
+    ${a.btn ? `<button class="ad-cta" onclick="adGo(${i})">${a.btn}</button>` : ""}</div>`;
+  }).join("");
   dots.innerHTML = ADS.map((_, i) => `<button class="ad-dot" onclick="adTo(${i})" aria-label="${i + 1}"></button>`).join("");
   adApply();
 }

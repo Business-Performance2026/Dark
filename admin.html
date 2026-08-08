@@ -488,6 +488,7 @@ function renderAdsForm() {
   const slides = ADS && ADS.length ? ADS : DEFAULT_ADS;
   return `
   <div class="card"><div class="card-h"><h2>🖼️ الشرائح الإعلانية (تتبدل كل 3 ثوانٍ في التطبيق)</h2></div>
+  <p style="padding:0 4px 12px;color:#8a8172;font-size:.85rem">💡 <b>وضع الصورة فقط:</b> ارفع صورة مصممة جاهزة (1200×400 بكسل) واترك العنوان والنص والزر فاضية — يظهر الإعلان كصورة كاملة بدون أي كتابة فوقها. ولو كتبت نصوصًا تظهر فوق الصورة.</p>
   <form class="panel" id="adsForm">
     ${slides.map((a, i) => `
     <div class="slide-box">
