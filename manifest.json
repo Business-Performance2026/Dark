@@ -4,6 +4,7 @@
   "description": "منصة تربط أصحاب المشاريع بشركات البناء والتشطيب في سلطنة عمان",
   "lang": "ar",
   "dir": "rtl",
+  "id": "darakom.app",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
