@@ -1060,7 +1060,7 @@ if (FIREBASE_READY) {
 } else firebaseReadyResolve();
 
 // ============ التخصصات ============
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   { icon: "🏗️", name: "المقاولون", en: "Contractors", desc: "بناء وتشطيب متكامل", enDesc: "Full build & finish", count: 120 },
   { icon: "🧱", name: "مواد البناء", en: "Building Materials", desc: "موردون وأسعار تنافسية", enDesc: "Suppliers, best prices", count: 85 },
   { icon: "⚡", name: "الكهرباء", en: "Electrical", desc: "تأسيس وتشطيب وصيانة", enDesc: "Wiring & maintenance", count: 64 },
@@ -1074,6 +1074,36 @@ const CATEGORIES = [
   { icon: "🌴", name: "تنسيق الحدائق", en: "Landscaping", desc: "لاندسكيب وأنسنة خارجية", enDesc: "Gardens & outdoor", count: 30 },
   { icon: "📹", name: "الأمن والكاميرات", en: "Security & CCTV", desc: "أنظمة مراقبة وحماية", enDesc: "Cameras & protection", count: 33 },
 ];
+let CATEGORIES = DEFAULT_CATEGORIES.slice();
+async function loadCats() {
+  try {
+    if (db && getDocsFn) {
+      const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "settings"))), 9000);
+      const d = snap.docs.find(x => x.id === "categories");
+      if (d && Array.isArray(d.data().list) && d.data().list.length) CATEGORIES = d.data().list;
+    } else {
+      const s = JSON.parse(localStorage.getItem("darak_categories") || "null");
+      if (Array.isArray(s) && s.length) CATEGORIES = s;
+    }
+  } catch (e) { console.warn("تعذر تحميل الأقسام", e); }
+  renderCats();
+  fillCatSelects();
+}
+function fillCatSelects() {
+  ["reqCategory", "regCategory", "ueCategory"].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = "";
+    CATEGORIES.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c.name;
+      o.textContent = `${c.icon} ${c.name}`;
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  });
+}
 
 // ============================================================
 // نظام اللغة — عربي / English
@@ -1329,13 +1359,7 @@ async function saveToDB(collectionName, data) {
 // نافذة طلب الخدمة (تتطلب حسابًا — البريد الإلكتروني شرط)
 // ============================================================
 const requestModal = document.getElementById("requestModal");
-const reqCat = document.getElementById("reqCategory");
-CATEGORIES.forEach(c => {
-  const o = document.createElement("option");
-  o.value = c.name;
-  o.textContent = `${c.icon} ${c.name}`;
-  reqCat.appendChild(o);
-});
+
 
 function openRequestModal() {
   document.getElementById("reqName").value = currentUser?.displayName || "";
@@ -1442,13 +1466,7 @@ document.querySelectorAll(".role-option").forEach(opt => {
 });
 
 // تعبئة تخصصات نموذج التسجيل
-const regCat = document.getElementById("regCategory");
-CATEGORIES.forEach(c => {
-  const o = document.createElement("option");
-  o.value = c.name;
-  o.textContent = `${c.icon} ${c.name}`;
-  regCat.appendChild(o);
-});
+
 
 // منطقة الحساب في الهيدر
 function renderAuthArea() {
@@ -1839,13 +1857,7 @@ document.getElementById("reasonConfirm").addEventListener("click", () => {
 
 // --- نافذة تعديل المستخدم ---
 let editingUid = null;
-const ueCat = document.getElementById("ueCategory");
-CATEGORIES.forEach(c => {
-  const o = document.createElement("option");
-  o.value = c.name;
-  o.textContent = `${c.icon} ${c.name}`;
-  ueCat.appendChild(o);
-});
+
 window.adminEdit = async uid => {
   const users = await fetchAllUsers();
   const u = users.find(x => x.uid === uid);
@@ -2861,10 +2873,12 @@ renderAds();
 restartAdTimer();
 function bootData() {
   loadAds();
+  loadCats();
   loadLiveCompanies();
   loadLiveEngineers();
 }
 bootData();
+fillCatSelects();
 firebaseReady.then(() => { bootData(); });
 </script>
 <script>

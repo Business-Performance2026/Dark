@@ -132,6 +132,7 @@ td{padding:10px 12px;border-bottom:1px solid #f5f1e8;font-size:.82rem;color:var(
     <button data-t="requests" type="button">📋 الطلبات <span class="cnt" id="cntRequests">0</span></button>
     <button data-t="quotes" type="button">💰 عروض الأسعار <span class="cnt" id="cntQuotes">0</span></button>
     <button data-t="employees" type="button">👷 الموظفون <span class="cnt" id="cntEmployees">0</span></button>
+    <button data-t="cats" type="button">🗂️ الأقسام</button>
     <button data-t="ads" type="button">🖼️ الإعلانات</button>
     <button data-t="footer" type="button">⚙️ الفوتر</button>
   </div>
@@ -232,7 +233,7 @@ A.onAuthStateChanged(auth, user => {
 });
 
 // ====== تحميل كل البيانات ======
-let USERS = [], REQUESTS = [], QUOTES = [], EMPLOYEES = [], ADS = null, FOOTER = null;
+let USERS = [], REQUESTS = [], QUOTES = [], EMPLOYEES = [], ADS = null, FOOTER = null, CATS = null;
 async function loadAll() {
   try {
     const [u, r, q, e, s] = await Promise.all([
@@ -249,6 +250,7 @@ async function loadAll() {
     s.docs.forEach(d => {
       if (d.id === "ads") ADS = d.data().slides;
       if (d.id === "footer") FOOTER = d.data();
+        if (d.id === "categories") CATS = d.data().list;
     });
   } catch (e) { console.error(e); toast("تعذر تحميل البيانات — تحقق من القواعد", true); }
   renderAll();
@@ -287,6 +289,7 @@ function switchTab(t) {
   else if (t === "requests") box.innerHTML = renderRequests();
   else if (t === "quotes") box.innerHTML = renderQuotes();
   else if (t === "employees") box.innerHTML = renderEmployees();
+  else if (t === "cats") box.innerHTML = renderCatsForm();
   else if (t === "ads") box.innerHTML = renderAdsForm();
   else if (t === "footer") box.innerHTML = renderFooterForm();
   bindTabEvents(t);
@@ -425,6 +428,62 @@ const DEFAULT_ADS = [
   { h: "اطلب عرض سعر رسمي 📄", p: "استلم كوتيشن PDF ووافق أو ارفض بتعليق", btn: "اطلب خدمة الآن", link: "request", img: "" },
   { h: "من أول خطوة.. لبيت أحلامك ✨", p: "12 تخصصًا من الأساس حتى المفتاح", btn: "استكشف الأقسام", link: "cats", img: "" }
 ];
+const DEFAULT_CATS = [
+  { icon: "🏗️", name: "المقاولون", en: "Contractors" }, { icon: "🧱", name: "مواد البناء", en: "Building Materials" },
+  { icon: "⚡", name: "الكهرباء", en: "Electrical" }, { icon: "🚰", name: "السباكة", en: "Plumbing" },
+  { icon: "❄️", name: "التكييف", en: "HVAC" }, { icon: "🎨", name: "الديكور", en: "Decor" },
+  { icon: "🪟", name: "الألمنيوم والزجاج", en: "Aluminium & Glass" }, { icon: "🪑", name: "الأثاث", en: "Furniture" },
+  { icon: "🛋️", name: "شركات التنظيف", en: "Cleaning" }, { icon: "🏠", name: "المنازل الذكية", en: "Smart Homes" },
+  { icon: "🌿", name: "الحدائق والتنسيق", en: "Landscaping" }, { icon: "🧰", name: "الصيانة", en: "Maintenance" }
+];
+let catEditIdx = -1;
+function catsList() { return (CATS && CATS.length ? CATS : DEFAULT_CATS); }
+function renderCatsForm() {
+  const list = catsList();
+  return `
+  <div class="card"><div class="card-h"><h2>🗂️ إدارة الأقسام (التخصصات)</h2></div>
+  <div class="panel">
+    <form id="catForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      <input type="hidden" id="cIdx" value="-1">
+      <input id="cIcon" placeholder="الأيقونة 🏗️" style="width:110px" required>
+      <input id="cName" placeholder="الاسم بالعربي *" style="flex:1;min-width:140px" required>
+      <input id="cEn" placeholder="الاسم بالإنجليزي" dir="ltr" style="flex:1;min-width:140px">
+      <button class="submit" type="submit" id="catSubmit" style="padding:9px 20px">إضافة ➕</button>
+    </form>
+    <table><thead><tr><th>الأيقونة</th><th>الاسم (عربي)</th><th>الاسم (إنجليزي)</th><th>الإجراء</th></tr></thead>
+    <tbody>${list.map((c, i) => `
+      <tr>
+        <td data-l="الأيقونة" style="font-size:1.4rem">${c.icon}</td>
+        <td data-l="الاسم (عربي)"><b>${c.name}</b></td>
+        <td data-l="الاسم (إنجليزي)" dir="ltr">${c.en || "—"}</td>
+        <td data-l="الإجراء"><button class="abtn a-ok" onclick="catEdit(${i})">✏️ تعديل</button> <button class="abtn a-no" onclick="catDel(${i})">🗑️ حذف</button></td>
+      </tr>`).join("")}</tbody></table>
+    <p style="color:#8a8172;font-size:.8rem;margin-top:10px">⚠️ حذف قسم لا يحذف شركاته — لكنها تتوقف عن الظهور تحت قسم معروف حتى تنقلها لقسم آخر.</p>
+  </div></div>`;
+}
+window.catEdit = function(i) {
+  const c = catsList()[i];
+  $("cIdx").value = i;
+  $("cIcon").value = c.icon || "";
+  $("cName").value = c.name || "";
+  $("cEn").value = c.en || "";
+  $("catSubmit").textContent = "حفظ التعديل 💾";
+};
+window.catDel = async function(i) {
+  if (!confirm("حذف هذا القسم؟")) return;
+  const list = catsList().slice();
+  list.splice(i, 1);
+  await saveCats(list);
+};
+async function saveCats(list) {
+  try {
+    await F.setDoc(F.doc(db, "settings", "categories"), { list });
+    CATS = list;
+    catEditIdx = -1;
+    toast("تم حفظ الأقسام ✅");
+    switchTab("cats");
+  } catch (err) { console.error(err); toast("تعذر الحفظ", true); }
+}
 function renderAdsForm() {
   const slides = ADS && ADS.length ? ADS : DEFAULT_ADS;
   return `
@@ -475,6 +534,16 @@ function bindSearch(inputId, rowClass) {
 function bindTabEvents(t) {
   if (t === "companies" || t === "clients") bindSearch("userSearch", "urow");
   if (t === "requests") bindSearch("reqSearch", "rrow");
+  if (t === "cats") {
+    $("catForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const list = catsList().slice();
+      const item = { icon: $("cIcon").value.trim(), name: $("cName").value.trim(), en: $("cEn").value.trim() };
+      const idx = +$("cIdx").value;
+      if (idx >= 0) list[idx] = item; else list.push(item);
+      await saveCats(list);
+    });
+  }
   if (t === "ads") {
     $("adsForm").addEventListener("submit", async e => {
       e.preventDefault();
