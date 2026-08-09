@@ -1286,7 +1286,7 @@ const I18N = {
     tech_req_title: "🔧 اطلب فني", tech_req_for: "التخصص:", tech_details: "وصف المشكلة أو العمل المطلوب *",
     tech_login_first: "سجّل دخولك أولًا عشان ترسل طلبك", tech_sent: "تم استلام طلبك! بيشوفه الفنيون في التخصص المطلوب",
     dash_tech: "لوحة الفني 🔧", sub_tech: "طلبات العملاء الواردة في تخصصك",
-    quote_file_opt: "ملف العرض (PDF) — اختياري", req_err: "تعذر إرسال الطلب، حاول مرة أخرى", sending: "جارٍ الإرسال…"
+    quote_file_opt: "ملف العرض (PDF) — اختياري", pdf_required: "الرجاء إرفاق ملف عرض السعر (PDF) 📎", req_err: "تعذر إرسال الطلب، حاول مرة أخرى", sending: "جارٍ الإرسال…"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -2999,7 +2999,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   const file = document.getElementById("quoteFile").files[0];
   const isTechRole = currentUser?.role === "tech";
   if (file && file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
-  if (!file && !isTechRole) { showToast(t("pdf_only"), "error"); return; }
+  if (!file && !isTechRole) { showToast(t("pdf_required"), "error"); return; }
   const btn = document.getElementById("quoteSubmit");
   const r = lastRequests.find(x => x.id === document.getElementById("quoteModal").dataset.requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
@@ -3008,12 +3008,20 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   try {
     let pdfUrl = "";
     const pdfName = file ? file.name : "";
-    if (file && storage && refFn) {
-      const sref = refFn(storage, "quotes/" + Date.now() + "_" + file.name.replace(/[^\w.]/g, "_"));
-      await uploadBytesFn(sref, file);
-      pdfUrl = await getUrlFn(sref);
-    } else if (file.size < 700 * 1024) {
-      pdfUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+    if (file) {
+      const toDataUrl = () => new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+      try {
+        if (storage && refFn) {
+          const sref = refFn(storage, "quotes/" + Date.now() + "_" + file.name.replace(/[^\w.]/g, "_"));
+          await uploadBytesFn(sref, file);
+          pdfUrl = await getUrlFn(sref);
+        } else if (file.size < 700 * 1024) {
+          pdfUrl = await toDataUrl();
+        }
+      } catch (upErr) {
+        console.warn("فشل رفع الملف للتخزين — محاولة مضمنة", upErr);
+        if (file.size < 700 * 1024) pdfUrl = await toDataUrl();
+      }
     }
     const quote = {
       requestId: r.id,
