@@ -1594,6 +1594,10 @@ window.setRole = setRole;
 
 document.getElementById("btnRequestService").addEventListener("click", openRequestFlow);
 document.getElementById("btnJoinProvider").addEventListener("click", openJoinFlow);
+document.getElementById("btnJoinTech").addEventListener("click", () => {
+  if (currentUser) { openDashboard(); return; }
+  setAuthTab("register"); setRole("tech"); openAuth();
+});
 document.getElementById("dashActionBtn").addEventListener("click", () => {
   if (currentUser?.role === "client") openRequestModal(); else openRequestFlow();
 });
@@ -2895,6 +2899,78 @@ async function loadLiveEngineers() {
     renderEngineers();
   } catch (e) { console.error(e); }
 }
+
+// ============================================================
+// نظام التقييم — العميل يقيّم الشركة/الفني بعد قبول العرض ⭐
+// ============================================================
+let RATINGS = [];
+async function fetchRatings() {
+  if (db && getDocsFn) {
+    const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "ratings"))), 9000);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return JSON.parse(localStorage.getItem("darak_ratings") || "[]");
+}
+function ratingAvg(uid) {
+  const rs = RATINGS.filter(r => r.providerUid === uid);
+  if (!rs.length) return null;
+  return { avg: (rs.reduce((a, b) => a + (+b.stars || 0), 0) / rs.length).toFixed(1), count: rs.length };
+}
+let ratingQuote = null, ratingStars = 0;
+const RATE_HINTS = ["", "😞 سيئة", "😐 مقبولة", "🙂 جيدة", "😃 جيدة جداً", "🤩 ممتازة"];
+window.openRateModal = function(quoteId) {
+  const q = (_lastQuotes || []).find(x => x.id === quoteId);
+  if (!q) { showToast(t("quote_err"), "error"); return; }
+  ratingQuote = q; ratingStars = 0;
+  document.getElementById("rateFor").textContent = (q.providerName || "—") + " • " + (q.category || "");
+  document.getElementById("rateComment").value = "";
+  document.getElementById("rateHint").textContent = "";
+  paintStars();
+  document.getElementById("rateModal").classList.add("open");
+};
+function paintStars() {
+  document.querySelectorAll("#rateStars span").forEach(sp => {
+    const s = +sp.dataset.s;
+    sp.textContent = s <= ratingStars ? "⭐" : "☆";
+    sp.style.transform = s <= ratingStars ? "scale(1.15)" : "";
+  });
+}
+document.querySelectorAll("#rateStars span").forEach(sp => sp.addEventListener("click", () => {
+  ratingStars = +sp.dataset.s;
+  document.getElementById("rateHint").textContent = RATE_HINTS[ratingStars] || "";
+  paintStars();
+}));
+document.getElementById("rateClose").addEventListener("click", () => document.getElementById("rateModal").classList.remove("open"));
+document.getElementById("rateModal").addEventListener("click", e => { if (e.target.id === "rateModal") e.target.classList.remove("open"); });
+document.getElementById("rateSubmit").addEventListener("click", async () => {
+  if (!ratingQuote) return;
+  if (!ratingStars) { showToast("اختر عدد النجوم أولاً ⭐", "error"); return; }
+  const btn = document.getElementById("rateSubmit");
+  btn.disabled = true;
+  try {
+    const rec = {
+      quoteId: ratingQuote.id,
+      providerUid: ratingQuote.providerUid || "",
+      providerName: ratingQuote.providerName || "",
+      clientUid: currentUser?.uid || "",
+      clientName: currentUser?.displayName || "",
+      stars: ratingStars,
+      comment: document.getElementById("rateComment").value.trim()
+    };
+    if (db && addDocFn) await addDocFn(collectionFn(db, "ratings"), { ...rec, createdAt: serverTimestampFn() });
+    else {
+      const rs = JSON.parse(localStorage.getItem("darak_ratings") || "[]");
+      rs.push({ ...rec, id: "r_" + Date.now(), createdAt: new Date().toISOString() });
+      localStorage.setItem("darak_ratings", JSON.stringify(rs));
+    }
+    RATINGS.push(rec);
+    document.getElementById("rateModal").classList.remove("open");
+    showToast("شكراً لك! تم إرسال تقييمك ⭐");
+    loadQuotesSection();
+    loadLiveCompanies();
+  } catch (e) { console.error(e); showToast("تعذر إرسال التقييم — حاول مرة أخرى", "error"); }
+  btn.disabled = false;
+});
 
 // ============================================================
 // نظام عروض الأسعار — الشركة ترفع PDF والعميل يوافق أو يرفض بتعليق
