@@ -234,7 +234,7 @@ A.onAuthStateChanged(auth, user => {
 });
 
 // ====== تحميل كل البيانات ======
-let USERS = [], REQUESTS = [], QUOTES = [], EMPLOYEES = [], ADS = null, FOOTER = null, CATS = null;
+let USERS = [], REQUESTS = [], QUOTES = [], EMPLOYEES = [], ADS = null, FOOTER = null, CATS = null, TECHCATS = null;
 async function loadAll() {
   try {
     const [u, r, tr, q, e, s] = await Promise.all([
@@ -493,6 +493,59 @@ async function saveCats(list) {
     catEditIdx = -1;
     toast("تم حفظ الأقسام ✅");
     switchTab("cats");
+  } catch (err) { console.error(err); toast("تعذر الحفظ", true); }
+}
+
+// ====== 🔧 تخصصات الفنيين المستقلين — قائمة منفصلة تماماً عن أقسام الشركات ======
+const DEFAULT_TECHCATS = [
+  { icon: "⚡", name: "كهربائي", en: "Electrician" }, { icon: "🚰", name: "سباك", en: "Plumber" },
+  { icon: "❄️", name: "تكييف وتبريد", en: "AC & Cooling" }, { icon: "🎨", name: "دهان", en: "Painter" },
+  { icon: "🪚", name: "نجار", en: "Carpenter" }, { icon: "🔧", name: "صيانة عامة وأجهزة", en: "General & Appliances" }
+];
+function techcatsList() { return (TECHCATS && TECHCATS.length ? TECHCATS : DEFAULT_TECHCATS); }
+function renderTechCatsForm() {
+  const list = techcatsList();
+  return `
+  <div class="card"><div class="card-h"><h2>🔧 إدارة تخصصات الفنيين (قسم اطلب فني)</h2></div>
+  <div class="panel">
+    <form id="techcatForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      <input type="hidden" id="tcIdx" value="-1">
+      <input id="tcIcon" placeholder="الأيقونة ⚡" style="width:110px" required>
+      <input id="tcName" placeholder="الاسم بالعربي *" style="flex:1;min-width:140px" required>
+      <input id="tcEn" placeholder="الاسم بالإنجليزي" dir="ltr" style="flex:1;min-width:140px">
+      <button class="submit" type="submit" id="techcatSubmit" style="padding:9px 20px">إضافة ➕</button>
+    </form>
+    <table><thead><tr><th>الأيقونة</th><th>الاسم (عربي)</th><th>الاسم (إنجليزي)</th><th>الإجراء</th></tr></thead>
+    <tbody>${list.map((c, i) => `
+      <tr>
+        <td data-l="الأيقونة" style="font-size:1.4rem">${c.icon}</td>
+        <td data-l="الاسم (عربي)"><b>${c.name}</b></td>
+        <td data-l="الاسم (إنجليزي)" dir="ltr">${c.en || "—"}</td>
+        <td data-l="الإجراء"><button class="abtn a-ok" onclick="techcatEdit(${i})">✏️ تعديل</button> <button class="abtn a-no" onclick="techcatDel(${i})">🗑️ حذف</button></td>
+      </tr>`).join("")}</tbody></table>
+    <p style="color:#8a8172;font-size:.8rem;margin-top:10px">ℹ️ هذه التخصصات تظهر فقط في قسم «اطلب فني» وطلبات الصيانة — منفصلة تماماً عن أقسام الشركات.</p>
+  </div></div>`;
+}
+window.techcatEdit = function(i) {
+  const c = techcatsList()[i];
+  $("tcIdx").value = i;
+  $("tcIcon").value = c.icon || "";
+  $("tcName").value = c.name || "";
+  $("tcEn").value = c.en || "";
+  $("techcatSubmit").textContent = "حفظ التعديل 💾";
+};
+window.techcatDel = async function(i) {
+  if (!confirm("حذف هذا التخصص؟")) return;
+  const list = techcatsList().slice();
+  list.splice(i, 1);
+  await saveTechCats(list);
+};
+async function saveTechCats(list) {
+  try {
+    await F.setDoc(F.doc(db, "settings", "tech_categories"), { list });
+    TECHCATS = list;
+    toast("تم حفظ تخصصات الفنيين ✅");
+    switchTab("techcats");
   } catch (err) { console.error(err); toast("تعذر الحفظ", true); }
 }
 function renderAdsForm() {
