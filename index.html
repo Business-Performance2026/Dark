@@ -215,6 +215,13 @@ footer ul a:hover{color:var(--gold-2)}
 .co-loc{font-size:.68rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .more-bar{width:calc(100% - 24px);margin:8px 12px 14px;padding:11px;border:1.5px dashed var(--gold);border-radius:12px;background:#faf6ee;color:var(--navy);font-weight:700;font-size:.86rem;cursor:pointer;font-family:inherit;transition:.2s}
 .more-bar:active{background:#f3ead6}
+.q-menu-item{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #e6ddc9;border-radius:14px;padding:14px 16px;margin:0 12px 10px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.95rem;transition:.15s;box-shadow:0 1px 4px rgba(22,40,58,.05)}
+.q-menu-item:active{background:#faf6ee;border-color:var(--gold)}
+.q-menu-side{display:flex;align-items:center;gap:8px}
+.q-menu-arrow{color:var(--gold);font-size:1.35rem;font-weight:900}
+.q-back{display:inline-flex;align-items:center;gap:6px;margin:6px 12px 10px;padding:8px 16px;background:#faf6ee;border:1.5px solid #e6ddc9;border-radius:100px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.85rem}
+.q-back:active{background:#f3ead6}
+.qpage-title{padding:2px 16px 10px;color:var(--navy);font-weight:800;font-size:1rem;display:flex;justify-content:space-between;align-items:center}
 #quotesTitle::after{content:"▾";float:left;background:var(--gold);color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;box-shadow:0 2px 6px rgba(185,141,78,.4)}
 #quotesTitle.closed::after{content:"◂"}
 .q-group{border:1px solid #e6ddc9;border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
@@ -836,7 +843,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 20)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 21)</small>
     </div>
   </div>
 </footer>
@@ -3168,6 +3175,17 @@ const isExpiredReq = r => { const t = tsq(r); return t && (Date.now() - t) > REQ
 function moreBtn(n, label) {
   return n > 0 ? `<button class="more-bar" data-open="" data-label="${label}" onclick="toggleDashRows(this)">⌄ عرض كل ${label} — باقي ${n}</button>` : "";
 }
+// 🔀 تنقل صفحات العروض: القائمة ↔ صفحة النوع
+window.openQGroup = function(key) {
+  const m = document.getElementById("qMenu"); if (m) m.style.display = "none";
+  document.querySelectorAll(".qpage").forEach(p => { p.style.display = p.id === "qpage_" + key ? "" : "none"; });
+  const tt = document.getElementById("quotesTitle"); if (tt) tt.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+window.closeQGroup = function() {
+  document.querySelectorAll(".qpage").forEach(p => p.style.display = "none");
+  const m = document.getElementById("qMenu"); if (m) m.style.display = "";
+};
+
 window.toggleDashRows = function(btn) {
   const extras = [...btn.parentElement.querySelectorAll("[data-extra]")];
   const open = btn.dataset.open === "1";
@@ -3223,6 +3241,18 @@ async function loadQuotesSection() {
     if (left <= 0) return "";
     return `<div style="margin-top:6px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:5px 10px;font-size:.78rem;font-weight:700;color:#b45309;text-align:center">⏳ باقي ${left} ${left === 1 ? "يوم" : left === 2 ? "يومين" : "أيام"} وينتهي هذا العرض ويُحذف إذا لم يُرد عليه</div>`;
   };
+  // 🧭 قائمة رئيسية + صفحة مستقلة لكل نوع عروض
+  const menuHtml = gs => `<div id="qMenu">${gs.map(g => `
+    <div class="q-menu-item" onclick="openQGroup('${g.key}')">
+      <span>${g.title}</span>
+      <span class="q-menu-side"><span class="q-count">${g.list.length}</span><span class="q-menu-arrow">‹</span></span>
+    </div>`).join("")}</div>`;
+  const pageShell = (g, inner) => `
+    <div class="qpage" id="qpage_${g.key}" style="display:none">
+      <div class="q-back" onclick="closeQGroup()">→ رجوع</div>
+      <div class="qpage-title"><span>${g.title}</span><span class="q-count">${g.list.length}</span></div>
+      <div style="padding:0 8px 8px">${inner}</div>
+    </div>`;
   const autoHideNote = `<div style="padding:0 4px 8px"><small style="color:var(--muted);font-size:.75rem">ℹ️ العرض الذي لا يحصل على رد خلال 7 أيام يُحذف تلقائيًا — والمرفوضة القديمة تُحذف أيضًا</small></div>`;
   if (!quotes.length) { box.innerHTML = autoHideNote + '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
 
@@ -3260,12 +3290,7 @@ async function loadQuotesSection() {
     const stBadge2 = s => s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
       : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
       : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
-    box.innerHTML = autoHideNote + groups.map(g => `
-      <div class="q-group${g.key === "rejected" ? " closed" : ""}">
-        <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
-          <span>${g.title}</span><span class="q-count">${g.list.length}</span>
-        </div>
-        <div class="q-group-body">
+    box.innerHTML = autoHideNote + menuHtml(groups) + groups.map(g => pageShell(g, `
           ${g.list.length ? g.list.map((q, qi) => `
             <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
               <div class="q-card-head">
@@ -3283,8 +3308,7 @@ async function loadQuotesSection() {
               </div>
             </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
           ${moreBtn(g.list.length - 5, "العروض")}
-        </div>
-      </div>`).join("");
+    `)).join("");
     return;
   }
 
@@ -3297,12 +3321,7 @@ async function loadQuotesSection() {
     { key: "accepted", title: "✅ عروض قبلتها",      list: quotes.filter(q => q.status === "accepted") },
     { key: "rejected", title: "⛔ عروض رفضتها",      list: quotes.filter(q => q.status === "rejected") }
   ];
-  box.innerHTML = autoHideNote + groupsC.map(g => `
-    <div class="q-group${g.key === "rejected" ? " closed" : ""}">
-      <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
-        <span>${g.title}</span><span class="q-count">${g.list.length}</span>
-      </div>
-      <div class="q-group-body">
+  box.innerHTML = autoHideNote + menuHtml(groupsC) + groupsC.map(g => pageShell(g, `
         ${g.list.length ? g.list.map((q, qi) => `
           <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
             <div class="q-card-head">
@@ -3326,8 +3345,7 @@ async function loadQuotesSection() {
             </div>
           </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
         ${moreBtn(g.list.length - 5, "العروض")}
-      </div>
-    </div>`).join("");
+    `)).join("");
   } catch (renderErr) {
     console.error(renderErr);
     box.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>صار خطأ أثناء عرض العروض<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${renderErr.message || renderErr}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
