@@ -1000,6 +1000,23 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </div>
 
+<!-- ================= نافذة تقييم الخدمة ================= -->
+<div class="modal-overlay" id="rateModal">
+  <div class="modal" style="text-align:center">
+    <button class="modal-close" id="rateClose" aria-label="إغلاق">✕</button>
+    <h3 id="rateTitle">⭐ قيّم الخدمة</h3>
+    <p id="rateFor" style="color:var(--muted)"></p>
+    <div id="rateStars" style="display:flex;justify-content:center;gap:8px;font-size:2.4rem;cursor:pointer;margin:14px 0 6px;direction:ltr">
+      <span data-s="1">☆</span><span data-s="2">☆</span><span data-s="3">☆</span><span data-s="4">☆</span><span data-s="5">☆</span>
+    </div>
+    <div id="rateHint" style="color:var(--gold);font-weight:700;min-height:22px;margin-bottom:10px"></div>
+    <div class="form-group" style="text-align:right">
+      <textarea id="rateComment" rows="2" placeholder="تعليق اختياري — كيف كانت تجربتك؟"></textarea>
+    </div>
+    <button class="submit-btn" id="rateSubmit">إرسال التقييم ⭐</button>
+  </div>
+</div>
+
 <!-- ================= نافذة سبب الرفض / الإيقاف ================= -->
 <div class="modal-overlay" id="reasonModal">
   <div class="modal">
@@ -1423,7 +1440,7 @@ function coCard(p) {
     ${p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="">` : `<div class="co-logo">${p.icon || "🏢"}</div>`}
     <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
-    <div class="co-rate">★ ${p.rating || "5.0"} ${p.demo ? "" : " · ✅"}</div>
+    <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"} ${p.demo ? "" : " · ✅"}</div>
     ${p.location ? `<div class="co-loc">📍 ${p.location}</div>` : ""}
   </div>`;
 }
@@ -1818,6 +1835,14 @@ async function openDashboard() {
     : isPro
     ? t(isTech ? "sub_tech" : "sub_provider") + (currentUser.category ? ` (${currentUser.category})` : "")
     : t("sub_client");
+  // ⭐ عرض تقييم الشركة/الفني من تقييمات العملاء
+  if (isPro) {
+    try {
+      if (!RATINGS.length) RATINGS = await fetchRatings();
+      const rt = ratingAvg(currentUser.uid);
+      if (rt) document.getElementById("dashSubtitle").textContent += ` — ⭐ ${rt.avg} (${rt.count} تقييم)`;
+    } catch (e) { console.warn(e); }
+  }
   document.getElementById("dashActionBtn").style.display = (isPro || admin) ? "none" : "inline-flex";
   document.getElementById("statTotalLabel").textContent = admin ? t("total_admin") : isPro ? t("total_provider") : t("total_client");
 
@@ -2348,20 +2373,28 @@ function renderAccountView() {
   }
 }
 
-// --- البحث الفوري ---
+// --- البحث الفوري — متسامح مع الهمزات والتاء المربوطة ويبحث في الشركات والأقسام وتخصصات الفنيين ---
+function normAr(s) {
+  return (s || "").toLowerCase()
+    .replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
+    .replace(/[\u064B-\u0652\u0670]/g, "").replace(/ـ/g, "").trim();
+}
 document.getElementById("searchInput").addEventListener("input", e => {
   const q = e.target.value.trim();
   const sec = document.getElementById("searchResults");
   if (q.length < 2) { sec.style.display = "none"; return; }
-  const ql = q.toLowerCase();
-  const matchedCats = CATEGORIES.filter(c => c.name.includes(q) || c.en.toLowerCase().includes(ql));
-  const matchedPros = allCompanies().filter(p => p.name.includes(q) || p.cat.includes(q) || p.catEn.toLowerCase().includes(ql));
+  const nq = normAr(q);
+  const hit = (name, en) => normAr(name).includes(nq) || (en || "").toLowerCase().includes(nq);
+  const matchedCats = CATEGORIES.filter(c => hit(c.name, c.en));
+  const matchedTechs = TECHS.filter(c => hit(c.name, c.en));
+  const matchedPros = allCompanies().filter(p => hit(p.name, p.nameEn) || hit(p.cat, p.catEn));
   if (isMobileView() && currentView !== "home") showView("home");
   sec.style.display = "";
-  document.getElementById("searchCats").innerHTML = matchedCats.map(c =>
-    `<button class="search-cat-chip" onclick="pickCategory('${c.name}')">${c.icon} ${LANG === "en" ? c.en : c.name}</button>`).join("");
+  document.getElementById("searchCats").innerHTML =
+    matchedCats.map(c => `<button class="search-cat-chip" onclick="pickCategory('${c.name}')">${c.icon} ${LANG === "en" ? c.en : c.name}</button>`).join("") +
+    matchedTechs.map(c => `<button class="search-cat-chip" onclick="openTechFlow('${c.name}')">${c.icon} ${LANG === "en" ? c.en : c.name} 🔧</button>`).join("");
   document.getElementById("searchPros").innerHTML = matchedPros.map(proCard).join("");
-  document.getElementById("searchEmpty").style.display = (!matchedCats.length && !matchedPros.length) ? "" : "none";
+  document.getElementById("searchEmpty").style.display = (!matchedCats.length && !matchedTechs.length && !matchedPros.length) ? "" : "none";
 });
 
 // --- زر تبديل اللغة ---
@@ -2437,7 +2470,7 @@ window.openCompany = async function(id) {
       <div style="flex:1;min-width:200px">
         <h2>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
-        <div class="co-rate2">★ ${p.rating || "5.0"}</div>
+        <div class="co-rate2">${p.ratingCount ? `★ ${p.rating} (${p.ratingCount} تقييم)` : "✨ شركة جديدة"}</div>
         ${p.location ? `<div class="co-loc" style="font-size:.85rem;color:#7a6a4d">📍 ${p.location}</div>` : ""}
       </div>
       <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
@@ -2836,11 +2869,15 @@ async function loadLiveCompanies() {
     } else {
       users = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.role === "provider");
     }
-    liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => ({
-      id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || "", catEn: u.category || "",
-      icon: "🏢", rating: "5.0", phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
-      web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
-    }));
+    try { RATINGS = await fetchRatings(); } catch (e) { console.warn("تعذر تحميل التقييمات", e); }
+    liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => {
+      const rt = ratingAvg(u.uid);
+      return {
+        id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || "", catEn: u.category || "",
+        icon: "🏢", rating: rt ? rt.avg : "", ratingCount: rt ? rt.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
+        web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
+      };
+    });
     renderProviders();
   } catch (e) { console.error(e); }
 }
@@ -3009,7 +3046,11 @@ async function loadQuotesSection() {
     const fileCell = q.pdfUrl ? `<a href="${q.pdfUrl}" target="_blank" style="color:var(--gold);font-weight:700">${t("q_view")}</a>` : (q.pdfName || "—");
     const lastCell = q.status === "sent"
       ? `<button class="action-btn action-approve" onclick="decideQuote('${q.id}','accepted')">${t("q_accept")}</button> <button class="action-btn action-reject" onclick="decideQuote('${q.id}','rejected')">${t("q_reject")}</button>`
-      : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—");
+      : (q.status === "accepted"
+        ? (ratedIds.has(q.id)
+          ? `<span style="color:var(--gold);font-weight:700">تم التقييم ⭐</span>`
+          : `<button class="action-btn action-approve" onclick="openRateModal('${q.id}')">⭐ قيّم الخدمة</button>`)
+        : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—"));
     return `<tr>
       <td data-lbl="${t("q_company")}"><b>${q.providerName || "—"}</b></td>
       <td data-lbl="${t("th_cat")}">${q.category || "—"}</td>
