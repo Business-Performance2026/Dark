@@ -3059,7 +3059,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
 
 async function fetchQuotes(field, value) {
   if (db && getDocsFn) {
-    const snap = await getDocsFn(queryFn(collectionFn(db, "quotes"), whereFn(field, "==", value)));
+    const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "quotes"), whereFn(field, "==", value))), 9000);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   }
   return JSON.parse(localStorage.getItem("darak_quotes") || "[]").filter(q => q[field] === value);
@@ -3080,8 +3080,12 @@ async function loadQuotesSection() {
   wrap.style.display = "";
   document.getElementById("quotesTitle").textContent = isClient ? t("quotes_title") : t("q_sent_title");
   box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
-  let quotes = [];
-  try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); }
+  let quotes = [], loadFailed = false;
+  try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); loadFailed = true; }
+  if (loadFailed) {
+    box.innerHTML = `<div class="dash-empty"><div class="big">📶</div>تعذر تحميل العروض — تحقق من الاتصال<br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
+    return;
+  }
   quotes.sort((a, b) => tsq(b) - tsq(a));
   _lastQuotes = quotes;
   updateNotifBadge();
@@ -3147,6 +3151,7 @@ async function loadQuotesSection() {
   }).join("")}</tbody></table>`;
 }
 
+window.loadQuotesSection = loadQuotesSection;
 window.decideQuote = function(quoteId, decision) {
   const title = decision === "accepted" ? t("comment_accept_title") : t("comment_reject_title");
   openReasonModal(title, comment => updateQuoteDecision(quoteId, decision, comment));
