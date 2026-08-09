@@ -133,6 +133,7 @@ td{padding:10px 12px;border-bottom:1px solid #f5f1e8;font-size:.82rem;color:var(
     <button data-t="quotes" type="button">💰 عروض الأسعار <span class="cnt" id="cntQuotes">0</span></button>
     <button data-t="employees" type="button">👷 الموظفون <span class="cnt" id="cntEmployees">0</span></button>
     <button data-t="cats" type="button">🗂️ الأقسام</button>
+    <button data-t="techcats" type="button">🔧 تخصصات الفنيين</button>
     <button data-t="ads" type="button">🖼️ الإعلانات</button>
     <button data-t="footer" type="button">⚙️ الفوتر</button>
   </div>
@@ -251,6 +252,7 @@ async function loadAll() {
       if (d.id === "ads") ADS = d.data().slides;
       if (d.id === "footer") FOOTER = d.data();
         if (d.id === "categories") CATS = d.data().list;
+      if (d.id === "tech_categories") TECHCATS = d.data().list;
     });
   } catch (e) { console.error(e); toast("تعذر تحميل البيانات — تحقق من القواعد", true); }
   renderAll();
@@ -285,6 +287,7 @@ function switchTab(t) {
   const box = $("tabContent");
   if (t === "overview") box.innerHTML = renderOverview();
   else if (t === "companies") box.innerHTML = renderUsers("provider");
+  else if (t === "techs") box.innerHTML = renderUsers("tech");
   else if (t === "clients") box.innerHTML = renderUsers("client");
   else if (t === "requests") box.innerHTML = renderRequests();
   else if (t === "quotes") box.innerHTML = renderQuotes();
@@ -303,17 +306,18 @@ const statusBadge = s =>
 
 function renderOverview() {
   const recent = REQUESTS.slice(0, 6);
-  const pendingCos = USERS.filter(u => u.role === "provider" && u.status === "pending");
+  const pendingCos = USERS.filter(u => (u.role === "provider" || u.role === "tech") && u.status === "pending");
   return `
   <div class="card">
-    <div class="card-h"><h2>⏳ شركات بانتظار الموافقة (${pendingCos.length})</h2></div>
-    ${pendingCos.length ? `<div class="tbl-wrap"><table><thead><tr><th>الشركة</th><th>التخصص</th><th>الهاتف</th><th>الإجراء</th></tr></thead><tbody>
+    <div class="card-h"><h2>⏳ شركات وفنيون بانتظار الموافقة (${pendingCos.length})</h2></div>
+    ${pendingCos.length ? `<div class="tbl-wrap"><table><thead><tr><th>الاسم</th><th>النوع</th><th>التخصص</th><th>الهاتف</th><th>الإجراء</th></tr></thead><tbody>
       ${pendingCos.map(u => `<tr>
-        <td data-l="الشركة"><b>${u.displayName || "—"}</b></td>
+        <td data-l="الاسم"><b>${u.displayName || "—"}</b></td>
+        <td data-l="النوع">${u.role === "tech" ? "🔧 فني" : "🏢 شركة"}</td>
         <td data-l="التخصص">${u.category || "—"}</td>
         <td data-l="الهاتف" dir="ltr">${u.phone || "—"}</td>
         <td data-l="الإجراء"><button class="abtn g" onclick="userAction('${u.uid}','approved')">قبول ✅</button><button class="abtn r" onclick="askReason('${u.uid}','rejected')">رفض ⛔</button></td>
-      </tr>`).join("")}</tbody></table></div>` : '<div class="empty">لا توجد شركات بانتظار الموافقة 🎉</div>'}
+      </tr>`).join("")}</tbody></table></div>` : '<div class="empty">لا يوجد طلبات انضمام بانتظار الموافقة 🎉</div>'}
   </div>
   <div class="card">
     <div class="card-h"><h2>🕐 أحدث الطلبات</h2></div>
@@ -330,13 +334,14 @@ function renderOverview() {
 
 function renderUsers(role) {
   const list = USERS.filter(u => u.role === role);
-  const title = role === "provider" ? "🏢 إدارة الشركات" : "👤 إدارة العملاء";
+  const title = role === "provider" ? "🏢 إدارة الشركات" : role === "tech" ? "🔧 إدارة الفنيين المستقلين" : "👤 إدارة العملاء";
+  const hasCat = role === "provider" || role === "tech";
   return `
   <div class="card">
     <div class="card-h"><h2>${title} (${list.length})</h2>
       <div class="tools"><input type="search" id="userSearch" placeholder="بحث بالاسم أو البريد…"></div></div>
     ${list.length ? `<div class="tbl-wrap"><table id="usersTable"><thead><tr>
-      <th>الاسم</th><th>البريد</th><th>الهاتف</th>${role === "provider" ? "<th>التخصص</th>" : ""}<th>الحالة</th><th>السبب</th><th>الإجراءات</th>
+      <th>الاسم</th><th>البريد</th><th>الهاتف</th>${hasCat ? "<th>التخصص</th>" : ""}<th>الحالة</th><th>السبب</th><th>الإجراءات</th>
     </tr></thead><tbody>
       ${list.map(u => `<tr class="urow" data-q="${(u.displayName || "") + " " + (u.email || "")}">
         <td data-l="الاسم"><b>${u.displayName || "—"}</b></td>
@@ -366,12 +371,12 @@ function renderRequests() {
       ${REQUESTS.map(r => `<tr class="rrow" data-q="${(r.name || "") + " " + (r.category || "") + " " + (r.city || "")}">
         <td data-l="العميل"><b>${r.name || "—"}</b></td>
         <td data-l="الهاتف" dir="ltr">${r.phone || "—"}</td>
-        <td data-l="التخصص">${r.category || "—"}</td>
+        <td data-l="التخصص">${r._tech ? "🔧 " : "🏗️ "}${r.category || "—"}</td>
         <td data-l="المدينة">${r.city || "—"}</td>
         <td data-l="الميزانية">${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td data-l="التفاصيل" style="max-width:200px;font-size:.76rem">${r.details || "—"}</td>
         <td data-l="التاريخ">${fmtD(r.createdAt)}</td>
-        <td data-l=""><button class="abtn r" onclick="deleteRequest('${r.docId}')">🗑️</button></td>
+        <td data-l=""><button class="abtn r" onclick="deleteRequest('${r.docId}','${r._col || "service_requests"}')">🗑️</button></td>
       </tr>`).join("")}</tbody></table></div>` : '<div class="empty">لا توجد طلبات</div>'}
   </div>`;
 }
@@ -543,6 +548,16 @@ function bindTabEvents(t) {
       const idx = +$("cIdx").value;
       if (idx >= 0) list[idx] = item; else list.push(item);
       await saveCats(list);
+    });
+  }
+  if (t === "techcats") {
+    $("techcatForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const list = techcatsList().slice();
+      const item = { icon: $("tcIcon").value.trim(), name: $("tcName").value.trim(), en: $("tcEn").value.trim() };
+      const idx = +$("tcIdx").value;
+      if (idx >= 0) list[idx] = item; else list.push(item);
+      await saveTechCats(list);
     });
   }
   if (t === "ads") {

@@ -563,9 +563,10 @@ footer ul a:hover{color:var(--gold-2)}
 
 <!-- ================= زرا الإجراء تحت الإعلانات ================= -->
 <section id="ctaSec" style="padding:14px 0 0">
-  <div class="container" style="display:flex;justify-content:center;gap:8px">
+  <div class="container" style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
     <button class="btn btn-gold btn-sm" id="btnRequestService" data-i18n="btn_request">📋 اطلب خدمة الآن</button>
     <button class="btn btn-outline btn-sm" id="btnJoinProvider" data-i18n="btn_join">🤝 سجّل كشركة</button>
+    <button class="btn btn-outline btn-sm" id="btnJoinTech" data-i18n="btn_join_tech">🔧 سجّل كفني</button>
   </div>
 </section>
 
@@ -1119,12 +1120,15 @@ const DEFAULT_CATEGORIES = [
   { icon: "📹", name: "الأمن والكاميرات", en: "Security & CCTV", desc: "أنظمة مراقبة وحماية", enDesc: "Cameras & protection", count: 33 },
 ];
 let CATEGORIES = DEFAULT_CATEGORIES.slice();
+let TECHS = TECH_CATEGORIES.slice();
 async function loadCats() {
   try {
     if (db && getDocsFn) {
       const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "settings"))), 9000);
       const d = snap.docs.find(x => x.id === "categories");
       if (d && Array.isArray(d.data().list) && d.data().list.length) CATEGORIES = d.data().list;
+      const td = snap.docs.find(x => x.id === "tech_categories");
+      if (td && Array.isArray(td.data().list) && td.data().list.length) TECHS = td.data().list;
     } else {
       const s = JSON.parse(localStorage.getItem("darak_categories") || "null");
       if (Array.isArray(s) && s.length) CATEGORIES = s;
@@ -1132,6 +1136,7 @@ async function loadCats() {
   } catch (e) { console.warn("تعذر تحميل الأقسام", e); }
   renderCats();
   fillCatSelects();
+  renderTechCats();
 }
 // 🔧 تخصصات الفنيين المستقلين (قسم اطلب فني)
 const TECH_CATEGORIES = [
@@ -1325,7 +1330,8 @@ const I18N = {
     tech_req_title: "🔧 Request a technician", tech_req_for: "Specialty:", tech_details: "Describe the problem or work needed *",
     tech_login_first: "Sign up or log in first to send your request", tech_sent: "Request received! Technicians in this specialty will see it",
     dash_tech: "🔧 Technician dashboard", sub_tech: "Client requests in your specialty",
-    quote_file_opt: "Quote file (PDF) — optional", req_err: "Could not send the request — try again", sending: "Sending…"
+    quote_file_opt: "Quote file (PDF) — optional", req_err: "Could not send the request — try again", sending: "Sending…",
+    btn_join_tech: "🔧 Join as technician"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -1342,7 +1348,7 @@ function renderCats() {
 function renderTechCats() {
   const el = document.getElementById("techCatRow");
   if (!el) return;
-  el.innerHTML = TECH_CATEGORIES.map(c => `
+  el.innerHTML = TECHS.map(c => `
   <div class="cat-chip" onclick="openTechFlow('${c.name}')">
     <div class="chip-ico">${c.icon}</div>
     <span>${LANG === "en" ? c.en : c.name}</span>
@@ -1350,7 +1356,7 @@ function renderTechCats() {
 }
 
 // مسار طلب الفني — العميل يعبئ النموذج، غير المسجل يسجل كعميل
-function openTechFlow(specialty) {
+window.openTechFlow = function(specialty) {
   if (currentUser?.role === "client") { openTechModal(specialty); }
   else if (currentUser) { showToast(currentUser.role === "tech" ? "أنت مسجل كفني — طلبات العملاء في لوحتك 👇" : "أنت مسجل كشركة — طلبات الصيانة تصل للفنيين المستقلين"); openDashboard(); }
   else { setAuthTab("register"); setRole("client"); openAuth(); showToast(t("tech_login_first")); }
@@ -1834,16 +1840,16 @@ async function openDashboard() {
     if (admin) {
       rows = [
         ...(await fetchCol("service_requests", c => queryFn(c))),
-        ...(await fetchCol("tech_requests", c => queryFn(c)))
+        ...(await fetchCol("tech_requests", c => queryFn(c))).map(x => ({ ...x, _tech: true }))
       ];
     } else if (isTech) {
-      rows = await fetchCol("tech_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c));
+      rows = (await fetchCol("tech_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c))).map(x => ({ ...x, _tech: true }));
     } else if (isProvider) {
       rows = await fetchCol("service_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c));
     } else {
       rows = [
         ...(await fetchCol("service_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid)))),
-        ...(await fetchCol("tech_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid))))
+        ...(await fetchCol("tech_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid)))).map(x => ({ ...x, _tech: true }))
       ];
     }
   } else {
@@ -2043,7 +2049,16 @@ window.adminEdit = async uid => {
   if (!u) { showToast("تعذر تحميل بيانات المستخدم", "error"); return; }
   editingUid = uid;
   document.getElementById("ueName").value = u.displayName || "";
-  document.getElementById("ueCategory").value = u.category || "";
+  // قائمة التخصص حسب نوع المستخدم — فني: تخصصات الصيانة | غيره: أقسام الشركات
+  const ueSel = document.getElementById("ueCategory");
+  ueSel.innerHTML = "";
+  (u.role === "tech" ? TECHS : CATEGORIES).forEach(c => {
+    const o = document.createElement("option");
+    o.value = c.name;
+    o.textContent = `${c.icon} ${c.name}`;
+    ueSel.appendChild(o);
+  });
+  ueSel.value = u.category || "";
   document.getElementById("userEditModal").classList.add("open");
 };
 document.getElementById("userEditClose").addEventListener("click", () => document.getElementById("userEditModal").classList.remove("open"));
