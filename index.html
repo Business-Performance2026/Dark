@@ -614,7 +614,6 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_tech">اطلب فني 🔧</h2>
     </div>
-    <p style="color:var(--muted);font-size:.85rem;margin:-6px 0 10px" data-i18n="secs_tech_sub">صيانة وإصلاحات البيت — اختر التخصص وبيشوف طلبك الفنيون فورًا</p>
     <div class="h-scroll cards-row" id="techCatRow"></div>
   </div>
 </section>
@@ -727,6 +726,8 @@ footer ul a:hover{color:var(--gold-2)}
       <button class="active" data-atab="requests" type="button">📋 الطلبات</button>
       <button data-atab="users" type="button">👥 إدارة المستخدمين</button>
       <button data-atab="quotes" type="button">💰 عروض الأسعار</button>
+      <button data-atab="cats" type="button">🗂️ الأقسام</button>
+      <button data-atab="techcats" type="button">🔧 تخصصات الفنيين</button>
       <button data-atab="ads" type="button">🖼️ الإعلانات</button>
       <button data-atab="footer" type="button">⚙️ إعدادات الفوتر</button>
     </div>
@@ -782,6 +783,14 @@ footer ul a:hover{color:var(--gold-2)}
         <div id="adsFields"></div>
         <button type="submit" class="submit-btn" data-i18n="ads_save">حفظ الإعلانات 💾</button>
       </form>
+    </div>
+    <div class="dash-table-wrap" id="catsWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy)">🗂️ أقسام الشركات (تظهر في طلبات البناء والتشطيب)</h3>
+      <div style="padding:6px 18px 18px" id="catsContent"></div>
+    </div>
+    <div class="dash-table-wrap" id="techcatsWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy)">🔧 تخصصات الفنيين (تظهر في قسم اطلب فني فقط)</h3>
+      <div style="padding:6px 18px 18px" id="techcatsContent"></div>
     </div>
   </div>
 </section>
@@ -1255,7 +1264,7 @@ const I18N = {
     n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
     n_quote_acc: "✅ {c} وافق على عرضك", n_quote_rej: "⛔ {c} رفض عرضك",
     co_send_msg: "أرسل رسالة",
-    role_tech: "فني مستقل", secs_tech: "اطلب فني 🔧",
+    role_tech: "فني مستقل", secs_tech: "اطلب فني 🔧", btn_join_tech: "🔧 سجّل كفني",
     secs_tech_sub: "صيانة وإصلاحات البيت — اختر التخصص وبيشوف طلبك الفنيون فورًا",
     tech_req_title: "🔧 اطلب فني", tech_req_for: "التخصص:", tech_details: "وصف المشكلة أو العمل المطلوب *",
     tech_login_first: "سجّل دخولك أولًا عشان ترسل طلبك", tech_sent: "تم استلام طلبك! بيشوفه الفنيون في التخصص المطلوب",
