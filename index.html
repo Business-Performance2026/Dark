@@ -1018,6 +1018,7 @@ let getDocsFn = null, queryFn = null, whereFn = null;
 let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
 let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
+let messaging = null, getTokenFn = null, onMessageFn = null, arrayUnionFn = null;
 
 let firebaseReadyResolve;
 const firebaseReady = new Promise(res => { firebaseReadyResolve = res; });
@@ -1051,6 +1052,16 @@ if (FIREBASE_READY) {
     updateProfileFn = authMod.updateProfile;
     onAuthStateFn = authMod.onAuthStateChanged;
     sendResetFn = authMod.sendPasswordResetEmail;
+    arrayUnionFn = firestore.arrayUnion;
+    try {
+      const msgMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
+      if (msgMod.isSupported && await msgMod.isSupported()) {
+        messaging = msgMod.getMessaging(app);
+        getTokenFn = msgMod.getToken;
+        onMessageFn = msgMod.onMessage;
+        console.log("✅ إشعارات Push جاهزة");
+      }
+    } catch (e) { console.warn("⚠️ إشعارات Push غير مدعومة على هذا المتصفح", e); }
     console.log("✅ Firebase متصل");
   } catch (e) {
     console.warn("⚠️ تعذر الاتصال بـ Firebase — الوضع التجريبي", e);
@@ -1601,6 +1612,32 @@ async function logout() {
   updateNotifBadge();
   document.getElementById("dashboard").classList.remove("open");
   showToast("تم تسجيل الخروج — نراك قريبًا");
+}
+
+// 🔔 إشعارات Push — تسجيل جهاز المستخدم ليصله التنبيه حتى والتطبيق مغلق
+const VAPID_KEY = "BAvstXTXpx1oHEEOaIq428sVNgpj0gp0v9P0dV5l9qLn47XdT-wyXVnOz4g2xRh5Q8WalkR-mWwW0tRHKvWfXkY";
+async function setupPush() {
+  try {
+    if (!messaging || !getTokenFn || !currentUser || !currentUser.uid) return;
+    if (!("Notification" in window) || !("serviceWorker" in navigator)) return;
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") return;
+    const reg = await navigator.serviceWorker.getRegistration();
+    const token = await getTokenFn(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+    if (!token || !db) return;
+    // نحفظ التوكن في وثيقة المستخدم — الـ Cloud Function ترسل له التنبيهات عبره
+    const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+    if (snap.docs.length) await updateDocFn(snap.docs[0].ref, { fcmTokens: arrayUnionFn(token) });
+    // تنبيه داخل التطبيق وهو مفتوح (الخلفية يتولاها sw.js)
+    if (onMessageFn && !setupPush._listening) {
+      setupPush._listening = true;
+      onMessageFn(messaging, payload => {
+        const n = (payload && payload.notification) || {};
+        showToast("🔔 " + (n.title || "دارك") + (n.body ? " — " + n.body : ""));
+        updateNotifBadge();
+      });
+    }
+  } catch (e) { console.warn("تعذر تفعيل الإشعارات", e); }
 }
 
 // ⚙️ بريد الأدمن — صاحب هذا البريد يشوف كل طلبات المنصة من لوحته
@@ -2862,6 +2899,7 @@ if (auth && onAuthStateFn) {
         }
         currentUser = prof;
         renderAuthArea();
+        setupPush();
       } catch (e) { console.warn("تعذر استعادة الجلسة", e); }
     } else if (!user && currentUser) {
       currentUser = null;
