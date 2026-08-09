@@ -832,7 +832,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 12)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 13)</small>
     </div>
   </div>
 </footer>
@@ -2857,6 +2857,10 @@ window.deleteEmployee = async function(id) {
 };
 
 // ---- دمج الشركات المسجلة والمهندسين من قاعدة البيانات في الصفحة الرئيسية ----
+// 🩺 كاشف أخطاء مؤقت للتشخيص — يعرض أي خطأ برمجي على الشاشة
+window.addEventListener("error", e => { try { showToast("🩺 خطأ: " + (e.message || "غير معروف"), "error"); } catch (_) {} });
+window.addEventListener("unhandledrejection", e => { try { showToast("🩺 خطأ: " + ((e.reason && e.reason.message) || e.reason || "غير معروف"), "error"); } catch (_) {} });
+
 function withTimeout(promise, ms) {
   return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
 }
@@ -3080,12 +3084,13 @@ async function loadQuotesSection() {
   wrap.style.display = "";
   document.getElementById("quotesTitle").textContent = isClient ? t("quotes_title") : t("q_sent_title");
   box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
-  let quotes = [], loadFailed = false;
-  try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); loadFailed = true; }
+  let quotes = [], loadFailed = false, failMsg = "";
+  try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); loadFailed = true; failMsg = e.message || String(e); }
   if (loadFailed) {
-    box.innerHTML = `<div class="dash-empty"><div class="big">📶</div>تعذر تحميل العروض — تحقق من الاتصال<br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
+    box.innerHTML = `<div class="dash-empty"><div class="big">📶</div>تعذر تحميل العروض — تحقق من الاتصال<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${failMsg}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
     return;
   }
+  try {
   quotes.sort((a, b) => tsq(b) - tsq(a));
   _lastQuotes = quotes;
   updateNotifBadge();
@@ -3149,6 +3154,10 @@ async function loadQuotesSection() {
       <td data-lbl="${t("q_actions")}" style="white-space:nowrap">${lastCell}</td>
     </tr>`;
   }).join("")}</tbody></table>`;
+  } catch (renderErr) {
+    console.error(renderErr);
+    box.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>صار خطأ أثناء عرض العروض<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${renderErr.message || renderErr}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
+  }
 }
 
 window.loadQuotesSection = loadQuotesSection;
