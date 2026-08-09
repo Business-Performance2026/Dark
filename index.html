@@ -1120,7 +1120,6 @@ const DEFAULT_CATEGORIES = [
   { icon: "📹", name: "الأمن والكاميرات", en: "Security & CCTV", desc: "أنظمة مراقبة وحماية", enDesc: "Cameras & protection", count: 33 },
 ];
 let CATEGORIES = DEFAULT_CATEGORIES.slice();
-let TECHS = TECH_CATEGORIES.slice();
 async function loadCats() {
   try {
     if (db && getDocsFn) {
@@ -1147,11 +1146,12 @@ const TECH_CATEGORIES = [
   { icon: "🪚", name: "نجار", en: "Carpenter" },
   { icon: "🔧", name: "صيانة عامة وأجهزة", en: "General & Appliances" },
 ];
+let TECHS = TECH_CATEGORIES.slice();
 // تعبئة قائمة تخصص التسجيل حسب نوع الحساب (شركة ← أقسام البناء | فني ← تخصصات الصيانة)
 function fillRegCats(role) {
   const sel = document.getElementById("regCategory");
   if (!sel) return;
-  const list = role === "tech" ? TECH_CATEGORIES : CATEGORIES;
+  const list = role === "tech" ? TECHS : CATEGORIES;
   sel.innerHTML = "";
   list.forEach(c => {
     const o = document.createElement("option");
