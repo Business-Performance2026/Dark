@@ -1160,6 +1160,11 @@ function fillRegCats(role) {
     sel.appendChild(o);
   });
 }
+// أقسام الشركات فقط — نستبعد أي تخصص فني أُضيف بالخطأ لقائمة الأقسام
+function companyCats() {
+  const techNames = new Set(TECHS.map(x => x.name));
+  return CATEGORIES.filter(c => !techNames.has(c.name));
+}
 function fillCatSelects() {
   fillRegCats(selectedRole);
   ["reqCategory", "ueCategory"].forEach(id => {
@@ -1167,7 +1172,7 @@ function fillCatSelects() {
     if (!sel) return;
     const cur = sel.value;
     sel.innerHTML = "";
-    CATEGORIES.forEach(c => {
+    companyCats().forEach(c => {
       const o = document.createElement("option");
       o.value = c.name;
       o.textContent = `${c.icon} ${c.name}`;
@@ -2399,7 +2404,7 @@ function updateNotifBadge() {
 function collectNotifs() {
   const items = [];
   if (!currentUser) return items;
-  const isProv = currentUser.role === "provider";
+  const isProv = currentUser.role === "provider" || currentUser.role === "tech";
   (lastRequests || []).forEach(r => {
     const ts = r.createdAt?.seconds ? r.createdAt.seconds * 1000 : new Date(r.createdAt || 0).getTime();
     if (isProv) items.push({ ts, key: "req_" + (r.id || ts), target: "requestsWrap",

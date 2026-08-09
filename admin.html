@@ -237,15 +237,19 @@ A.onAuthStateChanged(auth, user => {
 let USERS = [], REQUESTS = [], QUOTES = [], EMPLOYEES = [], ADS = null, FOOTER = null, CATS = null;
 async function loadAll() {
   try {
-    const [u, r, q, e, s] = await Promise.all([
+    const [u, r, tr, q, e, s] = await Promise.all([
       F.getDocs(F.query(F.collection(db, "users"))),
       F.getDocs(F.query(F.collection(db, "service_requests"))),
+      F.getDocs(F.query(F.collection(db, "tech_requests"))),
       F.getDocs(F.query(F.collection(db, "quotes"))),
       F.getDocs(F.query(F.collection(db, "employees"))),
       F.getDocs(F.query(F.collection(db, "settings")))
     ]);
     USERS = u.docs.map(d => ({ docId: d.id, ...d.data() }));
-    REQUESTS = r.docs.map(d => ({ docId: d.id, ...d.data() })).sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
+    REQUESTS = [
+      ...r.docs.map(d => ({ docId: d.id, _col: "service_requests", ...d.data() })),
+      ...tr.docs.map(d => ({ docId: d.id, _col: "tech_requests", _tech: true, ...d.data() }))
+    ].sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
     QUOTES = q.docs.map(d => ({ docId: d.id, ...d.data() })).sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
     EMPLOYEES = e.docs.map(d => ({ docId: d.id, ...d.data() }));
     s.docs.forEach(d => {
@@ -260,8 +264,10 @@ async function loadAll() {
 
 function renderAll() {
   const comps = USERS.filter(u => u.role === "provider");
+  const techs = USERS.filter(u => u.role === "tech");
   const clients = USERS.filter(u => u.role === "client");
   $("cntCompanies").textContent = comps.length;
+  $("cntTechs").textContent = techs.length;
   $("cntClients").textContent = clients.length;
   $("cntRequests").textContent = REQUESTS.length;
   $("cntQuotes").textContent = QUOTES.length;
@@ -271,7 +277,7 @@ function renderAll() {
   $("statsRow").innerHTML = `
     <div class="stat"><b>${USERS.length}</b><span>إجمالي المستخدمين</span></div>
     <div class="stat"><b>${comps.length}</b><span>الشركات</span></div>
-    <div class="stat o"><b>${comps.filter(c => c.status === "pending").length}</b><span>بانتظار الموافقة</span></div>
+    <div class="stat o"><b>${USERS.filter(c => (c.role === "provider" || c.role === "tech") && c.status === "pending").length}</b><span>بانتظار الموافقة</span></div>
     <div class="stat"><b>${REQUESTS.length}</b><span>الطلبات</span></div>
     <div class="stat g"><b>${acc}</b><span>عروض مقبولة</span></div>
     <div class="stat r"><b>${rej}</b><span>عروض مرفوضة</span></div>`;
@@ -538,7 +544,7 @@ function bindSearch(inputId, rowClass) {
   });
 }
 function bindTabEvents(t) {
-  if (t === "companies" || t === "clients") bindSearch("userSearch", "urow");
+  if (t === "companies" || t === "clients" || t === "techs") bindSearch("userSearch", "urow");
   if (t === "requests") bindSearch("reqSearch", "rrow");
   if (t === "cats") {
     $("catForm").addEventListener("submit", async e => {
@@ -660,10 +666,10 @@ window.deleteUser = async function(uid) {
     renderAll();
   } catch (e) { console.error(e); toast("فشل الحذف", true); }
 };
-window.deleteRequest = async function(docId) {
+window.deleteRequest = async function(docId, col = "service_requests") {
   if (!confirm("حذف هذا الطلب؟")) return;
   try {
-    await F.deleteDoc(F.doc(db, "service_requests", docId));
+    await F.deleteDoc(F.doc(db, col, docId));
     REQUESTS = REQUESTS.filter(x => x.docId !== docId);
     toast("تم الحذف 🗑️");
     renderAll();
