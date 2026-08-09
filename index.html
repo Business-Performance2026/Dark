@@ -836,7 +836,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 19)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 20)</small>
     </div>
   </div>
 </footer>
@@ -1912,7 +1912,7 @@ async function openDashboard() {
       : [...all, ...allTech].filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
-  if (!admin) rows = rows.filter(r => !isExpiredReq(r)); // 🕐 كل الأدوار: تُخفي الطلبات الأقدم من 7 أيام — تبقى عند الإدارة فقط
+  if (isPro) rows = rows.filter(r => !isExpiredReq(r)); // مقدم الخدمة: تُخفى القديمة (الحذف النهائي يتم من جهة العميل المالك)
   // 📊 حالة الطلب للعميل: نربط كل طلب بعروضه — الشركة/الفني: تُخفى المُسعَّرة وتبقى في «عروضي المرسلة»
   try {
     const qs = await fetchQuotes(isPro ? "providerUid" : "clientUid", currentUser.uid);
@@ -1922,6 +1922,16 @@ async function openDashboard() {
         const acc = rq.find(q => q.status === "accepted");
         return { ...r, _qCount: rq.length, _accName: acc ? (acc.providerName || "") : "" };
       });
+      // 🗑️ حذف نهائي: طلب مر عليه 7 أيام وما فيه عرض مقبول — يُحذف للجميع (يبقى المقبول/المكتمل)
+      const survivors = [];
+      for (const r of rows) {
+        if (isExpiredReq(r) && !r._accName) {
+          try { if (db && deleteDocFn) await deleteDocFn(docFn(db, r._tech ? "tech_requests" : "service_requests", r.id)); } catch (e) { console.warn("تعذر حذف طلب قديم", e.code || e); }
+          continue;
+        }
+        survivors.push(r);
+      }
+      rows = survivors;
     } else {
       const quoted = new Set(qs.map(x => x.requestId));
       if (!admin) rows = rows.filter(r => !quoted.has(r.id));
@@ -1950,7 +1960,7 @@ async function openDashboard() {
         : "لم ترسل أي طلب بعد — ابدأ بطلب خدمة لمشروعك من الأسفل"}
     </div>`;
   } else {
-    content.innerHTML = `${!admin ? `<div style="padding:12px 18px 0"><small style="color:var(--muted);font-size:.75rem">ℹ️ الطلبات الأقدم من 7 أيام تختفي تلقائيًا من لوحتك — وتبقى محفوظة لدى الإدارة</small></div>` : ""}<table class="dash-table">
+    content.innerHTML = `${!admin ? `<div style="padding:12px 18px 0"><small style="color:var(--muted);font-size:.75rem">ℹ️ الطلب الذي لا يحصل على موافقة خلال 7 أيام يُحذف تلقائيًا</small></div>` : ""}<table class="dash-table">
       <thead><tr>
         <th>${t("th_client")}</th><th>${t("th_phone")}</th><th>${t("th_city")}</th><th>${t("th_cat")}</th><th>${t("th_budget")}</th><th>${t("th_details")}</th><th>${t("th_status")}</th>
       </tr></thead>
@@ -3180,7 +3190,16 @@ async function loadQuotesSection() {
   box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
   let quotes = [], loadFailed = false, failMsg = "";
   try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); loadFailed = true; failMsg = e.message || String(e); }
-  quotes = quotes.filter(q => !isExpiredReq(q)); // 🕐 تُخفي العروض الأقدم من 7 أيام — تبقى عند الإدارة فقط
+  // 🗑️ حذف نهائي: عرض مرسل بلا رد 7 أيام أو مرفوض قديم — يُحذف للجميع (المقبول يبقى)
+  const keptQuotes = [];
+  for (const q of quotes) {
+    if ((q.status === "sent" || q.status === "rejected") && isExpiredReq(q)) {
+      try { if (db && deleteDocFn) await deleteDocFn(docFn(db, "quotes", q.id)); } catch (e) { console.warn("تعذر حذف عرض قديم", e.code || e); }
+      continue;
+    }
+    keptQuotes.push(q);
+  }
+  quotes = keptQuotes;
   if (loadFailed) {
     box.innerHTML = `<div class="dash-empty"><div class="big">📶</div>تعذر تحميل العروض — تحقق من الاتصال<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${failMsg}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
     return;
@@ -3197,7 +3216,14 @@ async function loadQuotesSection() {
   quotes.sort((a, b) => tsq(b) - tsq(a));
   _lastQuotes = quotes;
   updateNotifBadge();
-  const autoHideNote = `<div style="padding:0 4px 8px"><small style="color:var(--muted);font-size:.75rem">ℹ️ العروض الأقدم من 7 أيام تختفي تلقائيًا من لوحتك — وتبقى محفوظة لدى الإدارة</small></div>`;
+  // ⏳ عداد الأيام المتبقية قبل انتهاء العرض المرسل (للعميل ومقدم الخدمة)
+  const expiryLine = q => {
+    if (q.status !== "sent") return "";
+    const left = Math.ceil((REQ_TTL - (Date.now() - tsq(q))) / (24 * 3600 * 1000));
+    if (left <= 0) return "";
+    return `<div style="margin-top:6px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:5px 10px;font-size:.78rem;font-weight:700;color:#b45309;text-align:center">⏳ باقي ${left} ${left === 1 ? "يوم" : left === 2 ? "يومين" : "أيام"} وينتهي هذا العرض ويُحذف إذا لم يُرد عليه</div>`;
+  };
+  const autoHideNote = `<div style="padding:0 4px 8px"><small style="color:var(--muted);font-size:.75rem">ℹ️ العرض الذي لا يحصل على رد خلال 7 أيام يُحذف تلقائيًا — والمرفوضة القديمة تُحذف أيضًا</small></div>`;
   if (!quotes.length) { box.innerHTML = autoHideNote + '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
 
   if (isProv) {
@@ -3246,6 +3272,7 @@ async function loadQuotesSection() {
                 <b>${q.clientName || "—"}</b>
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
               </div>
+              ${expiryLine(q)}
               ${contactBlock(q)}
               <div class="q-det">
                 <div>🗂 ${q.category || "—"}</div>
@@ -3282,6 +3309,7 @@ async function loadQuotesSection() {
               <b>${q.providerName || "—"}</b>
               <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge(q.status)}</span>
             </div>
+            ${expiryLine(q)}
             ${q.status === "sent" ? `<div style="display:flex;gap:8px;margin-top:8px">
               <button class="action-btn action-approve" style="flex:1;justify-content:center" onclick="event.stopPropagation();decideQuote('${q.id}','accepted')">${t("q_accept")}</button>
               <button class="action-btn action-reject" style="flex:1;justify-content:center" onclick="event.stopPropagation();decideQuote('${q.id}','rejected')">${t("q_reject")}</button>
