@@ -843,7 +843,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 21)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 22)</small>
     </div>
   </div>
 </footer>
@@ -1957,9 +1957,13 @@ async function openDashboard() {
     ? Math.round(budgets.reduce((a, b) => a + b, 0) / budgets.length).toLocaleString("ar")
     : "—";
 
-  // الجدول
+  // الجدول — العميل: نخفيه تمامًا (كل متابعته من قسم العروض تحت) | الشركة/الفني/الأدمن: يبقى
   const content = document.getElementById("dashContent");
-  if (!rows.length) {
+  const isClientView = !admin && !isPro;
+  if (isClientView) {
+    content.innerHTML = `<div style="text-align:center;padding:14px 18px 4px;color:var(--muted);font-size:.82rem">
+      👇 كل عروضك وحالاتها في قسم <b style="color:var(--navy)">💰 عروض الأسعار</b> تحت</div>`;
+  } else if (!rows.length) {
     content.innerHTML = `<div class="dash-empty">
       <div class="big">📭</div>
       ${isProvider
