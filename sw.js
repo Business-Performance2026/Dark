@@ -1,5 +1,5 @@
 // دارك — Service Worker للتطبيق (PWA)
-const CACHE = "darak-v8";
+const CACHE = "darak-v9";
 const CORE = ["./", "./index.html", "./manifest.json", "./assets/logo.png", "./assets/icon-192.png", "./assets/icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

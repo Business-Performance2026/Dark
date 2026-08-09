@@ -836,7 +836,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 18)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 19)</small>
     </div>
   </div>
 </footer>
@@ -1912,7 +1912,7 @@ async function openDashboard() {
       : [...all, ...allTech].filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
-  if (isPro) rows = rows.filter(r => !isExpiredReq(r));
+  if (!admin) rows = rows.filter(r => !isExpiredReq(r)); // 🕐 كل الأدوار: تُخفي الطلبات الأقدم من 7 أيام — تبقى عند الإدارة فقط
   // 📊 حالة الطلب للعميل: نربط كل طلب بعروضه — الشركة/الفني: تُخفى المُسعَّرة وتبقى في «عروضي المرسلة»
   try {
     const qs = await fetchQuotes(isPro ? "providerUid" : "clientUid", currentUser.uid);
@@ -1950,7 +1950,7 @@ async function openDashboard() {
         : "لم ترسل أي طلب بعد — ابدأ بطلب خدمة لمشروعك من الأسفل"}
     </div>`;
   } else {
-    content.innerHTML = `<table class="dash-table">
+    content.innerHTML = `${!admin ? `<div style="padding:12px 18px 0"><small style="color:var(--muted);font-size:.75rem">ℹ️ الطلبات الأقدم من 7 أيام تختفي تلقائيًا من لوحتك — وتبقى محفوظة لدى الإدارة</small></div>` : ""}<table class="dash-table">
       <thead><tr>
         <th>${t("th_client")}</th><th>${t("th_phone")}</th><th>${t("th_city")}</th><th>${t("th_cat")}</th><th>${t("th_budget")}</th><th>${t("th_details")}</th><th>${t("th_status")}</th>
       </tr></thead>
@@ -3180,6 +3180,7 @@ async function loadQuotesSection() {
   box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
   let quotes = [], loadFailed = false, failMsg = "";
   try { quotes = await fetchQuotes(isClient ? "clientUid" : "providerUid", currentUser.uid); } catch (e) { console.error(e); loadFailed = true; failMsg = e.message || String(e); }
+  quotes = quotes.filter(q => !isExpiredReq(q)); // 🕐 تُخفي العروض الأقدم من 7 أيام — تبقى عند الإدارة فقط
   if (loadFailed) {
     box.innerHTML = `<div class="dash-empty"><div class="big">📶</div>تعذر تحميل العروض — تحقق من الاتصال<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${failMsg}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
     return;
@@ -3196,7 +3197,8 @@ async function loadQuotesSection() {
   quotes.sort((a, b) => tsq(b) - tsq(a));
   _lastQuotes = quotes;
   updateNotifBadge();
-  if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
+  const autoHideNote = `<div style="padding:0 4px 8px"><small style="color:var(--muted);font-size:.75rem">ℹ️ العروض الأقدم من 7 أيام تختفي تلقائيًا من لوحتك — وتبقى محفوظة لدى الإدارة</small></div>`;
+  if (!quotes.length) { box.innerHTML = autoHideNote + '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
 
   if (isProv) {
     // 📞 للعروض المقبولة القديمة بدون رقم عميل — نجلبه من الطلب مرة واحدة
@@ -3232,7 +3234,7 @@ async function loadQuotesSection() {
     const stBadge2 = s => s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
       : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
       : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
-    box.innerHTML = groups.map(g => `
+    box.innerHTML = autoHideNote + groups.map(g => `
       <div class="q-group${g.key === "rejected" ? " closed" : ""}">
         <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
           <span>${g.title}</span><span class="q-count">${g.list.length}</span>
@@ -3259,30 +3261,45 @@ async function loadQuotesSection() {
     return;
   }
 
-  box.innerHTML = `<table class="dash-table"><thead><tr>
-    <th>${t("q_company")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${t("q_actions")}</th>
-  </tr></thead><tbody>${quotes.map((q, qi) => {
-    const stBadge = q.status === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
-      : q.status === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
-      : `<span class="status-badge status-pending">${t("q_sent")}</span>`;
-    const fileCell = q.pdfUrl ? `<a href="${q.pdfUrl}" target="_blank" style="color:var(--gold);font-weight:700">${t("q_view")}</a>` : (q.pdfName || "—");
-    const lastCell = q.status === "sent"
-      ? `<button class="action-btn action-approve" onclick="decideQuote('${q.id}','accepted')">${t("q_accept")}</button> <button class="action-btn action-reject" onclick="decideQuote('${q.id}','rejected')">${t("q_reject")}</button>`
-      : (q.status === "accepted"
-        ? (ratedIds.has(q.id)
-          ? `<span style="color:var(--gold);font-weight:700">تم التقييم ⭐</span>`
-          : `<button class="action-btn action-approve" onclick="openRateModal('${q.id}')">⭐ قيّم الخدمة</button>`)
-        : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—"));
-    return `<tr${qi >= 5 ? ' data-extra style="display:none"' : ""}>
-      <td data-lbl="${t("q_company")}"><b>${q.providerName || "—"}</b></td>
-      <td data-lbl="${t("th_cat")}">${q.category || "—"}</td>
-      <td data-lbl="${t("q_amount")}">${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
-      <td data-lbl="${t("q_note")}" style="max-width:180px;font-size:.85rem">${q.note || "—"}</td>
-      <td data-lbl="${t("q_file")}">${fileCell}</td>
-      <td data-lbl="${t("th_status")}">${stBadge}</td>
-      <td data-lbl="${t("q_actions")}" style="white-space:nowrap">${lastCell}</td>
-    </tr>`;
-  }).join("")}</tbody></table>${moreBtn(quotes.length - 5, "العروض")}`;
+  // 📂 العميل: نفس تنظيم مقدم الخدمة — مجموعات قابلة للطي (بانتظار ردك / قبلتها / رفضتها)
+  const stBadge = s => s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
+    : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
+    : `<span class="status-badge status-pending">${t("q_sent")}</span>`;
+  const groupsC = [
+    { key: "sent",     title: "📤 عروض بانتظار ردك", list: quotes.filter(q => q.status === "sent") },
+    { key: "accepted", title: "✅ عروض قبلتها",      list: quotes.filter(q => q.status === "accepted") },
+    { key: "rejected", title: "⛔ عروض رفضتها",      list: quotes.filter(q => q.status === "rejected") }
+  ];
+  box.innerHTML = autoHideNote + groupsC.map(g => `
+    <div class="q-group${g.key === "rejected" ? " closed" : ""}">
+      <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
+        <span>${g.title}</span><span class="q-count">${g.list.length}</span>
+      </div>
+      <div class="q-group-body">
+        ${g.list.length ? g.list.map((q, qi) => `
+          <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
+            <div class="q-card-head">
+              <b>${q.providerName || "—"}</b>
+              <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge(q.status)}</span>
+            </div>
+            ${q.status === "sent" ? `<div style="display:flex;gap:8px;margin-top:8px">
+              <button class="action-btn action-approve" style="flex:1;justify-content:center" onclick="event.stopPropagation();decideQuote('${q.id}','accepted')">${t("q_accept")}</button>
+              <button class="action-btn action-reject" style="flex:1;justify-content:center" onclick="event.stopPropagation();decideQuote('${q.id}','rejected')">${t("q_reject")}</button>
+            </div>` : ""}
+            ${q.status === "accepted" ? `<div style="margin-top:8px">${ratedIds.has(q.id)
+              ? `<span style="color:var(--gold);font-weight:700">تم التقييم ⭐</span>`
+              : `<button class="action-btn action-approve" style="width:100%;justify-content:center" onclick="event.stopPropagation();openRateModal('${q.id}')">⭐ قيّم الخدمة</button>`}</div>` : ""}
+            <div class="q-det">
+              <div>🗂 ${q.category || "—"}</div>
+              ${q.createdAt ? `<div>📅 ${new Date(tsq(q)).toLocaleDateString("ar")}</div>` : ""}
+              ${q.note ? `<div>📝 ${q.note}</div>` : ""}
+              ${q.pdfUrl ? `<div>📄 <a href="${q.pdfUrl}" target="_blank" onclick="event.stopPropagation()" style="color:var(--gold);font-weight:700">${t("q_view")}</a></div>` : (q.pdfName ? `<div>📄 ${q.pdfName}</div>` : "")}
+              ${q.clientComment ? `<div>💬 ${t("aq_comment")}: ${q.clientComment}</div>` : ""}
+            </div>
+          </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
+        ${moreBtn(g.list.length - 5, "العروض")}
+      </div>
+    </div>`).join("");
   } catch (renderErr) {
     console.error(renderErr);
     box.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>صار خطأ أثناء عرض العروض<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${renderErr.message || renderErr}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
