@@ -1941,8 +1941,75 @@ function switchAdminTab(tab) {
   if (tab === "quotes") loadAdminQuotes();
   document.getElementById("adminAdsWrap").style.display = tab === "ads" ? "block" : "none";
   if (tab === "ads") fillAdsForm();
+  document.getElementById("catsWrap").style.display = tab === "cats" ? "block" : "none";
+  if (tab === "cats") renderAdminCats();
+  document.getElementById("techcatsWrap").style.display = tab === "techcats" ? "block" : "none";
+  if (tab === "techcats") renderAdminTechCats();
 }
 document.querySelectorAll("#adminTabs button").forEach(b => b.addEventListener("click", () => switchAdminTab(b.dataset.atab)));
+
+// ====== إدارة الأقسام وتخصصات الفنيين من داخل التطبيق (أدمن) ======
+function renderAdminCatList(kind) {
+  const isTech = kind === "techcats";
+  const list = isTech ? TECHS : CATEGORIES;
+  const box = document.getElementById(isTech ? "techcatsContent" : "catsContent");
+  if (!box) return;
+  const inp = "padding:9px 12px;border:2px solid #e8e2d5;border-radius:12px;font-family:inherit;font-size:.9rem";
+  box.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+      <input type="hidden" id="aceIdx" value="-1">
+      <input id="aceIcon" placeholder="🏗️" style="${inp};width:70px;text-align:center">
+      <input id="aceName" placeholder="الاسم بالعربي *" style="${inp};flex:1;min-width:130px">
+      <input id="aceEn" placeholder="بالإنجليزي" dir="ltr" style="${inp};flex:1;min-width:110px">
+      <button class="btn btn-gold btn-sm" id="aceSave" type="button">إضافة ➕</button>
+    </div>
+    <table class="dash-table"><thead><tr><th>الأيقونة</th><th>الاسم (عربي)</th><th>الاسم (إنجليزي)</th><th>إجراءات</th></tr></thead>
+    <tbody>${list.map((c, i) => `<tr>
+      <td style="font-size:1.4rem">${c.icon}</td>
+      <td><b>${c.name}</b></td>
+      <td dir="ltr">${c.en || "—"}</td>
+      <td style="white-space:nowrap">
+        <button class="action-btn action-edit" onclick="adminCatEdit('${kind}',${i})">✏️ تعديل</button>
+        <button class="action-btn action-delete" onclick="adminCatDel('${kind}',${i})">🗑️ حذف</button>
+      </td>
+    </tr>`).join("")}</tbody></table>
+    ${isTech ? '<p style="color:var(--muted);font-size:.8rem;margin-top:10px">ℹ️ هذه التخصصات خاصة بقسم «اطلب فني» فقط — منفصلة تماماً عن أقسام الشركات.</p>' : ""}`;
+  document.getElementById("aceSave").addEventListener("click", () => adminCatSave(kind));
+}
+function renderAdminCats() { renderAdminCatList("cats"); }
+function renderAdminTechCats() { renderAdminCatList("techcats"); }
+window.adminCatEdit = function(kind, i) {
+  const c = (kind === "techcats" ? TECHS : CATEGORIES)[i];
+  document.getElementById("aceIdx").value = i;
+  document.getElementById("aceIcon").value = c.icon || "";
+  document.getElementById("aceName").value = c.name || "";
+  document.getElementById("aceEn").value = c.en || "";
+  document.getElementById("aceSave").textContent = "حفظ التعديل 💾";
+};
+window.adminCatDel = async function(kind, i) {
+  if (!confirm("حذف هذا العنصر؟")) return;
+  const list = (kind === "techcats" ? TECHS : CATEGORIES).slice();
+  list.splice(i, 1);
+  await persistCatList(kind, list);
+};
+async function adminCatSave(kind) {
+  const name = document.getElementById("aceName").value.trim();
+  if (!name) { showToast("اكتب الاسم بالعربي أولاً", "error"); return; }
+  const item = { icon: document.getElementById("aceIcon").value.trim() || "🔹", name, en: document.getElementById("aceEn").value.trim() };
+  const list = (kind === "techcats" ? TECHS : CATEGORIES).slice();
+  const idx = +document.getElementById("aceIdx").value;
+  if (idx >= 0) list[idx] = item; else list.push(item);
+  await persistCatList(kind, list);
+}
+async function persistCatList(kind, list) {
+  try {
+    if (db && setDocFn) await setDocFn(docFn(db, "settings", kind === "techcats" ? "tech_categories" : "categories"), { list });
+    if (kind === "techcats") { TECHS = list.slice(); renderTechCats(); fillRegCats(selectedRole); }
+    else { CATEGORIES = list.slice(); renderCats(); fillCatSelects(); }
+    showToast("تم الحفظ ✅ — يظهر التعديل فوراً للجميع");
+    renderAdminCatList(kind);
+  } catch (e) { console.error(e); showToast("تعذر الحفظ — تحقق من الاتصال", "error"); }
+}
 
 async function fetchAllUsers() {
   if (db && getDocsFn) {
@@ -2176,7 +2243,7 @@ const VIEW_MAP = {
   dash: ["dashboard"],
   account: ["accountView"]
 };
-const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "engineers", "catView", "companyView", "empPage", "profilePage", "dashboard", "accountView"];
+const ALL_VIEWS = ["heroSec", "adsSec", "ctaSec", "categories", "providers", "techs", "catView", "companyView", "empPage", "profilePage", "dashboard", "accountView"];
 function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
