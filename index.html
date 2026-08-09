@@ -213,6 +213,8 @@ footer ul a:hover{color:var(--gold-2)}
 .status-new{background:#e0f2fe;color:#0369a1}
 
 .co-loc{font-size:.68rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#quotesTitle::after{content:"▾";float:left;color:var(--gold);font-size:.9rem}
+#quotesTitle.closed::after{content:"◂"}
 .q-group{border:1px solid #e6ddc9;border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
 .q-group-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:#faf6ee;font-weight:700;font-size:.92rem;color:var(--navy)}
 .q-count{background:var(--navy);color:#fff;border-radius:20px;padding:1px 10px;font-size:.8rem}
@@ -735,7 +737,7 @@ footer ul a:hover{color:var(--gold-2)}
       <div id="dashContent"></div>
     </div>
     <div class="dash-table-wrap" id="quotesWrap" style="margin-top:24px;display:none">
-      <h3 id="quotesTitle" style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem">💰 عروض الأسعار</h3>
+      <h3 id="quotesTitle" style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem;cursor:pointer" onclick="var c=document.getElementById('quotesContent');c.style.display=c.style.display==='none'?'':'none';this.classList.toggle('closed')" title="اضغط للطي/الفتح">💰 عروض الأسعار</h3>
       <div id="quotesContent"></div>
     </div>
 <div class="dash-table-wrap" id="employeesWrap" style="display:none;margin-top:24px">
@@ -832,7 +834,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 15)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 17)</small>
     </div>
   </div>
 </footer>
@@ -1075,7 +1077,7 @@ const FIREBASE_READY = true;
 let db = null, auth = null;
 let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
-let docFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
+let docFn = null, getDocFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
 let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
 let messaging = null, getTokenFn = null, onMessageFn = null, arrayUnionFn = null;
@@ -1097,6 +1099,7 @@ if (FIREBASE_READY) {
     queryFn = firestore.query;
     whereFn = firestore.where;
     docFn = firestore.doc;
+    getDocFn = firestore.getDoc;
     updateDocFn = firestore.updateDoc;
     deleteDocFn = firestore.deleteDoc;
     setDocFn = firestore.setDoc;
@@ -1949,7 +1952,7 @@ async function openDashboard() {
       <thead><tr>
         <th>${t("th_client")}</th><th>${t("th_phone")}</th><th>${t("th_city")}</th><th>${t("th_cat")}</th><th>${t("th_budget")}</th><th>${t("th_details")}</th><th>${t("th_status")}</th>
       </tr></thead>
-      <tbody>${rows.map(r => `<tr>
+      <tbody>${rows.map((r, ri) => `<tr${ri >= 5 ? ' data-extra style="display:none"' : ""}>
         <td data-lbl="${t("th_client")}"><b>${r.name || "—"}</b></td>
         <td data-lbl="${t("th_phone")}"><span dir="ltr">${r.phone || "—"}</span></td>
         <td data-lbl="${t("th_city")}">${r.city || "—"}</td>
@@ -1962,7 +1965,7 @@ async function openDashboard() {
             ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`
             : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
-    </table>`;
+    </table>${moreBtn(rows.length - 5)}`;
   }
   if (isProvider) {
     document.getElementById("employeesWrap").style.display = "";
@@ -1975,15 +1978,20 @@ async function openDashboard() {
 
 // 📊 شريط تقدم حالة الطلب للعميل: أرسلت ← وصلتك عروض ← اخترت العرض ← اكتمل
 function clientStatusCell(r) {
-  if (isExpiredReq(r)) return `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`;
+  if (isExpiredReq(r)) return `<span class="status-badge status-rejected" style="white-space:normal;text-align:center">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`;
   const done = r.status === "completed", acc = !!r._accName, hasQ = (r._qCount || 0) > 0;
   const stage = done ? 4 : acc ? 3 : hasQ ? 2 : 1;
-  const bar = `<div style="display:flex;align-items:center;gap:2px;margin-top:7px;direction:ltr">${[1, 2, 3, 4].map(i =>
-    `<span style="width:8px;height:8px;border-radius:50%;background:${stage >= i ? "#16a34a" : "#ddd6c8"};flex:0 0 auto"></span>${i < 4 ? `<span style="width:10px;height:2px;background:${stage > i ? "#16a34a" : "#e8e2d5"}"></span>` : ""}`).join("")}</div>`;
-  if (done) return `<span class="status-badge status-approved">🎉 اكتمل الطلب</span>${bar}`;
-  if (acc) return `<span class="status-badge status-approved">✅ اخترت: ${r._accName}</span><br><button class="action-btn action-approve" style="margin-top:6px" onclick="markReqDone('${r.id}',${r._tech ? "true" : "false"})">✔️ العمل اكتمل</button>${bar}`;
-  if (hasQ) return `<span class="status-badge status-pending">💰 وصلتك ${r._qCount} ${r._qCount > 2 ? "عروض" : r._qCount === 2 ? "عرضين" : "عرض"}</span><br><small style="color:var(--muted);font-size:.72rem">قارن واختر من قسم العروض 👇</small>${bar}`;
-  return `<span class="status-badge status-new">⏳ بانتظار العروض</span>${bar}`;
+  // شريط النقاط: موصلات مرنة تتمدد بعرض البطاقة، والمرحلة الحالية مضيئة
+  const bar = `<div style="display:flex;align-items:center;direction:ltr;width:100%;max-width:170px;margin:2px auto 0">${[1, 2, 3, 4].map(i =>
+    `<span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:${stage >= i ? "#16a34a" : "#ddd6c8"};${stage === i ? "box-shadow:0 0 0 3px rgba(22,163,74,.18)" : ""}"></span>${i < 4 ? `<span style="flex:1;height:2px;background:${stage > i ? "#16a34a" : "#e8e2d5"}"></span>` : ""}`).join("")}</div>`;
+  const box = inner => `<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:6px;background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:12px;padding:8px 10px">${inner}${bar}</div>`;
+  const bd = (cls, txt) => `<span class="status-badge ${cls}" style="white-space:normal;text-align:center;line-height:1.5">${txt}</span>`;
+  if (done) return box(bd("status-approved", "🎉 اكتمل الطلب"));
+  if (acc) return box(bd("status-approved", "✅ اخترت: " + r._accName) +
+    `<button class="action-btn action-approve" style="width:100%;justify-content:center;margin:0" onclick="markReqDone('${r.id}',${r._tech ? "true" : "false"})">✔️ العمل اكتمل</button>`);
+  if (hasQ) return box(bd("status-pending", `💰 وصلتك ${r._qCount} ${r._qCount > 2 ? "عروض" : r._qCount === 2 ? "عرضين" : "عرض"}`) +
+    `<small style="color:var(--muted);font-size:.72rem;text-align:center">قارن واختر من قسم العروض 👇</small>`);
+  return box(bd("status-new", "⏳ بانتظار العروض"));
 }
 // ✔️ العميل يعلّم الطلب كمكتمل بعد انتهاء العمل
 window.markReqDone = async function(reqId, isTech) {
@@ -3102,6 +3110,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
       requestId: r.id,
       clientUid: r.ownerUid || "",
       clientName: r.name || "",
+      clientPhone: r.phone || "",
       category: r.category || "",
       providerUid: currentUser?.uid || "",
       providerName: currentUser?.displayName || "",
@@ -3143,6 +3152,18 @@ const tsq = q => q.createdAt?.seconds ? q.createdAt.seconds * 1000 : new Date(q.
 const REQ_TTL = 7 * 24 * 60 * 60 * 1000;
 const isExpiredReq = r => { const t = tsq(r); return t && (Date.now() - t) > REQ_TTL; };
 
+// 📄 القوائم الطويلة: نعرض أول 5 عناصر فقط + زر «عرض الكل» — ما يضيع أي شي، بس ما تضطر تسحب
+function moreBtn(n) {
+  return n > 0 ? `<button class="btn btn-gold btn-sm" data-open="" style="margin:10px auto 14px;display:flex" onclick="toggleDashRows(this)">عرض الكل (${n} إضافي) ▼</button>` : "";
+}
+window.toggleDashRows = function(btn) {
+  const extras = [...btn.parentElement.querySelectorAll("[data-extra]")];
+  const open = btn.dataset.open === "1";
+  extras.forEach(el => el.style.display = open ? "none" : "");
+  btn.dataset.open = open ? "" : "1";
+  btn.innerHTML = open ? `عرض الكل (${extras.length} إضافي) ▼` : "إخفاء ▲";
+};
+
 async function loadQuotesSection() {
   const wrap = document.getElementById("quotesWrap");
   const box = document.getElementById("quotesContent");
@@ -3176,6 +3197,31 @@ async function loadQuotesSection() {
   if (!quotes.length) { box.innerHTML = '<div class="dash-empty"><div class="big">💰</div>' + t("q_empty") + "</div>"; return; }
 
   if (isProv) {
+    // 📞 للعروض المقبولة القديمة بدون رقم عميل — نجلبه من الطلب مرة واحدة
+    const needPhone = quotes.filter(q => q.status === "accepted" && !q.clientPhone && q.requestId && db && getDocFn);
+    if (needPhone.length) {
+      await Promise.all(needPhone.map(async q => {
+        try {
+          let s = await getDocFn(docFn(db, "service_requests", q.requestId));
+          if (!s.exists()) s = await getDocFn(docFn(db, "tech_requests", q.requestId));
+          if (s.exists()) { q.clientPhone = s.data().phone || ""; if (!q.clientName) q.clientName = s.data().name || ""; }
+        } catch (e) { console.warn(e); }
+      }));
+    }
+    // زر التواصل يظهر فقط بعد موافقة العميل على العرض
+    const contactBlock = q => {
+      if (q.status !== "accepted" || !q.clientPhone) return "";
+      const num = String(q.clientPhone).replace(/\D/g, "");
+      const wa = "https://wa.me/" + (num.startsWith("968") ? num : "968" + num);
+      return `<div style="margin-top:8px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:8px 10px">
+        <div style="font-size:.8rem;font-weight:700;color:#166534;margin-bottom:6px">🎉 العميل اختار عرضك — تواصل معه الآن للبدء بالعمل</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a href="${wa}" target="_blank" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex">💬 واتساب</a>
+          <a href="tel:${num}" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;background:var(--navy)">📞 اتصال</a>
+          <span dir="ltr" style="align-self:center;font-size:.85rem;font-weight:700;color:var(--navy)">${num}</span>
+        </div>
+      </div>`;
+    };
     const groups = [
       { key: "sent",     icon: "📤", title: t("q_grp_sent"), list: quotes.filter(q => q.status === "sent") },
       { key: "accepted", icon: "✅", title: t("q_grp_acc"),  list: quotes.filter(q => q.status === "accepted") },
@@ -3185,13 +3231,13 @@ async function loadQuotesSection() {
       : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
       : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
     box.innerHTML = groups.map(g => `
-      <div class="q-group">
+      <div class="q-group${g.key === "rejected" ? " closed" : ""}">
         <div class="q-group-head" onclick="this.parentElement.classList.toggle('closed')">
-          <span>${g.icon} ${g.title}</span><span class="q-count">${g.list.length}</span>
+          <span>${g.title}</span><span class="q-count">${g.list.length}</span>
         </div>
         <div class="q-group-body">
-          ${g.list.length ? g.list.map(q => `
-            <div class="q-card" onclick="this.classList.toggle('open')">
+          ${g.list.length ? g.list.map((q, qi) => `
+            <div class="q-card"${qi >= 5 ? ' data-extra style="display:none"' : ""} onclick="this.classList.toggle('open')">
               <div class="q-card-head">
                 <b>${q.clientName || "—"}</b>
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
@@ -3202,8 +3248,10 @@ async function loadQuotesSection() {
                 ${q.note ? `<div>📝 ${q.note}</div>` : ""}
                 ${q.pdfUrl ? `<div>📄 <a href="${q.pdfUrl}" target="_blank" onclick="event.stopPropagation()" style="color:var(--gold);font-weight:700">${t("q_view")}</a></div>` : ""}
                 ${q.clientComment ? `<div>💬 ${t("aq_comment")}: ${q.clientComment}</div>` : ""}
+                ${contactBlock(q)}
               </div>
             </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
+          ${moreBtn(g.list.length - 5)}
         </div>
       </div>`).join("");
     return;
@@ -3211,7 +3259,7 @@ async function loadQuotesSection() {
 
   box.innerHTML = `<table class="dash-table"><thead><tr>
     <th>${t("q_company")}</th><th>${t("th_cat")}</th><th>${t("q_amount")}</th><th>${t("q_note")}</th><th>${t("q_file")}</th><th>${t("th_status")}</th><th>${t("q_actions")}</th>
-  </tr></thead><tbody>${quotes.map(q => {
+  </tr></thead><tbody>${quotes.map((q, qi) => {
     const stBadge = q.status === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
       : q.status === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
       : `<span class="status-badge status-pending">${t("q_sent")}</span>`;
@@ -3223,7 +3271,7 @@ async function loadQuotesSection() {
           ? `<span style="color:var(--gold);font-weight:700">تم التقييم ⭐</span>`
           : `<button class="action-btn action-approve" onclick="openRateModal('${q.id}')">⭐ قيّم الخدمة</button>`)
         : (q.clientComment ? `<span style="font-size:.82rem">${q.clientComment}</span>` : "—"));
-    return `<tr>
+    return `<tr${qi >= 5 ? ' data-extra style="display:none"' : ""}>
       <td data-lbl="${t("q_company")}"><b>${q.providerName || "—"}</b></td>
       <td data-lbl="${t("th_cat")}">${q.category || "—"}</td>
       <td data-lbl="${t("q_amount")}">${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
@@ -3232,7 +3280,7 @@ async function loadQuotesSection() {
       <td data-lbl="${t("th_status")}">${stBadge}</td>
       <td data-lbl="${t("q_actions")}" style="white-space:nowrap">${lastCell}</td>
     </tr>`;
-  }).join("")}</tbody></table>`;
+  }).join("")}</tbody></table>${moreBtn(quotes.length - 5)}`;
   } catch (renderErr) {
     console.error(renderErr);
     box.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>صار خطأ أثناء عرض العروض<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${renderErr.message || renderErr}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
