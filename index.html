@@ -188,7 +188,7 @@ footer ul a:hover{color:var(--gold-2)}
 .auth-tabs{display:flex;background:var(--bg);border-radius:12px;padding:5px;margin-bottom:20px}
 .auth-tabs button{flex:1;padding:10px;border-radius:9px;background:none;font-weight:700;color:var(--muted);transition:.2s}
 .auth-tabs button.active{background:var(--navy);color:#fff}
-.role-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.role-picker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
 .role-option{border:2px solid #e7e3da;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:.2s}
 .role-option.active{border-color:var(--gold);background:var(--gold-soft)}
 .role-option .r-icon{font-size:1.6rem}
@@ -607,16 +607,14 @@ footer ul a:hover{color:var(--gold-2)}
   </div>
 </section>
 
-<!-- ================= المهندسون ================= -->
-<section id="engineers" style="padding-top:14px;padding-bottom:20px">
+<!-- ================= اطلب فني ================= -->
+<section id="techs" style="padding-top:14px;padding-bottom:20px">
   <div class="container">
     <div class="row-head">
-      <h2 class="row-title" data-i18n="secs_engineers">المهندسون</h2>
-      <div class="row-head-actions">
-        <a class="view-all" onclick="openAllEngineers()" data-i18n="view_all">عرض الكل</a>
-      </div>
+      <h2 class="row-title" data-i18n="secs_tech">اطلب فني 🔧</h2>
     </div>
-    <div class="h-scroll cards-row" id="engineerRow"></div>
+    <p style="color:var(--muted);font-size:.85rem;margin:-6px 0 10px" data-i18n="secs_tech_sub">صيانة وإصلاحات البيت — اختر التخصص وبيشوف طلبك الفنيون فورًا</p>
+    <div class="h-scroll cards-row" id="techCatRow"></div>
   </div>
 </section>
 
@@ -867,6 +865,10 @@ footer ul a:hover{color:var(--gold-2)}
             <div class="r-icon">🛠️</div>
             <b data-i18n="role_provider">مقدم خدمة</b>
           </div>
+          <div class="role-option" data-role="tech">
+            <div class="r-icon">🔧</div>
+            <b data-i18n="role_tech">فني مستقل</b>
+          </div>
         </div>
         <div class="form-group" id="regCategoryWrap" style="display:none">
           <label data-i18n="cat_lbl">تخصصك</label>
@@ -929,6 +931,37 @@ footer ul a:hover{color:var(--gold-2)}
         <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
       </div>
       <button type="submit" class="submit-btn" id="reqSubmit" data-i18n="send_req">إرسال الطلب 🚀</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= نافذة طلب فني (صيانة) ================= -->
+<div class="modal-overlay" id="techModal">
+  <div class="modal" style="width:min(540px,100%)">
+    <button class="modal-close" id="techClose" aria-label="إغلاق">✕</button>
+    <h3 data-i18n="tech_req_title">🔧 اطلب فني</h3>
+    <p id="techFor" style="color:var(--muted);font-size:.85rem;margin-top:-6px"></p>
+    <form id="techModalForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="req_name">الاسم الكامل *</label>
+          <input type="text" name="name" id="techReqName" required placeholder="مثال: محمد البلوشي">
+        </div>
+        <div class="form-group">
+          <label data-i18n="phone_lbl">رقم الجوال *</label>
+          <input type="tel" name="phone" required placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="city_lbl">المدينة *</label>
+        <input type="text" name="city" required placeholder="مثال: مسقط — الخوض">
+      </div>
+      <div class="form-group">
+        <label data-i18n="tech_details">وصف المشكلة أو العمل المطلوب *</label>
+        <textarea name="details" rows="3" required placeholder="مثال: فيش المطبخ ما يشتغل، وأبي أركب إنارة جديدة…"></textarea>
+      </div>
+      <input type="hidden" name="category" id="techCategory">
+      <button type="submit" class="submit-btn" id="techSubmit" data-i18n="send_req">إرسال الطلب 🚀</button>
     </form>
   </div>
 </div>
@@ -1100,8 +1133,31 @@ async function loadCats() {
   renderCats();
   fillCatSelects();
 }
+// 🔧 تخصصات الفنيين المستقلين (قسم اطلب فني)
+const TECH_CATEGORIES = [
+  { icon: "⚡", name: "كهربائي", en: "Electrician" },
+  { icon: "🚰", name: "سباك", en: "Plumber" },
+  { icon: "❄️", name: "تكييف وتبريد", en: "AC & Cooling" },
+  { icon: "🎨", name: "دهان", en: "Painter" },
+  { icon: "🪚", name: "نجار", en: "Carpenter" },
+  { icon: "🔧", name: "صيانة عامة وأجهزة", en: "General & Appliances" },
+];
+// تعبئة قائمة تخصص التسجيل حسب نوع الحساب (شركة ← أقسام البناء | فني ← تخصصات الصيانة)
+function fillRegCats(role) {
+  const sel = document.getElementById("regCategory");
+  if (!sel) return;
+  const list = role === "tech" ? TECH_CATEGORIES : CATEGORIES;
+  sel.innerHTML = "";
+  list.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c.name;
+    o.textContent = `${c.icon} ${LANG === "en" ? c.en : c.name}`;
+    sel.appendChild(o);
+  });
+}
 function fillCatSelects() {
-  ["reqCategory", "regCategory", "ueCategory"].forEach(id => {
+  fillRegCats(selectedRole);
+  ["reqCategory", "ueCategory"].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const cur = sel.value;
@@ -1188,7 +1244,13 @@ const I18N = {
     notif_title: "🔔 الإشعارات", notif_empty: "لا توجد إشعارات جديدة",
     n_new_req: "📋 طلب جديد من {n} — {c}", n_new_quote: "💰 عرض سعر جديد من {p}",
     n_quote_acc: "✅ {c} وافق على عرضك", n_quote_rej: "⛔ {c} رفض عرضك",
-    co_send_msg: "أرسل رسالة"
+    co_send_msg: "أرسل رسالة",
+    role_tech: "فني مستقل", secs_tech: "اطلب فني 🔧",
+    secs_tech_sub: "صيانة وإصلاحات البيت — اختر التخصص وبيشوف طلبك الفنيون فورًا",
+    tech_req_title: "🔧 اطلب فني", tech_req_for: "التخصص:", tech_details: "وصف المشكلة أو العمل المطلوب *",
+    tech_login_first: "سجّل دخولك أولًا عشان ترسل طلبك", tech_sent: "تم استلام طلبك! بيشوفه الفنيون في التخصص المطلوب",
+    dash_tech: "لوحة الفني 🔧", sub_tech: "طلبات العملاء الواردة في تخصصك",
+    quote_file_opt: "ملف العرض (PDF) — اختياري", req_err: "تعذر إرسال الطلب، حاول مرة أخرى", sending: "جارٍ الإرسال…"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -1257,7 +1319,13 @@ const I18N = {
     notif_title: "🔔 Notifications", notif_empty: "No new notifications",
     n_new_req: "📋 New request from {n} — {c}", n_new_quote: "💰 New quote from {p}",
     n_quote_acc: "✅ {c} accepted your quote", n_quote_rej: "⛔ {c} rejected your quote",
-    co_send_msg: "Send a message"
+    co_send_msg: "Send a message",
+    role_tech: "Independent technician", secs_tech: "Request a Technician 🔧",
+    secs_tech_sub: "Home repairs & maintenance — pick a specialty and technicians see your request instantly",
+    tech_req_title: "🔧 Request a technician", tech_req_for: "Specialty:", tech_details: "Describe the problem or work needed *",
+    tech_login_first: "Sign up or log in first to send your request", tech_sent: "Request received! Technicians in this specialty will see it",
+    dash_tech: "🔧 Technician dashboard", sub_tech: "Client requests in your specialty",
+    quote_file_opt: "Quote file (PDF) — optional", req_err: "Could not send the request — try again", sending: "Sending…"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
@@ -1269,6 +1337,59 @@ function renderCats() {
     <span>${LANG === "en" ? c.en : c.name}</span>
   </div>`).join("");
 }
+
+// 🔧 قسم اطلب فني — بطاقات تخصصات الصيانة
+function renderTechCats() {
+  const el = document.getElementById("techCatRow");
+  if (!el) return;
+  el.innerHTML = TECH_CATEGORIES.map(c => `
+  <div class="cat-chip" onclick="openTechFlow('${c.name}')">
+    <div class="chip-ico">${c.icon}</div>
+    <span>${LANG === "en" ? c.en : c.name}</span>
+  </div>`).join("");
+}
+
+// مسار طلب الفني — العميل يعبئ النموذج، غير المسجل يسجل كعميل
+function openTechFlow(specialty) {
+  if (currentUser?.role === "client") { openTechModal(specialty); }
+  else if (currentUser) { showToast(currentUser.role === "tech" ? "أنت مسجل كفني — طلبات العملاء في لوحتك 👇" : "أنت مسجل كشركة — طلبات الصيانة تصل للفنيين المستقلين"); openDashboard(); }
+  else { setAuthTab("register"); setRole("client"); openAuth(); showToast(t("tech_login_first")); }
+}
+
+function openTechModal(specialty) {
+  document.getElementById("techReqName").value = currentUser?.displayName || "";
+  document.getElementById("techCategory").value = specialty;
+  document.getElementById("techFor").textContent = t("tech_req_for") + " " + specialty;
+  document.getElementById("techModal").classList.add("open");
+}
+function closeTechModal() { document.getElementById("techModal").classList.remove("open"); }
+document.getElementById("techClose").addEventListener("click", closeTechModal);
+document.getElementById("techModal").addEventListener("click", e => { if (e.target.id === "techModal") closeTechModal(); });
+
+document.getElementById("techModalForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = document.getElementById("techSubmit");
+  btn.disabled = true;
+  btn.textContent = t("sending");
+  const data = {
+    ...Object.fromEntries(new FormData(e.target).entries()),
+    ownerUid: currentUser?.uid || null,
+    ownerEmail: currentUser?.email || ""
+  };
+  try {
+    const mode = await saveToDB("tech_requests", data);
+    showToast(t("tech_sent") + (mode === "local" ? " (وضع تجريبي)" : ""));
+    e.target.reset();
+    closeTechModal();
+    openDashboard();
+  } catch (err) {
+    console.error(err);
+    showToast(t("req_err"), "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t("send_req");
+  }
+});
 
 
 
@@ -1302,7 +1423,8 @@ function engCard(e) {
 }
 let liveEngineers = [];
 function renderEngineers() {
-  document.getElementById("engineerRow").innerHTML = [...liveEngineers].map(engCard).join("");
+  const el = document.getElementById("engineerRow");
+  if (el) el.innerHTML = [...liveEngineers].map(engCard).join("");
 }
 
 // نقر موثوق داخل الصفوف المتحركة (يعمل مع السحب والتحريك التلقائي)
@@ -1334,6 +1456,8 @@ function applyLang() {
   renderCats();
   renderProviders();
   renderEngineers();
+  renderTechCats();
+  fillRegCats(selectedRole);
   renderAuthArea();
   const dash = document.getElementById("dashboard");
   if (dash.classList.contains("open")) openDashboard();
@@ -1417,7 +1541,7 @@ function setRole(role) { document.querySelector(`.role-option[data-role="${role}
 
 function openRequestFlow() {
   if (currentUser?.role === "client") { openRequestModal(); }
-  else if (currentUser?.role === "provider") { showToast("أنت مسجل كشركة — طلبات العملاء في لوحتك 👇"); openDashboard(); }
+  else if (currentUser?.role === "provider" || currentUser?.role === "tech") { showToast(currentUser?.role === "tech" ? "أنت مسجل كفني — طلبات العملاء في لوحتك 👇" : "أنت مسجل كشركة — طلبات العملاء في لوحتك 👇"); openDashboard(); }
   else if (currentUser) { openDashboard(); }
   else { setAuthTab("register"); setRole("client"); openAuth(); }
 }
@@ -1472,7 +1596,8 @@ document.querySelectorAll(".role-option").forEach(opt => {
     document.querySelectorAll(".role-option").forEach(o => o.classList.remove("active"));
     opt.classList.add("active");
     selectedRole = opt.dataset.role;
-    document.getElementById("regCategoryWrap").style.display = selectedRole === "provider" ? "block" : "none";
+    document.getElementById("regCategoryWrap").style.display = (selectedRole === "provider" || selectedRole === "tech") ? "block" : "none";
+    fillRegCats(selectedRole);
   });
 });
 
@@ -1514,9 +1639,9 @@ authForm.addEventListener("submit", async e => {
           email: fd.email,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: selectedRole === "provider" ? fd.category : "",
+          category: (selectedRole === "provider" || selectedRole === "tech") ? fd.category : "",
           phone: fd.phone || "",
-          status: selectedRole === "provider" ? "pending" : "approved",
+          status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
         };
         await addDocFn(collectionFn(db, "users"), { ...currentUser, createdAt: serverTimestampFn() });
@@ -1538,9 +1663,9 @@ authForm.addEventListener("submit", async e => {
           password: fd.password,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: selectedRole === "provider" ? fd.category : "",
+          category: (selectedRole === "provider" || selectedRole === "tech") ? fd.category : "",
           phone: fd.phone || "",
-          status: selectedRole === "provider" ? "pending" : "approved",
+          status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
         };
         users.push(profile);
@@ -1663,16 +1788,18 @@ async function openDashboard() {
   document.getElementById("companyProfileWrap").style.display = "none";
   document.getElementById("employeesWrap").style.display = "none";
   const admin = isAdmin();
+  const isTech = currentUser.role === "tech" && !admin;
   const isProvider = currentUser.role === "provider" && !admin;
+  const isPro = isProvider || isTech; // مقدم خدمة بشقيه: شركة أو فني
 
-  document.getElementById("dashTitle").textContent = admin ? t("dash_admin") : isProvider ? t("dash_provider") : t("dash_client");
+  document.getElementById("dashTitle").textContent = admin ? t("dash_admin") : isTech ? t("dash_tech") : isProvider ? t("dash_provider") : t("dash_client");
   document.getElementById("dashSubtitle").textContent = admin
     ? t("sub_admin")
-    : isProvider
-    ? t("sub_provider") + (currentUser.category ? ` (${currentUser.category})` : "")
+    : isPro
+    ? t(isTech ? "sub_tech" : "sub_provider") + (currentUser.category ? ` (${currentUser.category})` : "")
     : t("sub_client");
-  document.getElementById("dashActionBtn").style.display = (isProvider || admin) ? "none" : "inline-flex";
-  document.getElementById("statTotalLabel").textContent = admin ? t("total_admin") : isProvider ? t("total_provider") : t("total_client");
+  document.getElementById("dashActionBtn").style.display = (isPro || admin) ? "none" : "inline-flex";
+  document.getElementById("statTotalLabel").textContent = admin ? t("total_admin") : isPro ? t("total_provider") : t("total_client");
 
   // تبويبات الأدمن
   document.getElementById("adminTabs").style.display = admin ? "flex" : "none";
@@ -1696,30 +1823,45 @@ async function openDashboard() {
     return;
   }
 
-  // جلب الطلبات
+  // جلب الطلبات — شركة: طلبات البناء | فني: طلبات الصيانة | عميل/أدمن: الاثنان
   let rows = [];
   if (db && getDocsFn) {
-    const col = collectionFn(db, "service_requests");
-    const q = admin
-      ? queryFn(col)
-      : isProvider && currentUser.category
-      ? queryFn(col, whereFn("category", "==", currentUser.category))
-      : queryFn(col, whereFn("ownerUid", "==", currentUser.uid));
-    const snap = await getDocsFn(q);
-    rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const fetchCol = async (colName, filt) => {
+      const col = collectionFn(db, colName);
+      const snap = await getDocsFn(filt(col));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    };
+    if (admin) {
+      rows = [
+        ...(await fetchCol("service_requests", c => queryFn(c))),
+        ...(await fetchCol("tech_requests", c => queryFn(c)))
+      ];
+    } else if (isTech) {
+      rows = await fetchCol("tech_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c));
+    } else if (isProvider) {
+      rows = await fetchCol("service_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c));
+    } else {
+      rows = [
+        ...(await fetchCol("service_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid)))),
+        ...(await fetchCol("tech_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid))))
+      ];
+    }
   } else {
     const all = JSON.parse(localStorage.getItem("darak_service_requests") || "[]");
+    const allTech = JSON.parse(localStorage.getItem("darak_tech_requests") || "[]");
     rows = admin
-      ? all
+      ? [...all, ...allTech]
+      : isTech
+      ? allTech.filter(r => !currentUser.category || r.category === currentUser.category)
       : isProvider
       ? all.filter(r => !currentUser.category || r.category === currentUser.category)
-      : all.filter(r => r.ownerUid === currentUser.uid);
+      : [...all, ...allTech].filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
-  if (isProvider) rows = rows.filter(r => !isExpiredReq(r));
-  // إخفاء الطلبات التي صار لها عرض سعر — الشركة: يبقى في «عروضي المرسلة» | العميل: يبقى في «عروض الأسعار»
+  if (isPro) rows = rows.filter(r => !isExpiredReq(r));
+  // إخفاء الطلبات التي صار لها عرض سعر — الشركة/الفني: يبقى في «عروضي المرسلة» | العميل: يبقى في «عروض الأسعار»
   try {
-    const qs = await fetchQuotes(isProvider ? "providerUid" : "clientUid", currentUser.uid);
+    const qs = await fetchQuotes(isPro ? "providerUid" : "clientUid", currentUser.uid);
     const quoted = new Set(qs.map(x => x.requestId));
     if (!admin) rows = rows.filter(r => !quoted.has(r.id));
   } catch (e) { console.warn(e); }
@@ -1757,7 +1899,7 @@ async function openDashboard() {
         <td data-lbl="${t("th_cat")}">${r.category || "—"}</td>
         <td data-lbl="${t("th_budget")}">${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td data-lbl="${t("th_details")}" style="max-width:240px">${r.details || "—"}</td>
-        <td data-lbl="${t("th_status")}">${isExpiredReq(r) && !isProvider ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>` : `<span class="status-badge status-new">${t("badge_new")}</span>`}${isProvider ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
+        <td data-lbl="${t("th_status")}">${isExpiredReq(r) && !isPro ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>` : `<span class="status-badge status-new">${t("badge_new")}</span>`}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
     </table>`;
   }
@@ -2633,6 +2775,11 @@ window.openQuoteModal = function(requestId) {
   document.getElementById("quoteModal").dataset.requestId = requestId;
   document.getElementById("quoteFor").textContent = t("q_client") + ": " + (r.name || "—") + " • " + (r.category || "");
   document.getElementById("quoteForm").reset();
+  // الفني: ملف PDF اختياري — طلبات الصيانة تحتاج سرعة، والشركات: إلزامي
+  const isTechRole = currentUser?.role === "tech";
+  const qf = document.getElementById("quoteFile");
+  qf.required = !isTechRole;
+  qf.previousElementSibling.textContent = isTechRole ? t("quote_file_opt") : t("quote_file");
   document.getElementById("quoteModal").classList.add("open");
 };
 document.getElementById("quoteClose").addEventListener("click", () => document.getElementById("quoteModal").classList.remove("open"));
@@ -2641,7 +2788,9 @@ document.getElementById("quoteModal").addEventListener("click", e => { if (e.tar
 document.getElementById("quoteForm").addEventListener("submit", async e => {
   e.preventDefault();
   const file = document.getElementById("quoteFile").files[0];
-  if (!file || file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
+  const isTechRole = currentUser?.role === "tech";
+  if (file && file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
+  if (!file && !isTechRole) { showToast(t("pdf_only"), "error"); return; }
   const btn = document.getElementById("quoteSubmit");
   const r = lastRequests.find(x => x.id === document.getElementById("quoteModal").dataset.requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
@@ -2649,8 +2798,8 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   btn.textContent = t("quote_uploading");
   try {
     let pdfUrl = "";
-    const pdfName = file.name;
-    if (storage && refFn) {
+    const pdfName = file ? file.name : "";
+    if (file && storage && refFn) {
       const sref = refFn(storage, "quotes/" + Date.now() + "_" + file.name.replace(/[^\w.]/g, "_"));
       await uploadBytesFn(sref, file);
       pdfUrl = await getUrlFn(sref);
@@ -2707,7 +2856,7 @@ async function loadQuotesSection() {
   const box = document.getElementById("quotesContent");
   if (!wrap || !box) return;
   const isClient = currentUser?.role === "client";
-  const isProv = currentUser?.role === "provider";
+  const isProv = currentUser?.role === "provider" || currentUser?.role === "tech";
   if (!currentUser || isAdmin() || (!isClient && !isProv)) { wrap.style.display = "none"; return; }
   const st = currentUser.status || "approved";
   if (st !== "approved") { wrap.style.display = "none"; return; }
@@ -2917,7 +3066,7 @@ function bootData() {
   loadAds();
   loadCats();
   loadLiveCompanies();
-  loadLiveEngineers();
+  renderTechCats();
 }
 bootData();
 fillCatSelects();
