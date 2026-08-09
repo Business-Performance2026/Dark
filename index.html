@@ -213,7 +213,9 @@ footer ul a:hover{color:var(--gold-2)}
 .status-new{background:#e0f2fe;color:#0369a1}
 
 .co-loc{font-size:.68rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#quotesTitle::after{content:"▾";float:left;color:var(--gold);font-size:.9rem}
+.more-bar{width:calc(100% - 24px);margin:8px 12px 14px;padding:11px;border:1.5px dashed var(--gold);border-radius:12px;background:#faf6ee;color:var(--navy);font-weight:700;font-size:.86rem;cursor:pointer;font-family:inherit;transition:.2s}
+.more-bar:active{background:#f3ead6}
+#quotesTitle::after{content:"▾";float:left;background:var(--gold);color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;box-shadow:0 2px 6px rgba(185,141,78,.4)}
 #quotesTitle.closed::after{content:"◂"}
 .q-group{border:1px solid #e6ddc9;border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
 .q-group-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:#faf6ee;font-weight:700;font-size:.92rem;color:var(--navy)}
@@ -834,7 +836,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 17)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 18)</small>
     </div>
   </div>
 </footer>
@@ -1965,7 +1967,7 @@ async function openDashboard() {
             ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`
             : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
-    </table>${moreBtn(rows.length - 5)}`;
+    </table>${moreBtn(rows.length - 5, "الطلبات")}`;
   }
   if (isProvider) {
     document.getElementById("employeesWrap").style.display = "";
@@ -3153,15 +3155,15 @@ const REQ_TTL = 7 * 24 * 60 * 60 * 1000;
 const isExpiredReq = r => { const t = tsq(r); return t && (Date.now() - t) > REQ_TTL; };
 
 // 📄 القوائم الطويلة: نعرض أول 5 عناصر فقط + زر «عرض الكل» — ما يضيع أي شي، بس ما تضطر تسحب
-function moreBtn(n) {
-  return n > 0 ? `<button class="btn btn-gold btn-sm" data-open="" style="margin:10px auto 14px;display:flex" onclick="toggleDashRows(this)">عرض الكل (${n} إضافي) ▼</button>` : "";
+function moreBtn(n, label) {
+  return n > 0 ? `<button class="more-bar" data-open="" data-label="${label}" onclick="toggleDashRows(this)">⌄ عرض كل ${label} — باقي ${n}</button>` : "";
 }
 window.toggleDashRows = function(btn) {
   const extras = [...btn.parentElement.querySelectorAll("[data-extra]")];
   const open = btn.dataset.open === "1";
   extras.forEach(el => el.style.display = open ? "none" : "");
   btn.dataset.open = open ? "" : "1";
-  btn.innerHTML = open ? `عرض الكل (${extras.length} إضافي) ▼` : "إخفاء ▲";
+  btn.innerHTML = open ? `⌄ عرض كل ${btn.dataset.label} — باقي ${extras.length}` : `⌃ إخفاء ${btn.dataset.label}`;
 };
 
 async function loadQuotesSection() {
@@ -3213,13 +3215,13 @@ async function loadQuotesSection() {
       if (q.status !== "accepted" || !q.clientPhone) return "";
       const num = String(q.clientPhone).replace(/\D/g, "");
       const wa = "https://wa.me/" + (num.startsWith("968") ? num : "968" + num);
-      return `<div style="margin-top:8px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:8px 10px">
-        <div style="font-size:.8rem;font-weight:700;color:#166534;margin-bottom:6px">🎉 العميل اختار عرضك — تواصل معه الآن للبدء بالعمل</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a href="${wa}" target="_blank" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex">💬 واتساب</a>
-          <a href="tel:${num}" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;background:var(--navy)">📞 اتصال</a>
-          <span dir="ltr" style="align-self:center;font-size:.85rem;font-weight:700;color:var(--navy)">${num}</span>
+      return `<div style="margin-top:8px;background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:2px solid #22c55e;border-radius:12px;padding:10px">
+        <div style="font-size:.85rem;font-weight:800;color:#166534;margin-bottom:8px">🎉 العميل اختار عرضك! تواصل معه الآن للبدء بالعمل 👇</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <a href="${wa}" target="_blank" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;flex:1;justify-content:center;padding:10px;font-size:.92rem">💬 واتساب</a>
+          <a href="tel:${num}" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;flex:1;justify-content:center;padding:10px;font-size:.92rem;background:var(--navy)">📞 اتصال</a>
         </div>
+        <div dir="ltr" style="text-align:center;margin-top:6px;font-size:.9rem;font-weight:800;color:var(--navy)">${num}</div>
       </div>`;
     };
     const groups = [
@@ -3237,21 +3239,21 @@ async function loadQuotesSection() {
         </div>
         <div class="q-group-body">
           ${g.list.length ? g.list.map((q, qi) => `
-            <div class="q-card"${qi >= 5 ? ' data-extra style="display:none"' : ""} onclick="this.classList.toggle('open')">
+            <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
               <div class="q-card-head">
                 <b>${q.clientName || "—"}</b>
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
               </div>
+              ${contactBlock(q)}
               <div class="q-det">
                 <div>🗂 ${q.category || "—"}</div>
                 ${q.createdAt ? `<div>📅 ${new Date(tsq(q)).toLocaleDateString("ar")}</div>` : ""}
                 ${q.note ? `<div>📝 ${q.note}</div>` : ""}
                 ${q.pdfUrl ? `<div>📄 <a href="${q.pdfUrl}" target="_blank" onclick="event.stopPropagation()" style="color:var(--gold);font-weight:700">${t("q_view")}</a></div>` : ""}
                 ${q.clientComment ? `<div>💬 ${t("aq_comment")}: ${q.clientComment}</div>` : ""}
-                ${contactBlock(q)}
               </div>
             </div>`).join("") : `<div class="dash-empty" style="padding:10px">${t("q_empty_grp")}</div>`}
-          ${moreBtn(g.list.length - 5)}
+          ${moreBtn(g.list.length - 5, "العروض")}
         </div>
       </div>`).join("");
     return;
@@ -3280,7 +3282,7 @@ async function loadQuotesSection() {
       <td data-lbl="${t("th_status")}">${stBadge}</td>
       <td data-lbl="${t("q_actions")}" style="white-space:nowrap">${lastCell}</td>
     </tr>`;
-  }).join("")}</tbody></table>${moreBtn(quotes.length - 5)}`;
+  }).join("")}</tbody></table>${moreBtn(quotes.length - 5, "العروض")}`;
   } catch (renderErr) {
     console.error(renderErr);
     box.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>صار خطأ أثناء عرض العروض<br><small style="color:#b91c1c;direction:ltr;font-size:.72rem">${renderErr.message || renderErr}</small><br><button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="loadQuotesSection()">🔄 إعادة المحاولة</button></div>`;
