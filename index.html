@@ -832,7 +832,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 14)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 15)</small>
     </div>
   </div>
 </footer>
@@ -1908,11 +1908,19 @@ async function openDashboard() {
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
   if (isPro) rows = rows.filter(r => !isExpiredReq(r));
-  // إخفاء الطلبات التي صار لها عرض سعر — الشركة/الفني: يبقى في «عروضي المرسلة» | العميل: يبقى في «عروض الأسعار»
+  // 📊 حالة الطلب للعميل: نربط كل طلب بعروضه — الشركة/الفني: تُخفى المُسعَّرة وتبقى في «عروضي المرسلة»
   try {
     const qs = await fetchQuotes(isPro ? "providerUid" : "clientUid", currentUser.uid);
-    const quoted = new Set(qs.map(x => x.requestId));
-    if (!admin) rows = rows.filter(r => !quoted.has(r.id));
+    if (!admin && !isPro && currentUser.role === "client") {
+      rows = rows.map(r => {
+        const rq = qs.filter(q => q.requestId === r.id);
+        const acc = rq.find(q => q.status === "accepted");
+        return { ...r, _qCount: rq.length, _accName: acc ? (acc.providerName || "") : "" };
+      });
+    } else {
+      const quoted = new Set(qs.map(x => x.requestId));
+      if (!admin) rows = rows.filter(r => !quoted.has(r.id));
+    }
   } catch (e) { console.warn(e); }
   lastRequests = rows;
 
@@ -1948,7 +1956,11 @@ async function openDashboard() {
         <td data-lbl="${t("th_cat")}">${r.category || "—"}</td>
         <td data-lbl="${t("th_budget")}">${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td data-lbl="${t("th_details")}" style="max-width:240px">${r.details || "—"}</td>
-        <td data-lbl="${t("th_status")}">${isExpiredReq(r) && !isPro ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>` : `<span class="status-badge status-new">${t("badge_new")}</span>`}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
+        <td data-lbl="${t("th_status")}">${!isPro && !admin
+          ? clientStatusCell(r)
+          : (isExpiredReq(r) && !isPro
+            ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`
+            : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
     </table>`;
   }
@@ -1960,6 +1972,33 @@ async function openDashboard() {
   buildNotifs();
   
 }
+
+// 📊 شريط تقدم حالة الطلب للعميل: أرسلت ← وصلتك عروض ← اخترت العرض ← اكتمل
+function clientStatusCell(r) {
+  if (isExpiredReq(r)) return `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`;
+  const done = r.status === "completed", acc = !!r._accName, hasQ = (r._qCount || 0) > 0;
+  const stage = done ? 4 : acc ? 3 : hasQ ? 2 : 1;
+  const bar = `<div style="display:flex;align-items:center;gap:2px;margin-top:7px;direction:ltr">${[1, 2, 3, 4].map(i =>
+    `<span style="width:8px;height:8px;border-radius:50%;background:${stage >= i ? "#16a34a" : "#ddd6c8"};flex:0 0 auto"></span>${i < 4 ? `<span style="width:10px;height:2px;background:${stage > i ? "#16a34a" : "#e8e2d5"}"></span>` : ""}`).join("")}</div>`;
+  if (done) return `<span class="status-badge status-approved">🎉 اكتمل الطلب</span>${bar}`;
+  if (acc) return `<span class="status-badge status-approved">✅ اخترت: ${r._accName}</span><br><button class="action-btn action-approve" style="margin-top:6px" onclick="markReqDone('${r.id}',${r._tech ? "true" : "false"})">✔️ العمل اكتمل</button>${bar}`;
+  if (hasQ) return `<span class="status-badge status-pending">💰 وصلتك ${r._qCount} ${r._qCount > 2 ? "عروض" : r._qCount === 2 ? "عرضين" : "عرض"}</span><br><small style="color:var(--muted);font-size:.72rem">قارن واختر من قسم العروض 👇</small>${bar}`;
+  return `<span class="status-badge status-new">⏳ بانتظار العروض</span>${bar}`;
+}
+// ✔️ العميل يعلّم الطلب كمكتمل بعد انتهاء العمل
+window.markReqDone = async function(reqId, isTech) {
+  try {
+    if (db && updateDocFn) await updateDocFn(docFn(db, isTech ? "tech_requests" : "service_requests", reqId), { status: "completed" });
+    else {
+      const key = isTech ? "darak_tech_requests" : "darak_service_requests";
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      const r = list.find(x => x.id === reqId);
+      if (r) { r.status = "completed"; localStorage.setItem(key, JSON.stringify(list)); }
+    }
+    showToast("🎉 الحمد لله تم بنجاح! شكراً لاستخدامك دارك");
+    openDashboard();
+  } catch (e) { console.error(e); showToast("تعذر التحديث — حاول مرة أخرى", "error"); }
+};
 
 // ============================================================
 // إدارة الأدمن — تبويبات + إدارة المستخدمين
@@ -2448,6 +2487,10 @@ const IG_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#E1306C" s
 window.openCompany = async function(id) {
   const p = allCompanies().find(x => x.id === id);
   if (!p) return;
+  // 💬 آراء العملاء — تحميل كسول إذا ما كانت جاهزة
+  if (!RATINGS.length) { try { RATINGS = await fetchRatings(); } catch (e) { console.warn(e); } }
+  const revs = RATINGS.filter(r => r.providerUid === p.uid)
+    .sort((a, b) => tsq(b) - tsq(a)).slice(0, 10);
   let team = [];
   if (p.uid && db && getDocsFn) {
     try {
@@ -2482,6 +2525,20 @@ window.openCompany = async function(id) {
     <div class="co-actions">${links}</div>
     ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
     ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip">${s}</span>`).join("")}</div>` : ""}
+    <div class="co-block"><h3>💬 آراء العملاء ${revs.length ? `(${revs.length})` : ""}</h3>
+      ${revs.length ? revs.map(r => `
+      <div style="padding:10px 0;border-bottom:1px solid #f3efe7">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <b style="font-size:.86rem;color:var(--navy)">${(r.clientName || "عميل دارك").split(" ")[0]}</b>
+          <span style="color:#f59e0b;font-size:.82rem;white-space:nowrap">${"⭐".repeat(Math.max(1, +r.stars || 1))}</span>
+        </div>
+        ${r.comment ? `<p style="font-size:.85rem;color:#5a5245;margin:4px 0 0;line-height:1.6">${r.comment}</p>` : ""}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <small style="color:var(--muted);font-size:.72rem">${tsq(r) ? new Date(tsq(r)).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB") : ""}</small>
+          ${isAdmin() && r.id ? `<button class="action-btn action-delete" style="padding:3px 10px;font-size:.72rem" onclick="deleteRating('${r.id}','${p.id}')">🗑️ حذف</button>` : ""}
+        </div>
+      </div>`).join("") : '<p style="color:var(--muted);font-size:.85rem;margin:0">لا توجد آراء بعد — التقييمات تظهر هنا بعد كل خدمة مكتملة ⭐</p>'}
+    </div>
     <div class="co-block"><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3efe7">
         ${e.photo ? `<img src="${e.photo}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 auto">` : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;color:#fff;flex:0 0 auto">👷</div>'}
@@ -2492,6 +2549,20 @@ window.openCompany = async function(id) {
       </div>`).join("") : `<p>${t("co_no_eng")}</p>`}
     </div>`;
   showView("company");
+};
+
+// 🗑️ حذف تقييم مسيء — للأدمن فقط
+window.deleteRating = async function(ratingId, companyId) {
+  if (!isAdmin()) return;
+  if (!confirm("حذف هذا التقييم نهائياً؟")) return;
+  try {
+    if (db && deleteDocFn) await deleteDocFn(docFn(db, "ratings", ratingId));
+    else localStorage.setItem("darak_ratings", JSON.stringify((JSON.parse(localStorage.getItem("darak_ratings") || "[]")).filter(x => x.id !== ratingId)));
+    RATINGS = RATINGS.filter(x => x.id !== ratingId);
+    showToast("تم حذف التقييم 🗑️");
+    await loadLiveCompanies();
+    openCompany(companyId);
+  } catch (e) { console.error(e); showToast("تعذر الحذف — تحقق من القواعد", "error"); }
 };
 
 // ---- نظام الإشعارات (شركة ← طلبات وردود | عميل ← عروض جديدة) ----
