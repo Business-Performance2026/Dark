@@ -845,7 +845,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 24)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 25)</small>
     </div>
   </div>
 </footer>
@@ -913,6 +913,10 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <button type="submit" class="submit-btn" id="authSubmit" data-i18n="login_go">دخول</button>
     </form>
+    <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1.5px dashed #eee3cd">
+      <button type="button" id="guestBtn" style="background:none;border:none;color:var(--gold);font-weight:700;font-size:.92rem;cursor:pointer;font-family:inherit">👀 تصفح كضيف — بدون حساب</button>
+      <p style="color:var(--muted);font-size:.74rem;margin:6px 0 0">تقدر تتصفح الشركات وتقييماتها بحرية — التسجيل مطلوب فقط عند طلب الخدمة</p>
+    </div>
   </div>
 </div>
 
@@ -1607,7 +1611,7 @@ function openRequestFlow() {
   if (currentUser?.role === "client") { openRequestModal(); }
   else if (currentUser?.role === "provider" || currentUser?.role === "tech") { showToast(currentUser?.role === "tech" ? "أنت مسجل كفني — طلبات العملاء في لوحتك 👇" : "أنت مسجل كشركة — طلبات العملاء في لوحتك 👇"); openDashboard(); }
   else if (currentUser) { openDashboard(); }
-  else { setAuthTab("register"); setRole("client"); openAuth(); }
+  else { setAuthTab("register"); setRole("client"); openAuth(); showToast("سجّل حساب مجاني عشان تطلب الخدمة — ياخذ دقيقة بس ⏱️"); }
 }
 function openJoinFlow() {
   if (currentUser) { openDashboard(); return; }
@@ -1643,6 +1647,11 @@ let authMode = "login";
 let selectedRole = "client";
 
 function openAuth() { authModal.classList.add("open"); }
+// 👀 تصفح كضيف — يكمل تصفح بدون حساب، والتسجيل يُطلب فقط عند طلب خدمة
+document.getElementById("guestBtn").addEventListener("click", () => {
+  closeAuth();
+  showToast("تصفح براحتك 👌 — وإذا احتجت تطلب خدمة بنذكّرك بالتسجيل");
+});
 function closeAuth() { authModal.classList.remove("open"); }
 document.getElementById("authClose").addEventListener("click", closeAuth);
 authModal.addEventListener("click", e => { if (e.target === authModal) closeAuth(); });
