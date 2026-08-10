@@ -855,7 +855,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 30)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 31)</small>
     </div>
   </div>
 </footer>
@@ -2100,7 +2100,13 @@ window.markReqDone = async function(reqId, isTech) {
       if (r) { r.status = "completed"; localStorage.setItem(key, JSON.stringify(list)); }
     }
     showToast("🎉 الحمد لله تم بنجاح! شكراً لاستخدامك دارك");
+    // ⭐ بعد الإتمام: دعوة ذوق للتقييم مع خانة تعليق — تظهر مرة وحدة فقط
+    const doneQ = (_lastQuotes || []).find(x => x.requestId === reqId && x.status === "accepted");
+    const alreadyRated = doneQ && (RATINGS || []).some(r => r.quoteId === doneQ.id && r.clientUid === currentUser.uid);
     openDashboard();
+    if (doneQ && !alreadyRated) {
+      setTimeout(() => openRateModal(doneQ.id, "🌟 عساكم على القوة! كيف كانت الخدمة؟"), 800);
+    }
   } catch (e) { console.error(e); showToast("تعذر التحديث — حاول مرة أخرى", "error"); }
 };
 
@@ -3123,10 +3129,11 @@ function ratingAvg(uid) {
 }
 let ratingQuote = null, ratingStars = 0;
 const RATE_HINTS = ["", "😞 سيئة", "😐 مقبولة", "🙂 جيدة", "😃 جيدة جداً", "🤩 ممتازة"];
-window.openRateModal = function(quoteId) {
+window.openRateModal = function(quoteId, customTitle) {
   const q = (_lastQuotes || []).find(x => x.id === quoteId);
   if (!q) { showToast(t("quote_err"), "error"); return; }
   ratingQuote = q; ratingStars = 0;
+  document.getElementById("rateTitle").textContent = customTitle || "⭐ قيّم الخدمة";
   document.getElementById("rateFor").textContent = (q.providerName || "—") + " • " + (q.category || "");
   document.getElementById("rateComment").value = "";
   document.getElementById("rateHint").textContent = "";
