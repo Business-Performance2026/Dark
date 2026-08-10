@@ -217,6 +217,10 @@ footer ul a:hover{color:var(--gold-2)}
 .more-bar:active{background:#f3ead6}
 .contact-circle{width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;text-decoration:none;box-shadow:0 2px 6px rgba(22,40,58,.14);transition:.15s}
 .contact-circle:active{transform:scale(.92)}
+.cat-picks{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.cat-picks label{display:inline-flex;align-items:center;gap:6px;background:#faf6ee;border:1.5px solid #e6ddc9;border-radius:100px;padding:7px 13px;font-size:.82rem;cursor:pointer;font-weight:500;color:var(--navy);transition:.15s}
+.cat-picks label:has(input:checked){border-color:var(--gold);background:#f7edd9;font-weight:700}
+.cat-picks input{accent-color:var(--gold);width:15px;height:15px;margin:0;cursor:pointer}
 .q-menu-item{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #e6ddc9;border-radius:14px;padding:14px 16px;margin:0 12px 10px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.95rem;transition:.15s;box-shadow:0 1px 4px rgba(22,40,58,.05)}
 .q-menu-item:active{background:#faf6ee;border-color:var(--gold)}
 .q-menu-side{display:flex;align-items:center;gap:8px}
@@ -667,6 +671,7 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_logo">شعار الشركة (صورة)</label><input type="file" id="cpLogo" accept="image/*"></div>
         <div class="form-group"><label data-i18n="cp_name_ar">اسم الشركة (عربي)</label><input type="text" id="cpNameAr"></div>
         <div class="form-group"><label data-i18n="cp_name_en">اسم الشركة (إنجليزي)</label><input type="text" id="cpNameEn" dir="ltr"></div>
+        <div class="form-group"><label>تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
         <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
@@ -847,7 +852,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 28)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 29)</small>
     </div>
   </div>
 </footer>
@@ -897,9 +902,8 @@ footer ul a:hover{color:var(--gold-2)}
         </div>
         <div class="form-group" id="regCategoryWrap" style="display:none">
           <label data-i18n="cat_lbl">تخصصك</label>
-          <select name="category" id="regCategory">
-            <option value="">اختر التخصص…</option>
-          </select>
+          <div id="regCatList" class="cat-picks"></div>
+          <small style="color:var(--muted);font-size:.74rem">✅ تقدر تختار أكثر من تخصص</small>
         </div>
       </div>
       <div class="form-group">
@@ -1068,9 +1072,9 @@ footer ul a:hover{color:var(--gold-2)}
       <label>الاسم</label>
       <input type="text" id="ueName">
     </div>
-    <div class="form-group">
-      <label>التخصص</label>
-      <select id="ueCategory"></select>
+    <div class="form-group" id="ueCatWrap">
+      <label>التخصصات (اختر واحدًا أو أكثر)</label>
+      <div id="ueCatList" class="cat-picks"></div>
     </div>
     <button class="submit-btn" id="ueSave" type="button">حفظ 💾</button>
   </div>
@@ -1202,18 +1206,23 @@ const TECH_CATEGORIES = [
   { icon: "🔧", name: "صيانة عامة وأجهزة", en: "General & Appliances" },
 ];
 let TECHS = TECH_CATEGORIES.slice();
+// ✅ تخصصات متعددة: نخزن category (الأساسي — للتوافق مع السابق) + categories (الكل)
+function userCatsArr(u) {
+  if (!u) return [];
+  if (Array.isArray(u.categories) && u.categories.length) return u.categories;
+  return u.category ? [u.category] : [];
+}
+function catPickHtml(list, checked) {
+  return list.map(c => `<label><input type="checkbox" value="${c.name}"${checked && checked.includes(c.name) ? " checked" : ""}> ${c.icon} ${LANG === "en" ? c.en : c.name}</label>`).join("");
+}
+function getPickedCats(containerId) {
+  return [...document.querySelectorAll("#" + containerId + " input:checked")].map(i => i.value);
+}
 // تعبئة قائمة تخصص التسجيل حسب نوع الحساب (شركة ← أقسام البناء | فني ← تخصصات الصيانة)
 function fillRegCats(role) {
-  const sel = document.getElementById("regCategory");
-  if (!sel) return;
-  const list = role === "tech" ? TECHS : CATEGORIES;
-  sel.innerHTML = "";
-  list.forEach(c => {
-    const o = document.createElement("option");
-    o.value = c.name;
-    o.textContent = `${c.icon} ${LANG === "en" ? c.en : c.name}`;
-    sel.appendChild(o);
-  });
+  const box = document.getElementById("regCatList");
+  if (!box) return;
+  box.innerHTML = catPickHtml(role === "tech" ? TECHS : CATEGORIES, []);
 }
 // أقسام الشركات فقط — نستبعد أي تخصص فني أُضيف بالخطأ لقائمة الأقسام
 function companyCats() {
@@ -1702,6 +1711,12 @@ authForm.addEventListener("submit", async e => {
     if (auth) {
       // ===== وضع Firebase =====
       if (authMode === "register") {
+        const regCats = (selectedRole === "provider" || selectedRole === "tech") ? getPickedCats("regCatList") : [];
+        if ((selectedRole === "provider" || selectedRole === "tech") && !regCats.length) {
+          showToast("اختر تخصصًا واحدًا على الأقل ⬇️", "error");
+          btn.disabled = false; btn.textContent = t("register_go");
+          return;
+        }
         const cred = await createUserFn(auth, fd.email, fd.password);
         if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
         currentUser = {
@@ -1709,7 +1724,8 @@ authForm.addEventListener("submit", async e => {
           email: fd.email,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: (selectedRole === "provider" || selectedRole === "tech") ? fd.category : "",
+          category: regCats[0] || "",
+          categories: regCats,
           phone: fd.phone || "",
           status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
@@ -1727,13 +1743,20 @@ authForm.addEventListener("submit", async e => {
       const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
       if (authMode === "register") {
         if (users.find(u => u.email === fd.email)) throw new Error("exists");
+        const regCats = (selectedRole === "provider" || selectedRole === "tech") ? getPickedCats("regCatList") : [];
+        if ((selectedRole === "provider" || selectedRole === "tech") && !regCats.length) {
+          showToast("اختر تخصصًا واحدًا على الأقل ⬇️", "error");
+          btn.disabled = false; btn.textContent = t("register_go");
+          return;
+        }
         const profile = {
           uid: "local_" + Date.now(),
           email: fd.email,
           password: fd.password,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
-          category: (selectedRole === "provider" || selectedRole === "tech") ? fd.category : "",
+          category: regCats[0] || "",
+          categories: regCats,
           phone: fd.phone || "",
           status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
@@ -1866,7 +1889,7 @@ async function openDashboard() {
   document.getElementById("dashSubtitle").textContent = admin
     ? t("sub_admin")
     : isPro
-    ? t(isTech ? "sub_tech" : "sub_provider") + (currentUser.category ? ` (${currentUser.category})` : "")
+    ? t(isTech ? "sub_tech" : "sub_provider") + (userCatsArr(currentUser).length ? ` (${userCatsArr(currentUser).join("، ")})` : "")
     : t("sub_client");
   // ⭐ عرض تقييم الشركة/الفني من تقييمات العملاء
   if (isPro) {
@@ -1915,9 +1938,11 @@ async function openDashboard() {
         ...(await fetchCol("tech_requests", c => queryFn(c))).map(x => ({ ...x, _tech: true }))
       ];
     } else if (isTech) {
-      rows = (await fetchCol("tech_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c))).map(x => ({ ...x, _tech: true }));
+      const cats = userCatsArr(currentUser);
+      rows = (await fetchCol("tech_requests", c => cats.length > 1 ? queryFn(c, whereFn("category", "in", cats)) : cats.length ? queryFn(c, whereFn("category", "==", cats[0])) : queryFn(c))).map(x => ({ ...x, _tech: true }));
     } else if (isProvider) {
-      rows = await fetchCol("service_requests", c => currentUser.category ? queryFn(c, whereFn("category", "==", currentUser.category)) : queryFn(c));
+      const cats = userCatsArr(currentUser);
+      rows = await fetchCol("service_requests", c => cats.length > 1 ? queryFn(c, whereFn("category", "in", cats)) : cats.length ? queryFn(c, whereFn("category", "==", cats[0])) : queryFn(c));
     } else {
       rows = [
         ...(await fetchCol("service_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid)))),
@@ -1930,9 +1955,9 @@ async function openDashboard() {
     rows = admin
       ? [...all, ...allTech]
       : isTech
-      ? allTech.filter(r => !currentUser.category || r.category === currentUser.category)
+      ? allTech.filter(r => { const cats = userCatsArr(currentUser); return !cats.length || cats.includes(r.category); })
       : isProvider
-      ? all.filter(r => !currentUser.category || r.category === currentUser.category)
+      ? all.filter(r => { const cats = userCatsArr(currentUser); return !cats.length || cats.includes(r.category); })
       : [...all, ...allTech].filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
@@ -2199,7 +2224,7 @@ async function loadUsersTable() {
       <td dir="ltr" style="font-size:.82rem">${u.email || "—"}</td>
       <td>${u.phone ? `<a href="https://wa.me/${waNumber(u.phone)}" target="_blank" style="color:var(--gold);font-weight:700" dir="ltr">💬 ${u.phone}</a>` : "—"}</td>
       <td>${roleName}</td>
-      <td>${u.category || "—"}</td>
+      <td>${userCatsArr(u).join("، ") || "—"}</td>
       <td><span class="status-badge ${cls}">${lbl}</span></td>
       <td style="max-width:170px;font-size:.82rem">${u.statusReason || "—"}</td>
       <td style="white-space:nowrap">${btns}</td>
@@ -2283,23 +2308,18 @@ window.adminEdit = async uid => {
   if (!u) { showToast("تعذر تحميل بيانات المستخدم", "error"); return; }
   editingUid = uid;
   document.getElementById("ueName").value = u.displayName || "";
-  // قائمة التخصص حسب نوع المستخدم — فني: تخصصات الصيانة | غيره: أقسام الشركات
-  const ueSel = document.getElementById("ueCategory");
-  ueSel.innerHTML = "";
-  (u.role === "tech" ? TECHS : CATEGORIES).forEach(c => {
-    const o = document.createElement("option");
-    o.value = c.name;
-    o.textContent = `${c.icon} ${c.name}`;
-    ueSel.appendChild(o);
-  });
-  ueSel.value = u.category || "";
+  // ✅ تخصصات متعددة — فني: تخصصات الصيانة | غيره: أقسام الشركات (تُخفى عن العملاء)
+  const isProvRole = u.role === "provider" || u.role === "tech";
+  document.getElementById("ueCatWrap").style.display = isProvRole ? "" : "none";
+  document.getElementById("ueCatList").innerHTML = catPickHtml(u.role === "tech" ? TECHS : CATEGORIES, userCatsArr(u));
   document.getElementById("userEditModal").classList.add("open");
 };
 document.getElementById("userEditClose").addEventListener("click", () => document.getElementById("userEditModal").classList.remove("open"));
 document.getElementById("userEditModal").addEventListener("click", e => { if (e.target.id === "userEditModal") e.target.classList.remove("open"); });
 document.getElementById("ueSave").addEventListener("click", async () => {
   if (!editingUid) return;
-  const data = { displayName: document.getElementById("ueName").value.trim(), category: document.getElementById("ueCategory").value };
+  const ueCats = getPickedCats("ueCatList");
+  const data = { displayName: document.getElementById("ueName").value.trim(), category: ueCats[0] || "", categories: ueCats };
   try {
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", editingUid)));
@@ -2486,7 +2506,7 @@ function renderAccountView() {
     box.innerHTML = `
       <h3 style="color:var(--navy)">${currentUser.displayName || ""}</h3>
       <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
-      <p style="margin:8px 0 4px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
+      <p style="margin:8px 0 4px;font-weight:700">${roleName}${userCatsArr(currentUser).length ? " • " + userCatsArr(currentUser).join("، ") : ""}</p>
       <div class="acc-menu">
         <button class="acc-item" onclick="closeAccountView();setTimeout(() => document.getElementById('notifBtn').click(), 120)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
@@ -2553,7 +2573,7 @@ applyLang();
 function permName(v) { return v === "manager" ? t("emp_perm3") : v === "quotes" ? t("emp_perm2") : t("emp_perm1"); }
 
 window.openCategory = function(name) {
-  const cos = allCompanies().filter(p => !name || p.cat === name || p.catEn === name);
+  const cos = allCompanies().filter(p => !name || p.cat === name || p.catEn === name || (p.cats || []).includes(name));
   document.getElementById("catViewTitle").textContent = name ? (t("secs_companies") + " — " + name) : t("all_cos");
   document.getElementById("catViewGrid").innerHTML = cos.length
     ? cos.map(coCard).join("")
@@ -2870,6 +2890,8 @@ function fillCompanyProfileForm() {
   document.getElementById("cpNameEn").value = currentUser.nameEn || "";
   document.getElementById("cpBio").value = currentUser.bio || "";
   document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
+  const cpList = document.getElementById("cpCatList");
+  if (cpList) cpList.innerHTML = catPickHtml(currentUser.role === "tech" ? TECHS : CATEGORIES, userCatsArr(currentUser));
 }
 document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -2885,6 +2907,12 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     bio: document.getElementById("cpBio").value.trim(),
     services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
   };
+  if (currentUser.role === "provider" || currentUser.role === "tech") {
+    const cpCats = getPickedCats("cpCatList");
+    if (!cpCats.length) { showToast("اختر تخصصًا واحدًا على الأقل ✅", "error"); return; }
+    data.categories = cpCats;
+    data.category = cpCats[0];
+  }
   try {
     if (logoFile) data.logo = await uploadImage(logoFile, "logos");
     if (db && getDocsFn) {
@@ -3045,7 +3073,7 @@ async function loadLiveCompanies() {
     liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => {
       const rt = ratingAvg(u.uid);
       return {
-        id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || "", catEn: u.category || "",
+        id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || "", catEn: u.category || "", cats: userCatsArr(u),
         icon: "🏢", rating: rt ? rt.avg : "", ratingCount: rt ? rt.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
         web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
       };
