@@ -847,7 +847,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 27)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 28)</small>
     </div>
   </div>
 </footer>
@@ -1978,8 +1978,30 @@ async function openDashboard() {
   const content = document.getElementById("dashContent");
   const isClientView = !admin && !isPro;
   if (isClientView) {
-    content.innerHTML = `<div style="text-align:center;padding:14px 18px 4px;color:var(--muted);font-size:.82rem">
-      👇 كل عروضك وحالاتها في قسم <b style="color:var(--navy)">💰 عروض الأسعار</b> تحت</div>`;
+    // 📋 طلباتي المرسلة — صفحة مستقلة بنفس فكرة صفحات العروض (بدون زحمة)
+    const reqCards = rows.map(r => `<div class="q-card" style="cursor:default">
+      <div class="q-card-head">
+        <b>${r.category || "—"}</b>
+        <small style="color:var(--muted);font-size:.74rem">📅 ${new Date(ts(r)).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB")}</small>
+      </div>
+      <div style="font-size:.79rem;color:var(--muted);margin-top:3px">📍 ${r.city || "—"}${r.budget ? ` &nbsp;•&nbsp; 💰 ${(+r.budget).toLocaleString("ar")} ر.ع` : ""}</div>
+      ${r.details ? `<div style="font-size:.8rem;margin-top:3px">${r.details}</div>` : ""}
+      <div style="margin-top:8px;display:flex">${clientStatusCell(r)}</div>
+    </div>`).join("");
+    content.innerHTML = `
+      <div id="reqMenu" style="padding-top:6px">
+        <div class="q-menu-item" onclick="openReqPage()">
+          <span>📋 طلباتي المرسلة</span>
+          <span class="q-menu-side"><span class="q-count">${rows.length}</span><span class="q-menu-arrow">‹</span></span>
+        </div>
+        <div style="text-align:center;padding:0 18px 4px;color:var(--muted);font-size:.82rem">
+          👇 عروض الشركات والفنيين تصلك في قسم <b style="color:var(--navy)">💰 عروض الأسعار</b> تحت</div>
+      </div>
+      <div class="qpage" id="reqPage" style="display:none">
+        <div class="q-back" onclick="closeReqPage()">→ رجوع</div>
+        <div class="qpage-title"><span>📋 طلباتي المرسلة</span><span class="q-count">${rows.length}</span></div>
+        <div style="padding:0 12px 8px">${rows.length ? reqCards : `<div class="dash-empty"><div class="big">📭</div>لم ترسل أي طلب بعد — ابدأ بطلب خدمة من الأعلى</div>`}</div>
+      </div>`;
   } else if (!rows.length) {
     content.innerHTML = `<div class="dash-empty">
       <div class="big">📭</div>
@@ -3228,6 +3250,16 @@ window.openQGroup = function(key) {
 window.closeQGroup = function() {
   document.querySelectorAll(".qpage").forEach(p => p.style.display = "none");
   const m = document.getElementById("qMenu"); if (m) m.style.display = "";
+};
+// 🔀 صفحة "طلباتي المرسلة" للعميل
+window.openReqPage = function() {
+  const m = document.getElementById("reqMenu"); if (m) m.style.display = "none";
+  const p = document.getElementById("reqPage");
+  if (p) { p.style.display = ""; p.scrollIntoView({ behavior: "smooth", block: "start" }); }
+};
+window.closeReqPage = function() {
+  const p = document.getElementById("reqPage"); if (p) p.style.display = "none";
+  const m = document.getElementById("reqMenu"); if (m) m.style.display = "";
 };
 
 window.toggleDashRows = function(btn) {
