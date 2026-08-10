@@ -215,6 +215,8 @@ footer ul a:hover{color:var(--gold-2)}
 .co-loc{font-size:.68rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .more-bar{width:calc(100% - 24px);margin:8px 12px 14px;padding:11px;border:1.5px dashed var(--gold);border-radius:12px;background:#faf6ee;color:var(--navy);font-weight:700;font-size:.86rem;cursor:pointer;font-family:inherit;transition:.2s}
 .more-bar:active{background:#f3ead6}
+.contact-circle{width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;text-decoration:none;box-shadow:0 2px 6px rgba(22,40,58,.14);transition:.15s}
+.contact-circle:active{transform:scale(.92)}
 .q-menu-item{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #e6ddc9;border-radius:14px;padding:14px 16px;margin:0 12px 10px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.95rem;transition:.15s;box-shadow:0 1px 4px rgba(22,40,58,.05)}
 .q-menu-item:active{background:#faf6ee;border-color:var(--gold)}
 .q-menu-side{display:flex;align-items:center;gap:8px}
@@ -843,7 +845,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 23)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 24)</small>
     </div>
   </div>
 </footer>
@@ -3313,13 +3315,12 @@ async function loadQuotesSection() {
       if (q.status !== "accepted" || !q.clientPhone) return "";
       const num = String(q.clientPhone).replace(/\D/g, "");
       const wa = "https://wa.me/" + (num.startsWith("968") ? num : "968" + num);
-      return `<div style="margin-top:8px;background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:2px solid #22c55e;border-radius:12px;padding:10px">
-        <div style="font-size:.85rem;font-weight:800;color:#166534;margin-bottom:8px">🎉 العميل اختار عرضك! تواصل معه الآن للبدء بالعمل 👇</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <a href="${wa}" target="_blank" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;flex:1;justify-content:center;padding:10px;font-size:.92rem">💬 واتساب</a>
-          <a href="tel:${num}" onclick="event.stopPropagation()" class="action-btn action-approve" style="text-decoration:none;display:inline-flex;flex:1;justify-content:center;padding:10px;font-size:.92rem;background:var(--navy)">📞 اتصال</a>
+      return `<div style="margin-top:10px;border-top:1.5px dashed #eee3cd;padding-top:10px">
+        <div style="font-size:.78rem;font-weight:600;color:var(--muted);text-align:center;margin-bottom:10px">🎉 العميل اختار عرضك — تواصل معه الآن للبدء بالعمل</div>
+        <div style="display:flex;justify-content:space-between">
+          <a href="${wa}" target="_blank" onclick="event.stopPropagation()" class="contact-circle" style="background:#fff;border:1.5px solid #e6ddc9" title="واتساب">💬</a>
+          <a href="tel:${num}" onclick="event.stopPropagation()" class="contact-circle" style="background:var(--navy);color:#fff" title="اتصال">📞</a>
         </div>
-        <div dir="ltr" style="text-align:center;margin-top:6px;font-size:.9rem;font-weight:800;color:var(--navy)">${num}</div>
       </div>`;
     };
     const groups = [
@@ -3332,7 +3333,7 @@ async function loadQuotesSection() {
       : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
     box.innerHTML = autoHideNote + menuHtml(groups) + groups.map(g => pageShell(g, `
           ${g.list.length ? g.list.map((q, qi) => `
-            <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
+            <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:1.5px solid #e6ddc9;background:#fff;box-shadow:0 1px 8px rgba(22,40,58,.08);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
               <div class="q-card-head">
                 <b>${q.clientName || "—"}</b>
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
@@ -3363,7 +3364,7 @@ async function loadQuotesSection() {
   ];
   box.innerHTML = autoHideNote + menuHtml(groupsC) + groupsC.map(g => pageShell(g, `
         ${g.list.length ? g.list.map((q, qi) => `
-          <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:2px solid #4ade80;background:#f6fef8;box-shadow:0 2px 10px rgba(22,163,74,.12);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
+          <div class="q-card"${q.status === "accepted" || qi >= 5 ? ` style="${q.status === "accepted" ? "border:1.5px solid #e6ddc9;background:#fff;box-shadow:0 1px 8px rgba(22,40,58,.08);" : ""}${qi >= 5 ? "display:none" : ""}"` : ""}${qi >= 5 ? " data-extra" : ""} onclick="this.classList.toggle('open')">
             <div class="q-card-head">
               <b>${q.providerName || "—"}</b>
               <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge(q.status)}</span>
