@@ -751,6 +751,7 @@ footer ul a:hover{color:var(--gold-2)}
       <button data-atab="quotes" type="button">💰 عروض الأسعار</button>
       <button data-atab="cats" type="button">🗂️ الأقسام</button>
       <button data-atab="techcats" type="button">🔧 تخصصات الفنيين</button>
+      <button data-atab="ratings" type="button">⭐ التقييمات</button>
       <button data-atab="ads" type="button">🖼️ الإعلانات</button>
       <button data-atab="footer" type="button">⚙️ إعدادات الفوتر</button>
     </div>
@@ -815,6 +816,24 @@ footer ul a:hover{color:var(--gold-2)}
       <h3 style="padding:18px 18px 6px;color:var(--navy)">🔧 تخصصات الفنيين (تظهر في قسم اطلب فني فقط)</h3>
       <div style="padding:6px 18px 18px" id="techcatsContent"></div>
     </div>
+    <div class="dash-table-wrap" id="ratingsWrap" style="display:none;margin-top:24px">
+      <h3 style="padding:18px 18px 6px;color:var(--navy)">⭐ إدارة التقييمات والتعليقات</h3>
+      <div style="padding:6px 18px 16px;border-bottom:1.5px dashed #eee3cd">
+        <div style="font-weight:700;color:var(--navy);font-size:.9rem;margin-bottom:8px">➕ إضافة تقييم جديد</div>
+        <div class="form-group"><label>الشركة / الفني</label><select id="arProvider"></select></div>
+        <div class="form-group"><label>اسم العميل</label><input type="text" id="arClient" placeholder="مثال: أبو محمد"></div>
+        <div class="form-group"><label>النجوم</label><select id="arStars">
+          <option value="5">⭐⭐⭐⭐⭐ ممتاز (5)</option>
+          <option value="4">⭐⭐⭐⭐ جيد جدًا (4)</option>
+          <option value="3">⭐⭐⭐ جيد (3)</option>
+          <option value="2">⭐⭐ مقبول (2)</option>
+          <option value="1">⭐ ضعيف (1)</option>
+        </select></div>
+        <div class="form-group"><label>التعليق</label><textarea id="arComment" rows="2" placeholder="تعليق العميل…"></textarea></div>
+        <button class="btn btn-gold btn-sm" id="arAdd" type="button">➕ إضافة التقييم</button>
+      </div>
+      <div id="ratingsContent" style="padding:12px 14px 16px"></div>
+    </div>
   </div>
 </section>
 
@@ -855,7 +874,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 31)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 32)</small>
     </div>
   </div>
 </footer>
@@ -1080,6 +1099,25 @@ footer ul a:hover{color:var(--gold-2)}
       <div id="ueCatList" class="cat-picks"></div>
     </div>
     <button class="submit-btn" id="ueSave" type="button">حفظ 💾</button>
+  </div>
+</div>
+
+<!-- ================= نافذة تعديل تقييم (أدمن) ================= -->
+<div class="modal-overlay" id="rateEditModal">
+  <div class="modal">
+    <button class="modal-close" id="rateEditClose" aria-label="إغلاق">✕</button>
+    <h3>✏️ تعديل التقييم</h3>
+    <p id="reFor" style="color:var(--muted)"></p>
+    <div class="form-group"><label>النجوم</label><select id="reStars">
+      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+      <option value="4">⭐⭐⭐⭐ (4)</option>
+      <option value="3">⭐⭐⭐ (3)</option>
+      <option value="2">⭐⭐ (2)</option>
+      <option value="1">⭐ (1)</option>
+    </select></div>
+    <div class="form-group"><label>اسم العميل</label><input type="text" id="reClient"></div>
+    <div class="form-group"><label>التعليق</label><textarea id="reComment" rows="2"></textarea></div>
+    <button class="submit-btn" id="reSave" type="button">حفظ التعديلات 💾</button>
   </div>
 </div>
 
@@ -2132,6 +2170,8 @@ function switchAdminTab(tab) {
   if (tab === "cats") renderAdminCats();
   document.getElementById("techcatsWrap").style.display = tab === "techcats" ? "block" : "none";
   if (tab === "techcats") renderAdminTechCats();
+  document.getElementById("ratingsWrap").style.display = tab === "ratings" ? "block" : "none";
+  if (tab === "ratings") loadAdminRatings();
 }
 document.querySelectorAll("#adminTabs button").forEach(b => b.addEventListener("click", () => switchAdminTab(b.dataset.atab)));
 
@@ -2692,6 +2732,112 @@ window.deleteRating = async function(ratingId, companyId) {
     openCompany(companyId);
   } catch (e) { console.error(e); showToast("تعذر الحذف — تحقق من القواعد", "error"); }
 };
+
+// ====== ⭐ إدارة التقييمات من لوحة الأدمن: عرض + إضافة + تعديل + حذف ======
+async function loadAdminRatings() {
+  const box = document.getElementById("ratingsContent");
+  if (!box) return;
+  box.innerHTML = '<div class="dash-empty"><div class="big">⏳</div></div>';
+  try { RATINGS = await fetchRatings(); } catch (e) { console.warn(e); }
+  try {
+    const users = await fetchAllUsers();
+    const provs = users.filter(u => (u.role === "provider" || u.role === "tech") && (u.status || "approved") === "approved");
+    document.getElementById("arProvider").innerHTML = provs.length
+      ? provs.map(u => `<option value="${u.uid}" data-name="${(u.displayName || "").replace(/"/g, "")}">${u.role === "tech" ? "🔧" : "🏢"} ${u.displayName || u.email}</option>`).join("")
+      : '<option value="">— لا يوجد مقدمو خدمة —</option>';
+  } catch (e) { console.warn(e); }
+  const list = RATINGS.slice().sort((a, b) => tsq(b) - tsq(a));
+  box.innerHTML = list.length ? list.map(r => `<div class="q-card" style="cursor:default">
+    <div class="q-card-head"><b>${r.providerName || "—"}</b><span style="color:var(--gold);font-size:.85rem">${"⭐".repeat(Math.min(5, +r.stars || 0))}</span></div>
+    <div style="font-size:.78rem;color:var(--muted);margin-top:2px">👤 ${r.clientName || "—"}${tsq(r) ? " &nbsp;•&nbsp; 📅 " + new Date(tsq(r)).toLocaleDateString("ar") : ""}</div>
+    ${r.comment ? `<div style="font-size:.84rem;margin-top:4px">💬 ${r.comment}</div>` : ""}
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="action-btn action-approve" style="flex:1;justify-content:center" onclick="adminEditRating('${r.id}')">✏️ تعديل</button>
+      <button class="action-btn action-delete" style="flex:1;justify-content:center" onclick="adminDeleteRating('${r.id}')">🗑️ حذف</button>
+    </div>
+  </div>`).join("") : '<div class="dash-empty"><div class="big">⭐</div>لا توجد تقييمات بعد</div>';
+}
+
+window.adminDeleteRating = function(id) {
+  openConfirmModal("🗑️", "حذف هذا التقييم؟", "يُحذف نهائيًا ولا يمكن التراجع", "نعم، احذف", async () => {
+    try {
+      if (db && deleteDocFn) await deleteDocFn(docFn(db, "ratings", id));
+      else {
+        const rs = JSON.parse(localStorage.getItem("darak_ratings") || "[]").filter(x => x.id !== id);
+        localStorage.setItem("darak_ratings", JSON.stringify(rs));
+      }
+      RATINGS = RATINGS.filter(x => x.id !== id);
+      showToast("تم حذف التقييم ✅");
+      loadAdminRatings();
+      loadLiveCompanies();
+    } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
+  });
+};
+
+let _editRatingId = null;
+window.adminEditRating = function(id) {
+  const r = RATINGS.find(x => x.id === id);
+  if (!r) return;
+  _editRatingId = id;
+  document.getElementById("reFor").textContent = (r.providerName || "—");
+  document.getElementById("reStars").value = String(Math.min(5, Math.max(1, +r.stars || 5)));
+  document.getElementById("reClient").value = r.clientName || "";
+  document.getElementById("reComment").value = r.comment || "";
+  document.getElementById("rateEditModal").classList.add("open");
+};
+document.getElementById("rateEditClose").addEventListener("click", () => document.getElementById("rateEditModal").classList.remove("open"));
+document.getElementById("rateEditModal").addEventListener("click", e => { if (e.target.id === "rateEditModal") e.target.classList.remove("open"); });
+document.getElementById("reSave").addEventListener("click", async () => {
+  if (!_editRatingId) return;
+  const data = {
+    stars: +document.getElementById("reStars").value,
+    clientName: document.getElementById("reClient").value.trim(),
+    comment: document.getElementById("reComment").value.trim()
+  };
+  try {
+    if (db && updateDocFn) await updateDocFn(docFn(db, "ratings", _editRatingId), data);
+    else {
+      const rs = JSON.parse(localStorage.getItem("darak_ratings") || "[]");
+      const r = rs.find(x => x.id === _editRatingId);
+      if (r) { Object.assign(r, data); localStorage.setItem("darak_ratings", JSON.stringify(rs)); }
+    }
+    Object.assign(RATINGS.find(x => x.id === _editRatingId) || {}, data);
+    document.getElementById("rateEditModal").classList.remove("open");
+    showToast("تم حفظ التعديلات ✅");
+    loadAdminRatings();
+    loadLiveCompanies();
+  } catch (e) { console.error(e); showToast("تعذر الحفظ", "error"); }
+});
+
+document.getElementById("arAdd").addEventListener("click", async () => {
+  const sel = document.getElementById("arProvider");
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) { showToast("اختر الشركة أو الفني أولاً", "error"); return; }
+  const rec = {
+    quoteId: "",
+    providerUid: opt.value,
+    providerName: opt.dataset.name || opt.textContent.replace(/^[🏢🔧]\s*/, ""),
+    clientUid: "admin",
+    clientName: document.getElementById("arClient").value.trim() || "عميل دارك",
+    stars: +document.getElementById("arStars").value,
+    comment: document.getElementById("arComment").value.trim()
+  };
+  try {
+    if (db && addDocFn) await addDocFn(collectionFn(db, "ratings"), { ...rec, createdAt: serverTimestampFn() });
+    else {
+      const rs = JSON.parse(localStorage.getItem("darak_ratings") || "[]");
+      rec.id = "r_" + Date.now();
+      rs.push({ ...rec, createdAt: new Date().toISOString() });
+      localStorage.setItem("darak_ratings", JSON.stringify(rs));
+    }
+    RATINGS.push(rec);
+    document.getElementById("arClient").value = "";
+    document.getElementById("arComment").value = "";
+    showToast("تمت إضافة التقييم ⭐");
+    loadAdminRatings();
+    loadLiveCompanies();
+  } catch (e) { console.error(e); showToast("تعذرت الإضافة", "error"); }
+});
 
 // ---- نظام الإشعارات (شركة ← طلبات وردود | عميل ← عروض جديدة) ----
 let _lastQuotes = [];
