@@ -874,7 +874,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 32)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 33)</small>
     </div>
   </div>
 </footer>
@@ -2841,6 +2841,7 @@ document.getElementById("arAdd").addEventListener("click", async () => {
 
 // ---- نظام الإشعارات (شركة ← طلبات وردود | عميل ← عروض جديدة) ----
 let _lastQuotes = [];
+let _prevSentIds = null; // أول تحميل يعتبر خط الأساس — ما ننبّه على العروض القديمة
 function _notifRead() {
   try { return JSON.parse(localStorage.getItem("darak_notif_read_" + (currentUser?.uid || "")) || "[]"); } catch (e) { return []; }
 }
@@ -3500,6 +3501,15 @@ async function loadQuotesSection() {
   quotes.sort((a, b) => tsq(b) - tsq(a));
   _lastQuotes = quotes;
   updateNotifBadge();
+  // 🔔 تنبيه فوري للعميل وهو داخل التطبيق: أول ما يوصله عرض جديد يظهر له توست
+  if (isClient) {
+    const sentNow = quotes.filter(q => q.status === "sent");
+    if (_prevSentIds !== null) {
+      const fresh = sentNow.filter(q => !_prevSentIds.includes(q.id));
+      fresh.slice(0, 2).forEach(q => showToast("💰 وصلك عرض سعر جديد من " + (q.providerName || "—") + " — شوفه في عروض الأسعار 👇"));
+    }
+    _prevSentIds = sentNow.map(q => q.id);
+  }
   // ⏳ عداد الأيام المتبقية قبل انتهاء العرض المرسل (للعميل ومقدم الخدمة)
   const expiryLine = q => {
     if (q.status !== "sent") return "";
