@@ -217,6 +217,9 @@ footer ul a:hover{color:var(--gold-2)}
 .more-bar:active{background:#f3ead6}
 .contact-circle{width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;text-decoration:none;box-shadow:0 2px 6px rgba(22,40,58,.14);transition:.15s}
 .contact-circle:active{transform:scale(.92)}
+@keyframes donePulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}70%{box-shadow:0 0 0 10px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+.pulse-done{background:#16a34a !important;color:#fff !important;font-weight:800 !important;font-size:.88rem !important;padding:10px 12px !important;animation:donePulse 1.6s infinite}
+@keyframes dotWait{0%{box-shadow:0 0 0 0 rgba(185,141,78,.55)}70%{box-shadow:0 0 0 6px rgba(185,141,78,0)}100%{box-shadow:0 0 0 0 rgba(185,141,78,0)}}
 .cat-picks{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .cat-picks label{display:inline-flex;align-items:center;gap:6px;background:#faf6ee;border:1.5px solid #e6ddc9;border-radius:100px;padding:7px 13px;font-size:.82rem;cursor:pointer;font-weight:500;color:var(--navy);transition:.15s}
 .cat-picks label:has(input:checked){border-color:var(--gold);background:#f7edd9;font-weight:700}
@@ -852,7 +855,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 29)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 30)</small>
     </div>
   </div>
 </footer>
@@ -2069,17 +2072,23 @@ function clientStatusCell(r) {
   const done = r.status === "completed", acc = !!r._accName, hasQ = (r._qCount || 0) > 0;
   const stage = done ? 4 : acc ? 3 : hasQ ? 2 : 1;
   // شريط النقاط: موصلات مرنة تتمدد بعرض البطاقة، والمرحلة الحالية مضيئة
-  const bar = `<div style="display:flex;align-items:center;direction:ltr;width:100%;max-width:170px;margin:2px auto 0">${[1, 2, 3, 4].map(i =>
-    `<span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:${stage >= i ? "#16a34a" : "#ddd6c8"};${stage === i ? "box-shadow:0 0 0 3px rgba(22,163,74,.18)" : ""}"></span>${i < 4 ? `<span style="flex:1;height:2px;background:${stage > i ? "#16a34a" : "#e8e2d5"}"></span>` : ""}`).join("")}</div>`;
+  const bar = `<div style="display:flex;align-items:center;direction:ltr;width:100%;max-width:170px;margin:2px auto 0">${[1, 2, 3, 4].map(i => {
+    const waitLast = stage === 3 && i === 4; // النقطة الأخيرة تبرق بالذهبي: باقي ضغطة "اكتمل"
+    return `<span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:${stage >= i ? "#16a34a" : waitLast ? "#b98d4e" : "#ddd6c8"};${stage === i ? "box-shadow:0 0 0 3px rgba(22,163,74,.18)" : ""}${waitLast ? ";animation:dotWait 1.6s infinite" : ""}"></span>${i < 4 ? `<span style="flex:1;height:2px;background:${stage > i ? "#16a34a" : "#e8e2d5"}"></span>` : ""}`;
+  }).join("")}</div>`;
   const box = inner => `<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:6px;background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:12px;padding:8px 10px">${inner}${bar}</div>`;
   const bd = (cls, txt) => `<span class="status-badge ${cls}" style="white-space:normal;text-align:center;line-height:1.5">${txt}</span>`;
   if (done) return box(bd("status-approved", "🎉 اكتمل الطلب"));
   if (acc) return box(bd("status-approved", "✅ اخترت: " + r._accName) +
-    `<button class="action-btn action-approve" style="width:100%;justify-content:center;margin:0" onclick="markReqDone('${r.id}',${r._tech ? "true" : "false"})">✔️ العمل اكتمل</button>`);
+    `<button class="action-btn pulse-done" style="width:100%;justify-content:center;margin:0" onclick="confirmReqDone('${r.id}',${r._tech ? "true" : "false"})">🎉 العمل اكتمل — اضغط هنا</button>`);
   if (hasQ) return box(bd("status-pending", `💰 وصلتك ${r._qCount} ${r._qCount > 2 ? "عروض" : r._qCount === 2 ? "عرضين" : "عرض"}`) +
     `<small style="color:var(--muted);font-size:.72rem;text-align:center">قارن واختر من قسم العروض 👇</small>`);
   return box(bd("status-new", "⏳ بانتظار العروض"));
 }
+// ✔️ تأكيد أنيق قبل الإتمام — يمنع الضغط بالخطأ
+window.confirmReqDone = function(reqId, isTech) {
+  openConfirmModal("🎉", "اكتمل العمل؟", "أكّد فقط إذا انتهى العمل فعلًا", "نعم، اكتمل 🎉", () => markReqDone(reqId, isTech));
+};
 // ✔️ العميل يعلّم الطلب كمكتمل بعد انتهاء العمل
 window.markReqDone = async function(reqId, isTech) {
   try {
