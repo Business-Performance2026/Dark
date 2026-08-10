@@ -158,7 +158,7 @@ section{padding:90px 0}
 .form-note{margin-top:14px;text-align:center;font-size:.82rem;color:var(--muted)}
 
 /* ===== Toast ===== */
-.toast{position:fixed;bottom:26px;inset-inline-start:50%;transform:translateX(50%) translateY(120px);background:var(--navy);color:#fff;padding:16px 30px;border-radius:14px;box-shadow:var(--shadow-lg);font-weight:700;z-index:200;transition:.4s;display:flex;align-items:center;gap:10px}
+.toast{position:fixed;bottom:26px;inset-inline-start:50%;transform:translateX(50%) translateY(120px);background:var(--navy);color:#fff;padding:11px 20px;border-radius:100px;box-shadow:var(--shadow-lg);font-weight:500;font-size:.85rem;line-height:1.6;max-width:86vw;text-align:center;z-index:200;transition:.4s;display:flex;align-items:center;gap:8px}
 .toast.show{transform:translateX(50%) translateY(0)}
 .toast.success{border-inline-start:5px solid #4ade80}
 .toast.error{border-inline-start:5px solid #f87171}
@@ -843,7 +843,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 22)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 23)</small>
     </div>
   </div>
 </footer>
@@ -1038,6 +1038,19 @@ footer ul a:hover{color:var(--gold-2)}
       <textarea id="reasonText" rows="3" placeholder="مثال: المعلومات غير مكتملة، يرجى تحديث البيانات…"></textarea>
     </div>
     <button class="submit-btn" id="reasonConfirm" type="button">تأكيد ✅</button>
+  </div>
+</div>
+
+<!-- ================= نافذة تأكيد عامة ================= -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="text-align:center;padding:30px 26px">
+    <div id="confirmIcon" style="font-size:2.4rem">🗑️</div>
+    <h3 id="confirmTitle" style="margin:10px 0 6px;color:var(--navy)"></h3>
+    <p id="confirmSub" style="color:var(--muted);font-size:.88rem;line-height:1.7"></p>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="submit-btn" id="confirmOk" type="button" style="background:#b91c1c;flex:1">تأكيد</button>
+      <button class="submit-btn" id="confirmCancel" type="button" style="background:#8a8a8a;flex:1">إلغاء</button>
+    </div>
   </div>
 </div>
 
@@ -1246,7 +1259,7 @@ const I18N = {
     sub_admin: "جميع طلبات المنصة من كل التخصصات", sub_provider: "طلبات العملاء الواردة في تخصصك", sub_client: "تابع طلباتك المرسلة وتفاصيلها من هنا",
     total_admin: "كل الطلبات", total_provider: "طلب عميل", total_client: "طلباتي",
     th_client: "العميل", th_phone: "الجوال", th_city: "المدينة", th_cat: "التخصص", th_budget: "الميزانية", th_details: "التفاصيل", th_status: "الحالة", badge_new: "جديد",
-    role_client: "عميل", role_provider: "شركة",
+    role_client: "عميل", role_provider: "شركة", role_tech: "فني",
     account_guest: "أهلًا بك في دارك", account_guest_sub: "سجّل دخولك أو أنشئ حسابًا لإدارة طلباتك",
     register_btn: "إنشاء حساب", login_go: "دخول", register_go: "إنشاء الحساب ✅",
     modal_welcome: "مرحبًا بك في دارك 🏠", modal_sub: "سجّل دخولك أو أنشئ حسابًا جديدًا",
@@ -1321,7 +1334,7 @@ const I18N = {
     sub_admin: "All platform requests across every trade", sub_provider: "Incoming client requests in your trade", sub_client: "Track your submitted requests here",
     total_admin: "All requests", total_provider: "Client requests", total_client: "My requests",
     th_client: "Client", th_phone: "Phone", th_city: "City", th_cat: "Trade", th_budget: "Budget", th_details: "Details", th_status: "Status", badge_new: "New",
-    role_client: "Client", role_provider: "Company",
+    role_client: "Client", role_provider: "Company", role_tech: "Technician",
     account_guest: "Welcome to Darak", account_guest_sub: "Sign in or create an account to manage your requests",
     register_btn: "Create account", login_go: "Sign in", register_go: "Create account ✅",
     modal_welcome: "Welcome to Darak 🏠", modal_sub: "Sign in or create a new account",
@@ -2210,6 +2223,21 @@ function openReasonModal(title, cb) {
   document.getElementById("reasonModal").classList.add("open");
 }
 function closeReasonModal() { document.getElementById("reasonModal").classList.remove("open"); reasonCallback = null; }
+
+// --- نافذة تأكيد أنيقة (بدل confirm المتصفح) ---
+let confirmCb = null;
+window.openConfirmModal = function(icon, title, sub, okText, cb) {
+  document.getElementById("confirmIcon").textContent = icon;
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmSub").textContent = sub;
+  document.getElementById("confirmOk").textContent = okText;
+  confirmCb = cb;
+  document.getElementById("confirmModal").classList.add("open");
+};
+function closeConfirmModal() { document.getElementById("confirmModal").classList.remove("open"); confirmCb = null; }
+document.getElementById("confirmCancel").addEventListener("click", closeConfirmModal);
+document.getElementById("confirmModal").addEventListener("click", e => { if (e.target.id === "confirmModal") closeConfirmModal(); });
+document.getElementById("confirmOk").addEventListener("click", () => { const cb = confirmCb; closeConfirmModal(); if (cb) cb(); });
 document.getElementById("reasonClose").addEventListener("click", closeReasonModal);
 document.getElementById("reasonModal").addEventListener("click", e => { if (e.target.id === "reasonModal") closeReasonModal(); });
 document.getElementById("reasonConfirm").addEventListener("click", () => {
@@ -2417,16 +2445,24 @@ window.addEventListener("resize", () => {
 });
 
 // --- صفحة حسابي ---
+window.closeAccountView = function() {
+  const av = document.getElementById("accountView");
+  if (av) { av.classList.remove("open"); av.style.display = "none"; }
+  showView("home");
+};
+
 function renderAccountView() {
   const box = document.getElementById("accountContent");
   if (currentUser) {
-    const roleName = (currentUser.role === "provider" ? "🛠️ " : "🏠 ") + t(currentUser.role === "provider" ? "role_provider" : "role_client");
+    const roleName = currentUser.role === "provider" ? "🛠️ " + t("role_provider")
+      : currentUser.role === "tech" ? "🔧 " + t("role_tech")
+      : "🏠 " + t("role_client");
     box.innerHTML = `
       <h3 style="color:var(--navy)">${currentUser.displayName || ""}</h3>
       <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
       <p style="margin:8px 0 4px;font-weight:700">${roleName}${currentUser.category ? " • " + currentUser.category : ""}</p>
       <div class="acc-menu">
-        <button class="acc-item" onclick="document.getElementById('notifBtn').click()">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
+        <button class="acc-item" onclick="closeAccountView();setTimeout(() => document.getElementById('notifBtn').click(), 120)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
@@ -3434,7 +3470,9 @@ window.toggleCompanyProfile = function() {
 
 window.deleteMyAccount = async function() {
   if (!currentUser) return;
-  if (!confirm(t("acc_delete_confirm"))) return;
+  openConfirmModal("🗑️", t("acc_delete"), t("acc_delete_confirm"), "نعم، احذف نهائيًا", doDeleteMyAccount);
+};
+async function doDeleteMyAccount() {
   try {
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
