@@ -543,6 +543,7 @@ footer ul a:hover{color:var(--gold-2)}
 #companyProfileWrap .submit-btn,#employeesWrap .submit-btn{padding:9px 14px;font-size:.8rem}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -874,7 +875,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 33)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 34)</small>
     </div>
   </div>
 </footer>
@@ -1081,6 +1082,33 @@ footer ul a:hover{color:var(--gold-2)}
       <button class="submit-btn" id="confirmOk" type="button" style="background:#b91c1c;flex:1">تأكيد</button>
       <button class="submit-btn" id="confirmCancel" type="button" style="background:#8a8a8a;flex:1">إلغاء</button>
     </div>
+  </div>
+</div>
+
+
+<!-- ================= نافذة الرابط الخاص + QR ================= -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="text-align:center;padding:26px 22px">
+    <button class="modal-close" id="shareClose" aria-label="إغلاق">✕</button>
+    <div style="font-size:2.2rem">🔗</div>
+    <h3 style="margin:8px 0 4px;color:var(--navy)">رابطك الخاص وباركود QR</h3>
+    <p style="color:var(--muted);font-size:.84rem;line-height:1.7">شاركه مع عملائك — اللي يفتحه يوصل لصفحتك في دارك ويطلب منك مباشرة 🎯</p>
+    <div style="display:flex;gap:8px;margin-top:14px;direction:ltr">
+      <input type="text" id="shareLinkText" readonly style="flex:1;padding:10px;border:1.5px solid #e5dfd2;border-radius:10px;font-size:.78rem;background:#faf8f3;text-align:left;color:var(--navy)">
+      <button class="submit-btn" id="shareCopy" type="button" style="width:auto;padding:10px 16px;font-size:.8rem;margin:0">نسخ 📋</button>
+    </div>
+    <div style="margin-top:16px;display:grid;place-items:center">
+      <img id="shareQrImg" alt="QR" style="width:210px;height:210px;border-radius:14px;border:1.5px solid #f0ece4;background:#fff">
+    </div>
+    <a id="shareQrDown" class="submit-btn" style="background:var(--navy);margin-top:14px;display:block;text-decoration:none" download="darak-qr.png">تحميل الباركود ⬇️</a>
+  </div>
+</div>
+
+<!-- ================= نافذة استقبال رابط مشاركة (فني/شركة) ================= -->
+<div class="modal-overlay" id="shareLandingModal">
+  <div class="modal" style="text-align:center;padding:26px 22px">
+    <button class="modal-close" id="shareLandingClose" aria-label="إغلاق">✕</button>
+    <div id="shareLandingBody"></div>
   </div>
 </div>
 
@@ -1492,8 +1520,10 @@ document.getElementById("techModalForm").addEventListener("submit", async e => {
     ownerUid: currentUser?.uid || null,
     ownerEmail: currentUser?.email || ""
   };
+  if (pendingTargetUid) { data.targetUid = pendingTargetUid; data.targetName = pendingTargetName; }
   try {
     const mode = await saveToDB("tech_requests", data);
+    pendingTargetUid = null; pendingTargetName = ""; pendingTargetRole = "";
     showToast(t("tech_sent") + (mode === "local" ? " (وضع تجريبي)" : ""));
     e.target.reset();
     closeTechModal();
@@ -1634,8 +1664,10 @@ document.getElementById("requestModalForm").addEventListener("submit", async e =
     ownerUid: currentUser?.uid || null,
     ownerEmail: currentUser?.email || ""
   };
+  if (pendingTargetUid && pendingTargetRole !== "tech") { data.targetUid = pendingTargetUid; data.targetName = pendingTargetName; }
   try {
-    const mode = await saveToDB("service_requests", data);
+    const mode = await saveToDB(pendingTargetUid && pendingTargetRole === "tech" ? "tech_requests" : "service_requests", data);
+    pendingTargetUid = null; pendingTargetName = ""; pendingTargetRole = "";
     showToast("تم استلام طلبك! بيشوفه مقدمو الخدمة في التخصص المطلوب" + (mode === "local" ? " (وضع تجريبي)" : ""));
     e.target.reset();
     closeRequestModal();
@@ -1981,9 +2013,19 @@ async function openDashboard() {
     } else if (isTech) {
       const cats = userCatsArr(currentUser);
       rows = (await fetchCol("tech_requests", c => cats.length > 1 ? queryFn(c, whereFn("category", "in", cats)) : cats.length ? queryFn(c, whereFn("category", "==", cats[0])) : queryFn(c))).map(x => ({ ...x, _tech: true }));
+      try {
+        const tg = await fetchCol("tech_requests", c => queryFn(c, whereFn("targetUid", "==", currentUser.uid)));
+        const seen = new Set(rows.map(r => r.id));
+        rows = rows.concat(tg.filter(r => !seen.has(r.id)).map(r => ({ ...r, _tech: true, _targeted: true })));
+      } catch (e) { console.warn("تعذر تحميل الطلبات الموجهة", e); }
     } else if (isProvider) {
       const cats = userCatsArr(currentUser);
       rows = await fetchCol("service_requests", c => cats.length > 1 ? queryFn(c, whereFn("category", "in", cats)) : cats.length ? queryFn(c, whereFn("category", "==", cats[0])) : queryFn(c));
+      try {
+        const tg = await fetchCol("service_requests", c => queryFn(c, whereFn("targetUid", "==", currentUser.uid)));
+        const seen = new Set(rows.map(r => r.id));
+        rows = rows.concat(tg.filter(r => !seen.has(r.id)).map(r => ({ ...r, _targeted: true })));
+      } catch (e) { console.warn("تعذر تحميل الطلبات الموجهة", e); }
     } else {
       rows = [
         ...(await fetchCol("service_requests", c => queryFn(c, whereFn("ownerUid", "==", currentUser.uid)))),
@@ -1996,9 +2038,9 @@ async function openDashboard() {
     rows = admin
       ? [...all, ...allTech]
       : isTech
-      ? allTech.filter(r => { const cats = userCatsArr(currentUser); return !cats.length || cats.includes(r.category); })
+      ? allTech.filter(r => { const cats = userCatsArr(currentUser); return r.targetUid === currentUser.uid || !cats.length || cats.includes(r.category); })
       : isProvider
-      ? all.filter(r => { const cats = userCatsArr(currentUser); return !cats.length || cats.includes(r.category); })
+      ? all.filter(r => { const cats = userCatsArr(currentUser); return r.targetUid === currentUser.uid || !cats.length || cats.includes(r.category); })
       : [...all, ...allTech].filter(r => r.ownerUid === currentUser.uid);
   }
   rows = rows.map((r, i) => ({ id: r.id || ("req_" + i), ...r }));
@@ -2566,6 +2608,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="closeAccountView();setTimeout(() => document.getElementById('notifBtn').click(), 120)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
+        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
@@ -3769,6 +3812,93 @@ if (auth && onAuthStateFn) {
 }
 });
 // تشغيل الميزات الجديدة بعد تعريف كل شيء — فورًا ثم إعادة التحميل عند اتصال Firebase
+
+// ============================================================
+// 🔗 الرابط الخاص + باركود QR — للشركات والفنيين
+// ============================================================
+let pendingTargetUid = null, pendingTargetName = "", pendingTargetRole = "";
+
+window.myShareLink = function() {
+  const base = location.origin + location.pathname.replace(/[^\/]*$/, "");
+  return base + "?p=" + (currentUser?.uid || "");
+};
+
+window.openShareModal = function() {
+  if (!currentUser) return;
+  const link = myShareLink();
+  document.getElementById("shareLinkText").value = link;
+  const img = document.getElementById("shareQrImg");
+  const dl = document.getElementById("shareQrDown");
+  try {
+    if (!window.qrcode) throw new Error("qr-lib");
+    const q = window.qrcode(0, "M");
+    q.addData(link); q.make();
+    const url = q.createDataURL(6, 8);
+    img.src = url; dl.href = url; img.style.display = ""; dl.style.display = "";
+  } catch (e) { img.style.display = "none"; dl.style.display = "none"; }
+  document.getElementById("shareModal").classList.add("open");
+};
+document.getElementById("shareClose").addEventListener("click", () => document.getElementById("shareModal").classList.remove("open"));
+document.getElementById("shareModal").addEventListener("click", e => { if (e.target.id === "shareModal") e.target.classList.remove("open"); });
+document.getElementById("shareCopy").addEventListener("click", async () => {
+  const inp = document.getElementById("shareLinkText");
+  try { await navigator.clipboard.writeText(inp.value); }
+  catch (e) { inp.select(); document.execCommand("copy"); }
+  showToast("تم نسخ الرابط 📋 أرسله لعملائك");
+});
+
+window.closeShareLanding = function() { document.getElementById("shareLandingModal").classList.remove("open"); };
+document.getElementById("shareLandingClose").addEventListener("click", closeShareLanding);
+document.getElementById("shareLandingModal").addEventListener("click", e => { if (e.target.id === "shareLandingModal") closeShareLanding(); });
+
+window.requestFromTarget = function(cat, role) {
+  closeShareLanding();
+  if (currentUser?.role === "client") {
+    if (role === "tech") openTechModal(cat || "");
+    else { pendingCategory = cat || null; openRequestModal(); }
+  } else if (currentUser) { openDashboard(); }
+  else { setAuthTab("register"); setRole("client"); openAuth(); showToast("سجّل حساب مجاني وبيتحول طلبك مباشرة لصاحب الرابط ⏱️"); }
+};
+
+async function handleShareParam() {
+  let uid;
+  try { uid = new URLSearchParams(location.search).get("p"); } catch (e) { return; }
+  if (!uid) return;
+  let u = null;
+  if (db && getDocsFn) {
+    try {
+      const s = await withTimeout(getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid))), 9000);
+      if (s.docs.length) u = s.docs[0].data();
+    } catch (e) { console.warn(e); }
+  }
+  if (!u) u = (JSON.parse(localStorage.getItem("darak_users") || "[]")).find(x => x.uid === uid);
+  if (!u || (u.role !== "provider" && u.role !== "tech") || (u.status || "approved") !== "approved") {
+    if (db) showToast("⚠️ الرابط غير صالح أو الحساب غير مفعّل", "error");
+    return;
+  }
+  // انتظر تحميل قائمة الشركات عشان تفتح صفحة الشركة الكاملة لو كانت شركة
+  if (u.role === "provider" && !allCompanies().length) { try { await loadLiveCompanies(); } catch (e) {} }
+  pendingTargetUid = uid;
+  pendingTargetName = u.displayName || "";
+  pendingTargetRole = u.role;
+  const p = allCompanies().find(x => x.uid === uid);
+  if (p) {
+    openCompany(p.id);
+    showToast("👋 وصلت من رابط " + p.name + " — اضغط «اطلب عرض سعر» وطلبك بيوصلهم مباشرة");
+  } else {
+    const cats = userCatsArr(u).join("، ") || u.category || "";
+    const firstCat = (userCatsArr(u)[0] || u.category || "").replace(/'/g, "");
+    document.getElementById("shareLandingBody").innerHTML = `
+      <div style="font-size:2.4rem">${u.role === "tech" ? "🔧" : "🏢"}</div>
+      <h3 style="color:var(--navy);margin:8px 0 2px">${u.displayName || "—"}</h3>
+      <div style="color:var(--gold);font-weight:700;font-size:.85rem">${cats}</div>
+      ${u.location ? `<div style="color:#7a6a4d;font-size:.8rem;margin-top:4px">📍 ${u.location}</div>` : ""}
+      <p style="color:var(--muted);font-size:.82rem;line-height:1.7;margin-top:10px">وصلت من رابطهم الخاص — طلبك بيوصل لهم مباشرة 🎯</p>
+      <button class="submit-btn" style="margin-top:14px" onclick="requestFromTarget('${firstCat}', '${u.role}')">📨 اطلب منهم خدمة</button>`;
+    document.getElementById("shareLandingModal").classList.add("open");
+  }
+}
+
 startAutoRows();
 renderAds();
 restartAdTimer();
@@ -3780,7 +3910,8 @@ function bootData() {
 }
 bootData();
 fillCatSelects();
-firebaseReady.then(() => { bootData(); });
+handleShareParam();
+firebaseReady.then(() => { bootData(); handleShareParam(); });
 </script>
 <script>
 if ("serviceWorker" in navigator) {
