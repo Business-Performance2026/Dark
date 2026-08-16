@@ -881,7 +881,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 39)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 40)</small>
     </div>
   </div>
 </footer>
@@ -1919,7 +1919,11 @@ authForm.addEventListener("submit", async e => {
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", cred.user.uid)));
         currentUser = snap.docs.length
           ? snap.docs[0].data()
-          : { uid: cred.user.uid, email: fd.email, displayName: cred.user.displayName || fd.email, role: "client", category: "" };
+          : { uid: cred.user.uid, email: fd.email, displayName: cred.user.displayName || fd.email, role: "client", category: "", status: "approved", statusReason: "" };
+        if (!snap.docs.length) {
+          // إصلاح ذاتي: وثيقة المستخدم مفقودة — نعيد إنشاءها (يسترجع حساب الإدارة أيضًا)
+          try { await addDocFn(collectionFn(db, "users"), { ...currentUser, restoredAt: serverTimestampFn() }); } catch (e) {}
+        }
         localStorage.setItem("darak_session", JSON.stringify(currentUser));
       }
     } else {
@@ -2490,6 +2494,13 @@ window.adminApprove = uid => updateUserStatus(uid, "approved", "").catch(e => sh
 window.adminReject = uid => openReasonModal("⛔ رفض مقدم الخدمة", reason => updateUserStatus(uid, "rejected", reason).catch(e => showToast("تعذر التحديث", "error")));
 window.adminSuspend = uid => openReasonModal("🚫 إيقاف الحساب", reason => updateUserStatus(uid, "suspended", reason).catch(e => showToast("تعذر التحديث", "error")));
 window.adminDelete = async uid => {
+  try {
+    const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
+    if (usnap.docs.length && ADMIN_EMAILS.includes(usnap.docs[0].data().email)) {
+      showToast("⛔ لا يمكن حذف حساب الإدارة", "error");
+      return;
+    }
+  } catch (e) {}
   if (!confirm("متأكد من حذف هذا المستخدم؟ لن يقدر يدخل أو يظهر في التطبيق")) return;
   try {
     // حذف منطقي — قواعد Firestore تمنع الحذف النهائي من التطبيق
@@ -3604,13 +3615,16 @@ window.addEventListener("error", e => { try { showToast("🩺 خطأ: " + (e.mes
 window.addEventListener("unhandledrejection", e => {
   try {
     const msg = (e.reason && (e.reason.code || e.reason.message)) || String(e.reason || "");
-    if (/permission/i.test(msg) && typeof auth !== "undefined" && auth && !auth.currentUser && currentUser) {
-      localStorage.removeItem("darak_session");
-      currentUser = null;
-      renderAuthArea(); renderAccountView(); updateNotifBadge();
-      document.getElementById("dashboard").classList.remove("open");
-      showToast("🔐 انتهت جلسة الدخول — سجّل دخولك مرة ثانية عشان تكمل", "error");
-      return;
+    if (/permission/i.test(msg)) {
+      e.preventDefault();
+      if (typeof auth !== "undefined" && auth && !auth.currentUser && currentUser) {
+        localStorage.removeItem("darak_session");
+        currentUser = null;
+        renderAuthArea(); renderAccountView(); updateNotifBadge();
+        document.getElementById("dashboard").classList.remove("open");
+        showToast("🔐 انتهت جلسة الدخول — سجّل دخولك مرة ثانية عشان تكمل", "error");
+      }
+      return; // زائر أو بلا جلسة: لا نزعجه برسائل صلاحيات
     }
     showToast("🩺 خطأ: " + ((e.reason && e.reason.message) || e.reason || "غير معروف"), "error");
   } catch (_) {}
@@ -4116,6 +4130,10 @@ window.deleteMyAccount = async function() {
 };
 async function doDeleteMyAccount() {
   try {
+    if (ADMIN_EMAILS.includes(currentUser.email)) {
+      showToast("⛔ لا يمكن حذف حساب الإدارة", "error");
+      return;
+    }
     const uid0 = currentUser.uid;
     // 1) احذف وثيقة البيانات أولًا (الصلاحية متاحة ونحن مسجلون)
     if (db && getDocsFn) {
@@ -4167,7 +4185,20 @@ if (auth && onAuthStateFn) {
     if (user && !currentUser) {
       try {
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", user.uid)));
-        if (!snap.docs.length) { try { await signOutFn(auth); } catch (e) {} return; }
+        if (!snap.docs.length) {
+          // إصلاح ذاتي: لو الحساب إداري ووثيقته اختفت، نعيد إنشاءها بدل طرده
+          if (ADMIN_EMAILS.includes(user.email)) {
+            const prof2 = { uid: user.uid, email: user.email, displayName: user.displayName || "الإدارة", role: "client", category: "", phone: "", status: "approved", statusReason: "" };
+            try { await addDocFn(collectionFn(db, "users"), { ...prof2, restoredAt: serverTimestampFn() }); } catch (e) {}
+            currentUser = prof2;
+            localStorage.setItem("darak_session", JSON.stringify(prof2));
+            renderAuthArea(); setupPush();
+            showToast("🛠️ تم استرجاع حساب الإدارة تلقائيًا");
+            return;
+          }
+          try { await signOutFn(auth); } catch (e) {}
+          return;
+        }
         const prof = snap.docs[0].data();
         const st = prof.status || "approved";
         if (st === "deleted") { try { await signOutFn(auth); } catch (e) {} localStorage.removeItem("darak_session"); return; }
