@@ -409,7 +409,10 @@ footer ul a:hover{color:var(--gold-2)}
 .co-block{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;border:1.5px solid #f0ece4}
 .co-block h3{color:var(--navy);font-size:1.02rem;margin-bottom:10px}
 .co-block p{color:var(--muted);font-size:.9rem;line-height:1.8}
-.svc-chip{display:inline-block;background:#faf6ee;border:1px solid #eadfc8;color:var(--gold);font-weight:700;font-size:.78rem;padding:6px 14px;border-radius:30px;margin:0 0 8px 8px}
+.svc-chip{display:inline-block;background:#faf6ee;border:1px solid #eadfc8;color:var(--gold);font-weight:700;font-size:.78rem;padding:6px 14px;border-radius:30px;margin:0 0 8px 8px;cursor:pointer;transition:.2s}
+.svc-chip:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+.svc-sug{display:inline-block;background:#fff;border:1.5px dashed var(--gold-soft);color:var(--navy);font-weight:600;font-size:.74rem;padding:5px 12px;border-radius:30px;margin:0 0 6px 6px;cursor:pointer;transition:.2s}
+.svc-sug:hover{border-color:var(--gold);color:var(--gold)}
 .perm-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;background:#eef3f8;color:var(--navy)}
 
 
@@ -637,6 +640,7 @@ footer ul a:hover{color:var(--gold-2)}
   <div class="container">
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_tech">اطلب فني 🔧</h2>
+      <button class="btn btn-outline btn-sm" onclick="openTechDir()">👷 تصفح الفنيين</button>
     </div>
     <div class="h-scroll cards-row" id="techCatRow"></div>
   </div>
@@ -678,7 +682,7 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_name_en">اسم الشركة (إنجليزي)</label><input type="text" id="cpNameEn" dir="ltr"></div>
         <div class="form-group"><label>تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
-        <div class="form-group"><label data-i18n="cp_services">خدمات الشركة (افصل بينها بفاصلة ،)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"></div>
+        <div class="form-group"><label data-i18n="cp_services">خدماتك (افصل بينها بفاصلة ، أو اختر من الاقتراحات)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"><div id="cpSvcSugs" style="margin-top:6px"></div></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
         <div class="form-group"><label data-i18n="cp_loc">موقع الشركة (المدينة / المنطقة)</label><input type="text" id="cpLoc" placeholder="مسقط — الخوض"></div>
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
@@ -876,7 +880,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 36)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 37)</small>
     </div>
   </div>
 </footer>
@@ -1114,6 +1118,19 @@ footer ul a:hover{color:var(--gold-2)}
 </div>
 
 <!-- ================= نافذة تعديل مستخدم ================= -->
+<!-- ================= نافذة تعديل ملفي (لكل المستخدمين) ================= -->
+<div class="modal-overlay" id="myEditModal">
+  <div class="modal">
+    <button class="modal-close" id="myEditClose" aria-label="إغلاق">✕</button>
+    <h3>✏️ تعديل ملفي</h3>
+    <p>عدّل بياناتك ثم احفظ</p>
+    <div class="form-group"><label>الاسم</label><input type="text" id="meName"></div>
+    <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="mePhone" dir="ltr" placeholder="9XXXXXXX"></div>
+    <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="meEmail" dir="ltr"></div>
+    <button class="submit-btn" id="meSave" type="button">حفظ 💾</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="userEditModal">
   <div class="modal">
     <button class="modal-close" id="userEditClose" aria-label="إغلاق">✕</button>
@@ -1179,7 +1196,7 @@ let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
 let docFn = null, getDocFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
-let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null;
+let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null, deleteUserFn = null, updateEmailFn = null;
 let messaging = null, getTokenFn = null, onMessageFn = null, arrayUnionFn = null;
 
 let firebaseReadyResolve;
@@ -1215,6 +1232,8 @@ if (FIREBASE_READY) {
     updateProfileFn = authMod.updateProfile;
     onAuthStateFn = authMod.onAuthStateChanged;
     sendResetFn = authMod.sendPasswordResetEmail;
+    deleteUserFn = authMod.deleteUser;
+    updateEmailFn = authMod.updateEmail;
     arrayUnionFn = firestore.arrayUnion;
     try {
       const msgMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
@@ -1482,6 +1501,53 @@ function renderCats() {
     <span>${LANG === "en" ? c.en : c.name}</span>
   </div>`).join("");
 }
+
+// 👷 دليل الفنيين — قائمة الفنيين الحاليين مع تقييمهم، مجمعين حسب المنطقة
+let liveTechs = [];
+async function loadLiveTechs() {
+  try {
+    if (db && getDocsFn) {
+      const snap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "tech"))), 9000);
+      liveTechs = snap.docs.map(d => d.data()).filter(u => (u.status || "approved") === "approved");
+    } else {
+      liveTechs = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.role === "tech" && (u.status || "approved") === "approved");
+    }
+  } catch (e) { console.warn("تعذر تحميل الفنيين", e); }
+}
+window.openTechDir = async function() {
+  if (!liveTechs.length) await loadLiveTechs();
+  if (!RATINGS.length) { try { RATINGS = await fetchRatings(); } catch (e) {} }
+  const groups = {};
+  liveTechs.forEach(u => { const loc = u.location || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
+  const card = u => {
+    const rt = ratingAvg(u.uid);
+    const cats = userCatsArr(u).join(" • ") || "فني";
+    const firstCat = (userCatsArr(u)[0] || "").replace(/'/g, "");
+    return `<div class="co-card" style="cursor:default">
+      <div class="co-logo">🔧</div>
+      <h3>${u.displayName || "فني"}</h3>
+      <div class="co-cat">${cats}</div>
+      <div class="co-rate">${rt ? `★ ${rt.avg} (${rt.count})` : "✨ فني جديد"}</div>
+      <button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="requestTechDirect('${u.uid}', '${(u.displayName || "").replace(/'/g, "")}', '${firstCat}')">📨 اطلب منه</button>
+    </div>`;
+  };
+  const html = Object.keys(groups).sort().map(loc => `
+    <h3 style="color:var(--navy);margin:18px 0 10px;grid-column:1/-1">📍 ${loc}</h3>
+    ${groups[loc].map(card).join("")}`).join("");
+  document.getElementById("catViewTitle").textContent = "👷 الفنيون المستقلون";
+  document.getElementById("catViewGrid").innerHTML = liveTechs.length ? html
+    : `<div class="dash-empty" style="grid-column:1/-1"><div class="big">🔧</div>لا يوجد فنيون مسجلون بعد — اطلب من نموذج التخصصات وسيصل طلبك للفنيين فور تسجيلهم</div>`;
+  showView("cat");
+  document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", false));
+};
+// طلب موجه لفني معين من الدليل
+window.requestTechDirect = function(uid, name, cat) {
+  if (!currentUser) { setAuthTab("register"); setRole("client"); openAuth(); showToast("سجّل حساب مجاني عشان تطلب الفني ⏱️"); return; }
+  if (currentUser.role !== "client") { showToast("الطلبات للعملاء — حسابك حاليًا " + (currentUser.role === "tech" ? "فني" : "شركة")); return; }
+  pendingTargetUid = uid; pendingTargetName = name; pendingTargetRole = "tech";
+  openTechModal(cat);
+  showToast("🎯 طلبك بيوصل مباشرة إلى " + name);
+};
 
 // 🔧 قسم اطلب فني — بطاقات تخصصات الصيانة
 function renderTechCats() {
@@ -1763,6 +1829,9 @@ document.querySelectorAll(".role-option").forEach(opt => {
 
 // منطقة الحساب في الهيدر
 function renderAuthArea() {
+  const jp = document.getElementById("btnJoinProvider"), jt = document.getElementById("btnJoinTech");
+  if (jp) jp.style.display = currentUser ? "none" : "";
+  if (jt) jt.style.display = currentUser ? "none" : "";
   const area = document.getElementById("authArea");
   if (!area) return;
   if (currentUser) {
@@ -1795,7 +1864,34 @@ authForm.addEventListener("submit", async e => {
           btn.disabled = false; btn.textContent = t("register_go");
           return;
         }
-        const cred = await createUserFn(auth, fd.email, fd.password);
+        let cred;
+        try {
+          cred = await createUserFn(auth, fd.email, fd.password);
+        } catch (err) {
+          // الإيميل مسجل من قبل (عميل مثلًا) — إذا كلمة المرور صحيحة نرقّي الحساب لفني/شركة
+          if (err && err.code === "auth/email-already-in-use" && (selectedRole === "provider" || selectedRole === "tech")) {
+            const sign = await signInFn(auth, fd.email, fd.password);
+            const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", sign.user.uid)));
+            const upData = {
+              role: selectedRole, category: regCats[0] || "", categories: regCats,
+              status: "pending", statusReason: "",
+              displayName: fd.displayName || (usnap.docs.length ? usnap.docs[0].data().displayName : "") || fd.email,
+              phone: fd.phone || (usnap.docs.length ? usnap.docs[0].data().phone : "") || ""
+            };
+            if (usnap.docs.length) await updateDocFn(docFn(db, "users", usnap.docs[0].id), upData);
+            else await addDocFn(collectionFn(db, "users"), { uid: sign.user.uid, email: fd.email, ...upData, createdAt: serverTimestampFn() });
+            currentUser = { uid: sign.user.uid, email: fd.email, ...upData };
+            localStorage.setItem("darak_session", JSON.stringify(currentUser));
+            closeAuth();
+            authForm.reset();
+            renderAuthArea();
+            renderAccountView();
+            updateNotifBadge();
+            showToast("🎉 تم تحويل حسابك إلى " + (selectedRole === "tech" ? "فني" : "شركة") + " — بانتظار موافقة الإدارة");
+            return;
+          }
+          throw err;
+        }
         if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
         currentUser = {
           uid: cred.user.uid,
@@ -1822,7 +1918,27 @@ authForm.addEventListener("submit", async e => {
       // ===== وضع تجريبي: حسابات محلية في المتصفح =====
       const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
       if (authMode === "register") {
-        if (users.find(u => u.email === fd.email)) throw new Error("exists");
+        const ex = users.find(u => u.email === fd.email);
+        if (ex) {
+          if ((selectedRole === "provider" || selectedRole === "tech") && ex.password === fd.password) {
+            ex.role = selectedRole; ex.category = regCats[0] || ""; ex.categories = regCats;
+            ex.status = "pending"; ex.statusReason = "";
+            if (fd.displayName) ex.displayName = fd.displayName;
+            if (fd.phone) ex.phone = fd.phone;
+            localStorage.setItem("darak_users", JSON.stringify(users));
+            currentUser = { ...ex };
+            delete currentUser.password;
+            localStorage.setItem("darak_session", JSON.stringify(currentUser));
+            closeAuth();
+            authForm.reset();
+            renderAuthArea();
+            renderAccountView();
+            updateNotifBadge();
+            showToast("🎉 تم تحويل حسابك إلى " + (selectedRole === "tech" ? "فني" : "شركة") + " — بانتظار موافقة الإدارة");
+            return;
+          }
+          throw new Error("exists");
+        }
         const regCats = (selectedRole === "provider" || selectedRole === "tech") ? getPickedCats("regCatList") : [];
         if ((selectedRole === "provider" || selectedRole === "tech") && !regCats.length) {
           showToast("اختر تخصصًا واحدًا على الأقل ⬇️", "error");
@@ -2405,6 +2521,62 @@ document.getElementById("reasonConfirm").addEventListener("click", () => {
   if (cb) cb(reason);
 });
 
+// --- نافذة تعديل ملفي (العميل/الفني/الشركة يعدل بياناته) ---
+window.openMyEdit = function() {
+  if (!currentUser) return;
+  document.getElementById("meName").value = currentUser.displayName || "";
+  document.getElementById("mePhone").value = currentUser.phone || "";
+  document.getElementById("meEmail").value = currentUser.email || "";
+  document.getElementById("myEditModal").classList.add("open");
+};
+document.getElementById("myEditClose").addEventListener("click", () => document.getElementById("myEditModal").classList.remove("open"));
+document.getElementById("myEditModal").addEventListener("click", e => { if (e.target.id === "myEditModal") e.target.classList.remove("open"); });
+document.getElementById("meSave").addEventListener("click", async () => {
+  const nm = document.getElementById("meName").value.trim();
+  const ph = document.getElementById("mePhone").value.trim();
+  const em = document.getElementById("meEmail").value.trim();
+  if (!nm || !em) { showToast("الاسم والبريد مطلوبان", "error"); return; }
+  const btn = document.getElementById("meSave");
+  btn.disabled = true; btn.textContent = "لحظات…";
+  try {
+    const emailChanged = em !== currentUser.email;
+    // تغيير الإيميل في حساب الدخول — يتطلب دخولًا حديثًا
+    if (emailChanged && auth && auth.currentUser && updateEmailFn) {
+      try {
+        await updateEmailFn(auth.currentUser, em);
+      } catch (err) {
+        if (err && err.code === "auth/requires-recent-login") {
+          showToast("🔐 تغيير البريد يتطلب دخولًا حديثًا — سجّل خروج وادخل من جديد ثم عدّل", "error");
+          btn.disabled = false; btn.textContent = "حفظ 💾";
+          return;
+        }
+        if (err && err.code === "auth/email-already-in-use") {
+          showToast("هذا البريد مستخدم في حساب آخر", "error");
+          btn.disabled = false; btn.textContent = "حفظ 💾";
+          return;
+        }
+        throw err;
+      }
+    }
+    const data = { displayName: nm, phone: ph, email: em };
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const u = users.find(x => x.uid === currentUser.uid);
+      if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+    Object.assign(currentUser, data);
+    localStorage.setItem("darak_session", JSON.stringify(currentUser));
+    document.getElementById("myEditModal").classList.remove("open");
+    renderAuthArea();
+    renderAccountView();
+    showToast("تم حفظ ملفك ✅");
+  } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
+  btn.disabled = false; btn.textContent = "حفظ 💾";
+});
+
 // --- نافذة تعديل المستخدم ---
 let editingUid = null;
 
@@ -2667,6 +2839,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
+        <button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
         <button class="acc-item danger" onclick="deleteMyAccount()">🗑️ <span>${t("acc_delete")}</span></button>
@@ -2745,6 +2918,67 @@ window.openCategory = function(name) {
   showView("cat");
   document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === "companies"));
 };
+// 🏷️ الضغط على علامة خدمة — يعرض كل الشركات التي تقدمها
+window.searchByService = function(kw) {
+  const cos = allCompanies().filter(p => Array.isArray(p.services) && p.services.includes(kw));
+  document.getElementById("catViewTitle").textContent = "🏷️ " + kw;
+  document.getElementById("catViewGrid").innerHTML = cos.length
+    ? cos.map(coCard).join("")
+    : `<div class="dash-empty"><div class="big">🏷️</div>لا توجد شركات تقدم «${kw}» حاليًا</div>`;
+  showView("cat");
+};
+
+// 📚 مخزن الكلمات المفتاحية المشترك — يكبر مع كل خدمة جديدة تضيفها أي شركة أو فني
+let SERVICE_KEYWORDS = [];
+async function loadKeywords() {
+  // المخزن المشترك = تجميع خدمات كل الشركات والفنيين المسجلين (يقرأه الجميع بدون صلاحيات خاصة)
+  try {
+    if (db && getDocsFn) {
+      const all = [];
+      const pSnap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "provider"))), 9000);
+      const tSnap = await withTimeout(getDocsFn(queryFn(collectionFn(db, "users"), whereFn("role", "==", "tech"))), 9000);
+      pSnap.docs.concat(tSnap.docs).forEach(d => {
+        const sv = d.data().services;
+        if (Array.isArray(sv)) all.push(...sv);
+      });
+      SERVICE_KEYWORDS = [...new Set(all)];
+    }
+    const local = JSON.parse(localStorage.getItem("darak_keywords") || "[]");
+    SERVICE_KEYWORDS = [...new Set([...SERVICE_KEYWORDS, ...local])];
+  } catch (e) {
+    console.warn("تعذر تحميل الكلمات المفتاحية", e);
+    const local = JSON.parse(localStorage.getItem("darak_keywords") || "[]");
+    SERVICE_KEYWORDS = [...new Set([...SERVICE_KEYWORDS, ...local])];
+  }
+}
+async function addKeywordsToPool(newOnes) {
+  const fresh = newOnes.filter(k => k && !SERVICE_KEYWORDS.includes(k));
+  if (!fresh.length) return;
+  SERVICE_KEYWORDS = [...SERVICE_KEYWORDS, ...fresh];
+  // نحفظ نسخة محلية — والمخزن الأساسي يتجمع تلقائيًا من ملفات الشركات والفنيين
+  try {
+    const local = JSON.parse(localStorage.getItem("darak_keywords") || "[]");
+    localStorage.setItem("darak_keywords", JSON.stringify([...new Set([...local, ...fresh])]));
+  } catch (e) { console.warn("تعذر حفظ الكلمات", e); }
+}
+// اقتراحات الخدمات في نموذج الملف — تظهر حسب تخصص الشركة/الفني
+function renderSvcSuggestions() {
+  const box = document.getElementById("cpSvcSugs");
+  if (!box || !currentUser) return;
+  const current = document.getElementById("cpServices").value.split(/[،,]/).map(x => x.trim()).filter(Boolean);
+  const mine = SERVICE_KEYWORDS.filter(k => !current.includes(k));
+  box.innerHTML = mine.length
+    ? '<small style="color:var(--muted);display:block;margin-bottom:4px">اقتراحات — اضغط لإضافتها:</small>' + mine.map(k => `<span class="svc-sug" onclick="addSvcSug('${k.replace(/'/g, "")}')">＋ ${k}</span>`).join("")
+    : "";
+}
+window.addSvcSug = function(kw) {
+  const inp = document.getElementById("cpServices");
+  const parts = inp.value.split(/[،,]/).map(x => x.trim()).filter(Boolean);
+  if (!parts.includes(kw)) parts.push(kw);
+  inp.value = parts.join("، ");
+  renderSvcSuggestions();
+};
+
 window.openAllEngineers = function() {
   document.getElementById("catViewTitle").textContent = t("secs_engineers");
   document.getElementById("catViewGrid").innerHTML = liveEngineers.length
@@ -2801,7 +3035,7 @@ window.openCompany = async function(id) {
     </div>
     <div class="co-actions">${links}</div>
     ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
-    ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip">${s}</span>`).join("")}</div>` : ""}
+    ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip" onclick="searchByService('${String(s).replace(/'/g, "")}')">${s}</span>`).join("")}</div>` : ""}
     <div class="co-block"><h3>💬 آراء العملاء ${revs.length ? `(${revs.length})` : ""}</h3>
       ${revs.length ? revs.map(r => `
       <div style="padding:10px 0;border-bottom:1px solid #f3efe7">
@@ -3179,6 +3413,7 @@ function fillCompanyProfileForm() {
   document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
   const cpList = document.getElementById("cpCatList");
   if (cpList) cpList.innerHTML = catPickHtml(currentUser.role === "tech" ? TECHS : CATEGORIES, userCatsArr(currentUser));
+  renderSvcSuggestions();
 }
 document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -3212,6 +3447,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     const u = list.find(x => x.uid === currentUser.uid);
     if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(list)); }
     showToast(t("cp_saved"));
+    addKeywordsToPool(data.services || []);
     loadLiveCompanies();
   } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
 });
@@ -3840,11 +4076,30 @@ window.deleteMyAccount = async function() {
 };
 async function doDeleteMyAccount() {
   try {
+    const uid0 = currentUser.uid;
+    // 1) احذف وثيقة البيانات أولًا (الصلاحية متاحة ونحن مسجلون)
     if (db && getDocsFn) {
-      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid0)));
       if (snap.docs.length) await deleteDocFn(docFn(db, "users", snap.docs[0].id));
     }
-    const list = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.uid !== currentUser.uid);
+    // 2) ثم احذف حساب الدخول نفسه — بدونه يبقى الدخول شغالًا
+    if (auth && auth.currentUser && deleteUserFn) {
+      try {
+        await deleteUserFn(auth.currentUser);
+      } catch (err) {
+        if (err && err.code === "auth/requires-recent-login") {
+          // البيانات انحذفت — بس حساب الدخول يحتاج دخول حديث
+          localStorage.removeItem("darak_session");
+          currentUser = null;
+          renderAuthArea();
+          renderAccountView();
+          showToast("🔐 انحذفت بياناتك — ولإتمام حذف الدخول: ادخل مرة أخرى واحذف فورًا", "error");
+          return;
+        }
+        throw err;
+      }
+    }
+    const list = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(u => u.uid !== uid0);
     localStorage.setItem("darak_users", JSON.stringify(list));
     showToast(t("acc_deleted"));
     logout();
@@ -3872,9 +4127,8 @@ if (auth && onAuthStateFn) {
     if (user && !currentUser) {
       try {
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", user.uid)));
-        const prof = snap.docs.length
-          ? snap.docs[0].data()
-          : { uid: user.uid, email: user.email, displayName: user.displayName || user.email, role: "client", category: "" };
+        if (!snap.docs.length) { try { await signOutFn(auth); } catch (e) {} return; }
+        const prof = snap.docs[0].data();
         const st = prof.status || "approved";
         if (st === "suspended" || st === "rejected") {
           try { await signOutFn(auth); } catch (e) {}
@@ -3988,6 +4242,7 @@ restartAdTimer();
 function bootData() {
   loadAds();
   loadCats();
+  loadKeywords();
   loadLiveCompanies();
   renderTechCats();
 }
