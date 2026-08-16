@@ -567,6 +567,7 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="search-box">
       <span>🔍</span>
       <input type="text" id="searchInput" data-i18n-ph="search_placeholder" placeholder="ابحث عن خدمة أو شركة…">
+      <button type="button" id="searchClear" aria-label="مسح" style="display:none;border:none;background:#f3efe7;color:#7a6a4d;border-radius:50%;width:26px;height:26px;font-size:.78rem;cursor:pointer;flex:0 0 auto;line-height:1">✕</button>
     </div>
   </div>
 </header>
@@ -875,7 +876,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 35)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 36)</small>
     </div>
   </div>
 </footer>
@@ -1808,12 +1809,14 @@ authForm.addEventListener("submit", async e => {
           statusReason: ""
         };
         await addDocFn(collectionFn(db, "users"), { ...currentUser, createdAt: serverTimestampFn() });
+        localStorage.setItem("darak_session", JSON.stringify(currentUser));
       } else {
         const cred = await signInFn(auth, fd.email, fd.password);
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", cred.user.uid)));
         currentUser = snap.docs.length
           ? snap.docs[0].data()
           : { uid: cred.user.uid, email: fd.email, displayName: cred.user.displayName || fd.email, role: "client", category: "" };
+        localStorage.setItem("darak_session", JSON.stringify(currentUser));
       }
     } else {
       // ===== وضع تجريبي: حسابات محلية في المتصفح =====
@@ -1954,6 +1957,8 @@ async function openDashboard() {
   if (!currentUser) { openAuth(); return; }
   const dash = document.getElementById("dashboard");
   dash.classList.add("open");
+  const _dc = document.getElementById("dashContent");
+  if (_dc) _dc.innerHTML = '<div class="dash-empty" style="padding:44px 0"><div class="big">⏳</div>جارٍ تحميل البيانات…</div>';
   document.getElementById("quotesWrap").style.display = "none";
   document.getElementById("companyProfileWrap").style.display = "none";
   document.getElementById("employeesWrap").style.display = "none";
@@ -2531,6 +2536,7 @@ function isMobileView() { return window.innerWidth <= 820; }
 
 function showView(v) {
   currentView = v;
+  if (typeof navPush === "function") navPush(v);
   document.querySelectorAll(".tabbar .tab").forEach(tb => tb.classList.toggle("active", tb.dataset.view === v));
   const sr = document.getElementById("searchResults");
   if (sr) sr.style.display = "none";
@@ -2574,6 +2580,53 @@ function showView(v) {
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 window.showView = showView;
+
+// ====== ↩️ زر الرجوع (أندرويد/المتصفح): يرجع خطوة داخل التطبيق بدل ما يقفله ======
+const navHist = ["home"];
+let _navLock = false, _exitWarnAt = 0;
+try { history.replaceState({ darakNav: "home" }, ""); } catch (e) {}
+function navPush(v) {
+  if (_navLock) return;
+  if (navHist[navHist.length - 1] === v) return;
+  navHist.push(v);
+  try { history.pushState({ darakNav: v }, ""); } catch (e) {}
+}
+window.addEventListener("popstate", () => {
+  _navLock = true;
+  // 1) أي نافذة منبثقة مفتوحة؟ أغلقها أولًا
+  const openModal = document.querySelector(".modal-overlay.open");
+  if (openModal) {
+    openModal.classList.remove("open");
+    try { history.pushState({ darakNav: navHist[navHist.length - 1] }, ""); } catch (e) {}
+    _navLock = false;
+    return;
+  }
+  // 2) لوحة التحكم مفتوحة كطبقة؟ أغلقها
+  const dashEl = document.getElementById("dashboard");
+  if (dashEl && dashEl.classList.contains("open") && navHist[navHist.length - 1] !== "dash") {
+    dashEl.classList.remove("open");
+    try { history.pushState({ darakNav: navHist[navHist.length - 1] }, ""); } catch (e) {}
+    _navLock = false;
+    return;
+  }
+  // 3) ارجع للصفحة السابقة
+  if (navHist.length > 1) {
+    navHist.pop();
+    const prev = navHist[navHist.length - 1];
+    if (dashEl && dashEl.classList.contains("open") && prev !== "dash") dashEl.classList.remove("open");
+    showView(prev);
+    _navLock = false;
+    return;
+  }
+  // 4) في الرئيسية: اضغط رجوع مرتين للخروج
+  const now = Date.now();
+  if (now - _exitWarnAt < 2500) { _navLock = false; return; } // خروج فعلي
+  _exitWarnAt = now;
+  showToast("اضغط رجوع مرة أخرى للخروج 👋");
+  try { history.pushState({ darakNav: "home" }, ""); } catch (e) {}
+  _navLock = false;
+});
+
 document.querySelectorAll(".tabbar .tab").forEach(tb => tb.addEventListener("click", () => { if (tb.dataset.view === "companies") openCategory(""); else showView(tb.dataset.view); }));
 let _lastW = window.innerWidth;
 window.addEventListener("resize", () => {
@@ -2637,6 +2690,15 @@ function normAr(s) {
     .replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
     .replace(/[\u064B-\u0652\u0670]/g, "").replace(/ـ/g, "").trim();
 }
+// ✕ زر مسح البحث
+(function() {
+  const si = document.getElementById("searchInput");
+  const sc = document.getElementById("searchClear");
+  if (!si || !sc) return;
+  si.addEventListener("input", () => { sc.style.display = si.value ? "" : "none"; });
+  sc.addEventListener("click", () => { si.value = ""; sc.style.display = "none"; si.dispatchEvent(new Event("input", { bubbles: true })); si.focus(); });
+})();
+
 document.getElementById("searchInput").addEventListener("input", e => {
   const q = e.target.value.trim();
   const sec = document.getElementById("searchResults");
@@ -3022,6 +3084,22 @@ function restartAdTimer() {
   adTimer = setInterval(() => { adIdx = (adIdx + 1) % ADS.length; adApply(); }, 3000);
 }
 window.adTo = function(i) { adIdx = i; adApply(); restartAdTimer(); };
+// 👆 سحب الإعلانات باللمس — يمين/يسار
+(function() {
+  const sl = document.getElementById("adSlider");
+  if (!sl) return;
+  let sx = 0, dx = 0;
+  sl.style.touchAction = "pan-y";
+  sl.addEventListener("touchstart", e => { sx = e.touches[0].clientX; dx = 0; clearInterval(adTimer); }, { passive: true });
+  sl.addEventListener("touchmove", e => { dx = e.touches[0].clientX - sx; }, { passive: true });
+  sl.addEventListener("touchend", () => {
+    if (Math.abs(dx) > 40 && ADS.length > 1) {
+      adIdx = (adIdx + (dx < 0 ? 1 : -1) + ADS.length) % ADS.length;
+      adApply();
+    }
+    restartAdTimer();
+  });
+})();
 window.adGo = function(i) {
   const l = ADS[i]?.link || "";
   if (l === "join") openJoinFlow();
@@ -3804,10 +3882,11 @@ if (auth && onAuthStateFn) {
           return;
         }
         currentUser = prof;
+        localStorage.setItem("darak_session", JSON.stringify(prof));
         renderAuthArea();
         setupPush();
       } catch (e) { console.warn("تعذر استعادة الجلسة", e); }
-    } else if (!user && currentUser) {
+    } else if (!user && currentUser && !localStorage.getItem("darak_session")) {
       currentUser = null;
       renderAuthArea();
       document.getElementById("dashboard").classList.remove("open");
