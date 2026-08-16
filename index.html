@@ -881,7 +881,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 40)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 41)</small>
     </div>
   </div>
 </footer>
@@ -1848,6 +1848,39 @@ function renderAuthArea() {
   }
 }
 
+// --- الأدوار المتعددة: لقطة بيانات كل دور عشان ما تضيع عند التبديل ---
+const ROLE_SNAP_FIELDS = ["phone", "whatsapp", "insta", "web", "map", "displayName", "nameEn", "location", "bio", "services", "categories", "category", "logo"];
+function snapshotRoleData(u) {
+  const snap = {};
+  ROLE_SNAP_FIELDS.forEach(k => { if (u[k] !== undefined) snap[k] = u[k]; });
+  return snap;
+}
+window.switchRole = async function(newRole) {
+  if (!currentUser || !Array.isArray(currentUser.roles) || !currentUser.roles.includes(newRole) || currentUser.role === newRole) return;
+  const roleData = currentUser.roleData || {};
+  roleData[currentUser.role] = snapshotRoleData(currentUser); // خزّن بيانات الدور الحالي
+  const snap = roleData[newRole] || {};
+  const upd = { role: newRole, roleData };
+  ROLE_SNAP_FIELDS.forEach(k => {
+    const v = snap[k] !== undefined ? snap[k] : ((k === "categories" || k === "services") ? [] : "");
+    upd[k] = v; currentUser[k] = v;
+  });
+  currentUser.role = newRole; currentUser.roleData = roleData;
+  try {
+    if (db && getDocsFn) {
+      const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (usnap.docs.length) await updateDocFn(docFn(db, "users", usnap.docs[0].id), upd);
+    }
+  } catch (e) { console.warn(e); }
+  localStorage.setItem("darak_session", JSON.stringify(currentUser));
+  renderAuthArea(); renderAccountView(); updateNotifBadge();
+  const nm = newRole === "provider" ? "ملف الشركة 🛠️" : newRole === "tech" ? "ملف الفني 🔧" : "حساب العميل 🏠";
+  showToast("🔄 تم التبديل إلى " + nm);
+};
+function roleLabel(r) {
+  return r === "provider" ? "ملف الشركة 🛠️" : r === "tech" ? "ملف الفني 🔧" : "حساب العميل 🏠";
+}
+
 // إرسال نموذج الدخول / التسجيل
 authForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -1869,33 +1902,56 @@ authForm.addEventListener("submit", async e => {
         try {
           cred = await createUserFn(auth, fd.email, fd.password);
         } catch (err) {
-          // الإيميل مسجل من قبل (عميل مثلًا) — إذا كلمة المرور صحيحة نرقّي الحساب لفني/شركة
-          if (err && err.code === "auth/email-already-in-use" && (selectedRole === "provider" || selectedRole === "tech")) {
+          // الإيميل مسجل من قبل — كلمة المرور الصحيحة تضيف الدور الجديد لنفس الحساب (بدون فقدان الحساب القديم)
+          if (err && err.code === "auth/email-already-in-use") {
             let sign;
             try {
               sign = await signInFn(auth, fd.email, fd.password);
             } catch (e2) {
-              showToast("🔑 هذا البريد مسجل عندك — اكتب نفس كلمة المرور الحالية عشان نحوّل حسابك إلى " + (selectedRole === "tech" ? "فني" : "شركة"), "error");
+              showToast(selectedRole === "client"
+                ? "🔑 هذا البريد مسجل عندك — سجّل دخولك من تبويب دخول بنفس كلمة المرور"
+                : "🔑 هذا البريد مسجل عندك — اكتب نفس كلمة المرور الحالية عشان نضيف حساب " + (selectedRole === "tech" ? "الفني" : "الشركة") + " لحسابك", "error");
               btn.disabled = false; btn.textContent = t("register_go");
               return;
             }
             const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", sign.user.uid)));
+            const old = usnap.docs.length ? usnap.docs[0].data() : null;
+            const oldRole = (old && old.role) || "client";
+            const oldRoles = (old && Array.isArray(old.roles) && old.roles.length) ? old.roles : [oldRole];
+            // نفس الدور موجود مسبقًا؟ يعني مجرد تسجيل دخول
+            if (oldRoles.includes(selectedRole)) {
+              currentUser = old || { uid: sign.user.uid, email: fd.email, displayName: sign.user.displayName || fd.email, role: oldRole, roles: oldRoles, status: "approved" };
+              localStorage.setItem("darak_session", JSON.stringify(currentUser));
+              closeAuth(); authForm.reset();
+              renderAuthArea(); renderAccountView(); updateNotifBadge();
+              showToast(`أهلًا بك ${currentUser.displayName} 👋`);
+              openDashboard();
+              return;
+            }
+            // لقطة لبيانات الدور القديم عشان ما تضيع
+            const roleData = (old && old.roleData) || {};
+            roleData[oldRole] = snapshotRoleData(old || {});
+            const roles = [...oldRoles, selectedRole];
             const upData = {
-              role: selectedRole, category: regCats[0] || "", categories: regCats,
-              status: "pending", statusReason: "",
-              displayName: fd.displayName || (usnap.docs.length ? usnap.docs[0].data().displayName : "") || fd.email,
-              phone: fd.phone || (usnap.docs.length ? usnap.docs[0].data().phone : "") || ""
+              role: selectedRole, roles, roleData,
+              category: regCats[0] || "", categories: regCats,
+              // الحساب الموثوق (المعتمد) يبقى معتمدًا — ما يختفي من التطبيق
+              status: (old && (old.status || "approved") === "approved") ? "approved" : "pending",
+              statusReason: "",
+              displayName: fd.displayName || (old && old.displayName) || fd.email,
+              phone: fd.phone || (old && old.phone) || ""
             };
             if (usnap.docs.length) await updateDocFn(docFn(db, "users", usnap.docs[0].id), upData);
             else await addDocFn(collectionFn(db, "users"), { uid: sign.user.uid, email: fd.email, ...upData, createdAt: serverTimestampFn() });
-            currentUser = { uid: sign.user.uid, email: fd.email, ...upData };
+            currentUser = { ...(old || {}), uid: sign.user.uid, email: fd.email, ...upData };
             localStorage.setItem("darak_session", JSON.stringify(currentUser));
             closeAuth();
             authForm.reset();
             renderAuthArea();
             renderAccountView();
             updateNotifBadge();
-            showToast("🎉 تم تحويل حسابك إلى " + (selectedRole === "tech" ? "فني" : "شركة") + " — بانتظار موافقة الإدارة");
+            showToast("🎉 تمت إضافة حساب " + (selectedRole === "tech" ? "الفني" : selectedRole === "provider" ? "الشركة" : "العميل") + " إلى حسابك — تنقّل بين حساباتك من صفحة حسابي 🔄");
+            openDashboard();
             return;
           }
           throw err;
@@ -1906,6 +1962,7 @@ authForm.addEventListener("submit", async e => {
           email: fd.email,
           displayName: fd.displayName || fd.email,
           role: selectedRole,
+          roles: [selectedRole],
           category: regCats[0] || "",
           categories: regCats,
           phone: fd.phone || "",
@@ -2861,6 +2918,9 @@ function renderAccountView() {
       <p style="color:var(--muted);font-size:.9rem" dir="ltr">${currentUser.email || ""}</p>
       <p style="margin:8px 0 4px;font-weight:700">${roleName}${userCatsArr(currentUser).length ? " • " + userCatsArr(currentUser).join("، ") : ""}</p>
       <div class="acc-menu">
+        ${(Array.isArray(currentUser.roles) && currentUser.roles.length > 1)
+          ? currentUser.roles.filter(r => r !== currentUser.role).map(r => `<button class="acc-item" style="border:1.5px dashed var(--gold)" onclick="switchRole('${r}')">🔄 <span>التبديل إلى ${roleLabel(r)}</span></button>`).join("")
+          : ""}
         <button class="acc-item" onclick="closeAccountView();setTimeout(() => document.getElementById('notifBtn').click(), 120)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
