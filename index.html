@@ -640,7 +640,7 @@ footer ul a:hover{color:var(--gold-2)}
   <div class="container">
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_tech">اطلب فني 🔧</h2>
-      <button class="btn btn-outline btn-sm" onclick="openTechDir()">👷 تصفح الفنيين</button>
+      <button class="btn btn-gold btn-sm" onclick="openTechDir()" style="font-size:.85rem;padding:8px 16px;font-weight:800">👷 تصفح الفنيين ←</button>
     </div>
     <div class="h-scroll cards-row" id="techCatRow"></div>
   </div>
@@ -649,7 +649,6 @@ footer ul a:hover{color:var(--gold-2)}
 <!-- ================= صفحة قسم (شركات التخصص) ================= -->
 <section class="dashboard" id="catView" style="display:none">
   <div class="container">
-    <button class="btn btn-outline" onclick="goBackHome()" style="margin-bottom:16px" data-i18n="back">رجوع ←</button>
     <h2 id="catViewTitle" class="row-title" style="margin-bottom:18px"></h2>
     <div class="co-grid" id="catViewGrid"></div>
   </div>
@@ -684,6 +683,8 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
         <div class="form-group"><label data-i18n="cp_services">خدماتك (افصل بينها بفاصلة ، أو اختر من الاقتراحات)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"><div id="cpSvcSugs" style="margin-top:6px"></div></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
+        <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="cpPhone" dir="ltr" placeholder="9XXXXXXX"></div>
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="cpEmail" dir="ltr"></div>
         <div class="form-group"><label data-i18n="cp_loc">موقع الشركة (المدينة / المنطقة)</label><input type="text" id="cpLoc" placeholder="مسقط — الخوض"></div>
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
         <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
@@ -880,7 +881,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 37)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 38)</small>
     </div>
   </div>
 </footer>
@@ -1971,6 +1972,14 @@ authForm.addEventListener("submit", async e => {
     }
     // فحص حالة الحساب — الموقوف/المرفوض تظهر له رسالة السبب ولا يدخل
     const st0 = currentUser.status || "approved";
+    if (st0 === "deleted") {
+      if (auth && signOutFn) { try { await signOutFn(auth); } catch (e) {} }
+      localStorage.removeItem("darak_session");
+      currentUser = null;
+      closeAuth();
+      showToast("🚫 هذا الحساب محذوف — تواصل مع الإدارة", "error");
+      return;
+    }
     if (st0 === "suspended" || st0 === "rejected") {
       const reason = currentUser.statusReason || t("no_reason");
       if (auth && signOutFn) { try { await signOutFn(auth); } catch (e) {} }
@@ -2425,6 +2434,7 @@ async function loadUsersTable() {
   box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
   let users = [];
   try { users = await fetchAllUsers(); } catch (e) { console.error(e); }
+  users = users.filter(u => (u.status || "approved") !== "deleted");
   if (!users.length) {
     box.innerHTML = `<div class="dash-empty"><div class="big">👥</div>لا يوجد مستخدمون مسجلون بعد</div>`;
     return;
@@ -2473,17 +2483,11 @@ window.adminApprove = uid => updateUserStatus(uid, "approved", "").catch(e => sh
 window.adminReject = uid => openReasonModal("⛔ رفض مقدم الخدمة", reason => updateUserStatus(uid, "rejected", reason).catch(e => showToast("تعذر التحديث", "error")));
 window.adminSuspend = uid => openReasonModal("🚫 إيقاف الحساب", reason => updateUserStatus(uid, "suspended", reason).catch(e => showToast("تعذر التحديث", "error")));
 window.adminDelete = async uid => {
-  if (!confirm("متأكد من حذف هذا المستخدم؟ لا يمكن التراجع")) return;
+  if (!confirm("متأكد من حذف هذا المستخدم؟ لن يقدر يدخل أو يظهر في التطبيق")) return;
   try {
-    if (db && getDocsFn) {
-      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
-      if (snap.docs.length) await deleteDocFn(docFn(db, "users", snap.docs[0].id));
-    } else {
-      const users = JSON.parse(localStorage.getItem("darak_users") || "[]").filter(x => x.uid !== uid);
-      localStorage.setItem("darak_users", JSON.stringify(users));
-    }
-    showToast("تم حذف المستخدم 🗑️");
-    loadUsersTable();
+    // حذف منطقي — قواعد Firestore تمنع الحذف النهائي من التطبيق
+    await updateUserStatus(uid, "deleted", "حذفته الإدارة");
+    showToast("تم حذف المستخدم 🗑️ — لن يظهر أو يدخل بعد الآن");
   } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
 };
 
@@ -2839,7 +2843,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
         ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
-        <button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>
+        ${currentUser.role === "client" ? `<button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
         <button class="acc-item danger" onclick="deleteMyAccount()">🗑️ <span>${t("acc_delete")}</span></button>
@@ -3022,7 +3026,6 @@ window.openCompany = async function(id) {
     p.map ? `<a class="co-link" href="${p.map}" target="_blank">📍 ${t("co_map")}</a>` : ""
   ].join("");
   document.getElementById("companyProfile").innerHTML = `
-    <button class="btn btn-outline" onclick="goBackHome()" style="margin-bottom:16px">${t("back")}</button>
     <div class="co-hero">
       ${p.logo ? `<img src="${p.logo}" alt="" style="width:88px;height:88px;border-radius:22px;object-fit:cover;flex:0 0 auto">` : `<div class="co-big-logo">${p.icon || "🏢"}</div>`}
       <div style="flex:1;min-width:200px">
@@ -3403,6 +3406,8 @@ async function uploadImage(file, folder) {
 function fillCompanyProfileForm() {
   if (!currentUser) return;
   document.getElementById("cpWhatsApp").value = currentUser.whatsapp || currentUser.phone || "";
+  document.getElementById("cpPhone").value = currentUser.phone || "";
+  document.getElementById("cpEmail").value = currentUser.email || "";
   document.getElementById("cpInsta").value = currentUser.insta || "";
   document.getElementById("cpWeb").value = currentUser.web || "";
   document.getElementById("cpMap").value = currentUser.map || "";
@@ -3418,7 +3423,17 @@ function fillCompanyProfileForm() {
 document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
   const logoFile = document.getElementById("cpLogo").files[0];
+  const newEmail = document.getElementById("cpEmail").value.trim();
+  if (newEmail && newEmail !== currentUser.email && auth && auth.currentUser && updateEmailFn) {
+    try { await updateEmailFn(auth.currentUser, newEmail); }
+    catch (err) {
+      if (err && err.code === "auth/requires-recent-login") { showToast("🔐 تغيير البريد يتطلب دخولًا حديثًا — سجّل خروج وادخل من جديد ثم عدّل", "error"); return; }
+      if (err && err.code === "auth/email-already-in-use") { showToast("هذا البريد مستخدم في حساب آخر", "error"); return; }
+    }
+  }
   const data = {
+    phone: document.getElementById("cpPhone").value.trim(),
+    email: newEmail || currentUser.email,
     whatsapp: document.getElementById("cpWhatsApp").value.trim(),
     insta: document.getElementById("cpInsta").value.trim(),
     web: document.getElementById("cpWeb").value.trim(),
@@ -4130,6 +4145,7 @@ if (auth && onAuthStateFn) {
         if (!snap.docs.length) { try { await signOutFn(auth); } catch (e) {} return; }
         const prof = snap.docs[0].data();
         const st = prof.status || "approved";
+        if (st === "deleted") { try { await signOutFn(auth); } catch (e) {} localStorage.removeItem("darak_session"); return; }
         if (st === "suspended" || st === "rejected") {
           try { await signOutFn(auth); } catch (e) {}
           showToast("🚫 " + (st === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + (prof.statusReason || t("no_reason")), "error");
