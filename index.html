@@ -881,7 +881,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 41)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 42)</small>
     </div>
   </div>
 </footer>
@@ -1902,56 +1902,10 @@ authForm.addEventListener("submit", async e => {
         try {
           cred = await createUserFn(auth, fd.email, fd.password);
         } catch (err) {
-          // الإيميل مسجل من قبل — كلمة المرور الصحيحة تضيف الدور الجديد لنفس الحساب (بدون فقدان الحساب القديم)
+          // الإيميل مسجل من قبل — لا نسمح بحساب ثانٍ بنفس البريد (عميل/شركة/فني) — يوجَّه لتسجيل الدخول
           if (err && err.code === "auth/email-already-in-use") {
-            let sign;
-            try {
-              sign = await signInFn(auth, fd.email, fd.password);
-            } catch (e2) {
-              showToast(selectedRole === "client"
-                ? "🔑 هذا البريد مسجل عندك — سجّل دخولك من تبويب دخول بنفس كلمة المرور"
-                : "🔑 هذا البريد مسجل عندك — اكتب نفس كلمة المرور الحالية عشان نضيف حساب " + (selectedRole === "tech" ? "الفني" : "الشركة") + " لحسابك", "error");
-              btn.disabled = false; btn.textContent = t("register_go");
-              return;
-            }
-            const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", sign.user.uid)));
-            const old = usnap.docs.length ? usnap.docs[0].data() : null;
-            const oldRole = (old && old.role) || "client";
-            const oldRoles = (old && Array.isArray(old.roles) && old.roles.length) ? old.roles : [oldRole];
-            // نفس الدور موجود مسبقًا؟ يعني مجرد تسجيل دخول
-            if (oldRoles.includes(selectedRole)) {
-              currentUser = old || { uid: sign.user.uid, email: fd.email, displayName: sign.user.displayName || fd.email, role: oldRole, roles: oldRoles, status: "approved" };
-              localStorage.setItem("darak_session", JSON.stringify(currentUser));
-              closeAuth(); authForm.reset();
-              renderAuthArea(); renderAccountView(); updateNotifBadge();
-              showToast(`أهلًا بك ${currentUser.displayName} 👋`);
-              openDashboard();
-              return;
-            }
-            // لقطة لبيانات الدور القديم عشان ما تضيع
-            const roleData = (old && old.roleData) || {};
-            roleData[oldRole] = snapshotRoleData(old || {});
-            const roles = [...oldRoles, selectedRole];
-            const upData = {
-              role: selectedRole, roles, roleData,
-              category: regCats[0] || "", categories: regCats,
-              // الحساب الموثوق (المعتمد) يبقى معتمدًا — ما يختفي من التطبيق
-              status: (old && (old.status || "approved") === "approved") ? "approved" : "pending",
-              statusReason: "",
-              displayName: fd.displayName || (old && old.displayName) || fd.email,
-              phone: fd.phone || (old && old.phone) || ""
-            };
-            if (usnap.docs.length) await updateDocFn(docFn(db, "users", usnap.docs[0].id), upData);
-            else await addDocFn(collectionFn(db, "users"), { uid: sign.user.uid, email: fd.email, ...upData, createdAt: serverTimestampFn() });
-            currentUser = { ...(old || {}), uid: sign.user.uid, email: fd.email, ...upData };
-            localStorage.setItem("darak_session", JSON.stringify(currentUser));
-            closeAuth();
-            authForm.reset();
-            renderAuthArea();
-            renderAccountView();
-            updateNotifBadge();
-            showToast("🎉 تمت إضافة حساب " + (selectedRole === "tech" ? "الفني" : selectedRole === "provider" ? "الشركة" : "العميل") + " إلى حسابك — تنقّل بين حساباتك من صفحة حسابي 🔄");
-            openDashboard();
+            showToast("هذا البريد مسجل في التطبيق — سجّل دخولك من تبويب دخول. نسيت كلمة المرور؟ اضغط «نسيت كلمة المرور؟»", "error");
+            btn.disabled = false; btn.textContent = t("register_go");
             return;
           }
           throw err;
