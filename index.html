@@ -881,7 +881,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 43)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 44)</small>
     </div>
   </div>
 </footer>
@@ -1904,11 +1904,28 @@ authForm.addEventListener("submit", async e => {
         } catch (err) {
           // الإيميل مسجل من قبل — لا نسمح بحساب ثانٍ بنفس البريد (عميل/شركة/فني) — يوجَّه لتسجيل الدخول
           if (err && err.code === "auth/email-already-in-use") {
-            showToast("هذا البريد مسجل في التطبيق — سجّل دخولك من تبويب دخول. نسيت كلمة المرور؟ اضغط «نسيت كلمة المرور؟»", "error");
-            btn.disabled = false; btn.textContent = t("register_go");
-            return;
-          }
-          throw err;
+            // استثناء: الحساب انحذف من التطبيق (الإدارة حذفته) وبقي حساب الدخول يتيمًا في Authentication
+            // → نسمح بإعادة التسجيل بنفس كلمة المرور القديمة وننشئ حسابًا جديدًا نظيفًا
+            let orphan = false;
+            try {
+              const ex = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("email", "==", fd.email)));
+              orphan = !ex.docs.length;
+            } catch (eChk) { orphan = false; }
+            if (orphan) {
+              try {
+                cred = await signInFn(auth, fd.email, fd.password);
+                // نجح الدخول = نفس صاحب الحساب القديم — نكمل التسجيل تحته بحساب جديد
+              } catch (eSign) {
+                showToast("هذا البريد محجوز لحساب قديم — سجّل دخولك بنفس كلمة المرور القديمة عشان يتجدد حسابك، أو استخدم بريدًا آخر", "error");
+                btn.disabled = false; btn.textContent = t("register_go");
+                return;
+              }
+            } else {
+              showToast("هذا البريد مسجل في التطبيق — سجّل دخولك من تبويب دخول. نسيت كلمة المرور؟ اضغط «نسيت كلمة المرور؟»", "error");
+              btn.disabled = false; btn.textContent = t("register_go");
+              return;
+            }
+          } else throw err;
         }
         if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
         currentUser = {
