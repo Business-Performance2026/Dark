@@ -883,7 +883,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 46)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 47)</small>
     </div>
   </div>
 </footer>
@@ -2526,40 +2526,129 @@ const STATUS_LABELS = {
   suspended: ["موقوف 🚫", "status-suspended"]
 };
 
+let adminUsersCache = [];
 async function loadUsersTable() {
   const box = document.getElementById("usersContent");
   box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
   let users = [];
   try { users = await fetchAllUsers(); } catch (e) { console.error(e); }
   users = users.filter(u => (u.status || "approved") !== "deleted");
+  adminUsersCache = users;
   if (!users.length) {
     box.innerHTML = `<div class="dash-empty"><div class="big">👥</div>لا يوجد مستخدمون مسجلون بعد</div>`;
     return;
   }
-  box.innerHTML = `<table class="dash-table"><thead><tr>
-    <th>الاسم</th><th>البريد</th><th>الجوال</th><th>النوع</th><th>التخصص</th><th>الحالة</th><th>السبب</th><th>إجراءات</th>
-  </tr></thead><tbody>${users.map(u => {
-    const st = u.status || "approved";
-    const [lbl, cls] = STATUS_LABELS[st] || STATUS_LABELS.approved;
-    const roleName = u.role === "provider" ? "🛠️ شركة" : "🏠 عميل";
-    let btns = "";
-    if (st !== "approved") btns += `<button class="action-btn action-approve" onclick="adminApprove('${u.uid}')">✅ تفعيل</button>`;
-    if (st === "pending" && u.role === "provider") btns += `<button class="action-btn action-reject" onclick="adminReject('${u.uid}')">⛔ رفض</button>`;
-    if (st === "approved") btns += `<button class="action-btn action-suspend" onclick="adminSuspend('${u.uid}')">🚫 إيقاف</button>`;
-    btns += `<button class="action-btn action-edit" onclick="adminEdit('${u.uid}')">✏️ تعديل</button>`;
-    btns += `<button class="action-btn action-delete" onclick="adminDelete('${u.uid}')">🗑️ حذف</button>`;
-    return `<tr>
-      <td><b>${u.displayName || "—"}</b></td>
-      <td dir="ltr" style="font-size:.82rem">${u.email || "—"}</td>
-      <td>${u.phone ? `<a href="https://wa.me/${waNumber(u.phone)}" target="_blank" style="color:var(--gold);font-weight:700" dir="ltr">💬 ${u.phone}</a>` : "—"}</td>
-      <td>${roleName}</td>
-      <td>${userCatsArr(u).join("، ") || "—"}</td>
-      <td><span class="status-badge ${cls}">${lbl}</span></td>
-      <td style="max-width:170px;font-size:.82rem">${u.statusReason || "—"}</td>
-      <td style="white-space:nowrap">${btns}</td>
-    </tr>`;
-  }).join("")}</tbody></table>`;
+  const nC = users.filter(u => !u.role || u.role === "client").length;
+  const nP = users.filter(u => u.role === "provider").length;
+  const nT = users.filter(u => u.role === "tech").length;
+  const card = (icon, lbl, n, color) => `<div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 8px;text-align:center">
+    <div style="font-size:1.4rem">${icon}</div>
+    <div style="font-size:1.5rem;font-weight:800;color:${color}">${n}</div>
+    <div style="font-size:.78rem;color:var(--muted);font-weight:700">${lbl}</div>
+  </div>`;
+  box.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 12px 12px">
+      ${card("🏠", "العملاء", nC, "var(--navy)")}
+      ${card("🛠️", "الشركات", nP, "var(--gold)")}
+      ${card("🔧", "الفنيون", nT, "#16a34a")}
+    </div>
+    <div style="padding:0 12px 12px">
+      <div class="q-card" style="cursor:default">
+        <b style="color:var(--navy)">🗂️ إدارة ملف مستخدم</b>
+        <div class="form-group" style="margin-top:10px;margin-bottom:8px">
+          <input type="text" id="auSearch" placeholder="🔍 ابحث بالاسم أو البريد أو الجوال…" oninput="adminFilterUsers()">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <select id="auSelect" onchange="adminPickUser()"></select>
+        </div>
+        <div id="auEditor"></div>
+      </div>
+    </div>`;
+  adminFilterUsers();
 }
+
+function adminRoleName(r) {
+  return r === "provider" ? "🛠️ شركة" : r === "tech" ? "🔧 فني" : "🏠 عميل";
+}
+
+window.adminFilterUsers = function() {
+  const sel = document.getElementById("auSelect");
+  if (!sel) return;
+  const q = normAr((document.getElementById("auSearch").value || "").trim());
+  const list = adminUsersCache.filter(u => !q
+    || normAr(u.displayName || "").includes(q)
+    || normAr(u.email || "").includes(q)
+    || normAr(adminRoleName(u.role)).includes(q)
+    || normAr(u.location || "").includes(q)
+    || (u.phone || "").replace(/\s/g, "").includes(q.replace(/\s/g, "")));
+  sel.innerHTML = `<option value="">— اختر المستخدم (${list.length}) —</option>` +
+    list.map(u => `<option value="${u.uid}">${u.displayName || "بدون اسم"} • ${adminRoleName(u.role)} • ${u.email || ""}</option>`).join("");
+  document.getElementById("auEditor").innerHTML = "";
+};
+
+window.adminPickUser = function() {
+  const uid = document.getElementById("auSelect").value;
+  const ed = document.getElementById("auEditor");
+  if (!uid) { ed.innerHTML = ""; return; }
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (!u) { ed.innerHTML = ""; return; }
+  const st = u.status || "approved";
+  const isProv = u.role === "provider" || u.role === "tech";
+  ed.innerHTML = `
+    <div style="border-top:1.5px dashed #e7e3da;margin-top:10px;padding-top:12px">
+      <div class="form-group"><label>الاسم</label><input type="text" id="auName" value="${(u.displayName || "").replace(/"/g, "&quot;")}"></div>
+      <div class="form-group"><label>رقم الجوال</label><input type="tel" id="auPhone" dir="ltr" value="${u.phone || ""}"></div>
+      <div class="form-group"><label>📍 المنطقة</label><input type="text" id="auLoc" value="${(u.location || "").replace(/"/g, "&quot;")}" placeholder="مسقط / السيب / المعبيلة"></div>
+      <div class="form-group"><label>البريد (للقراءة فقط)</label><input type="email" dir="ltr" value="${u.email || ""}" disabled style="opacity:.6"></div>
+      ${isProv ? `<div class="form-group"><label>التخصصات</label><div id="auCatList" class="cat-picks">${catPickHtml(u.role === "tech" ? TECHS : CATEGORIES, userCatsArr(u))}</div></div>
+      <div class="form-group"><label>الخدمات</label><input type="text" id="auServices" value="${(Array.isArray(u.services) ? u.services.join("، ") : (u.services || "")).replace(/"/g, "&quot;")}"></div>` : ""}
+      <div class="form-group"><label>الحالة</label>
+        <select id="auStatus">
+          <option value="approved"${st === "approved" ? " selected" : ""}>✅ مفعّل</option>
+          <option value="pending"${st === "pending" ? " selected" : ""}>⏳ بانتظار الموافقة</option>
+          <option value="suspended"${st === "suspended" ? " selected" : ""}>🚫 موقوف</option>
+          <option value="rejected"${st === "rejected" ? " selected" : ""}>⛔ مرفوض</option>
+        </select>
+      </div>
+      <div class="form-group"><label>سبب الإيقاف/الرفض (اختياري)</label><input type="text" id="auReason" value="${(u.statusReason || "").replace(/"/g, "&quot;")}"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="submit-btn" style="flex:2" onclick="adminSaveUser('${u.uid}')">💾 حفظ التعديلات</button>
+        <button class="action-btn action-delete" style="flex:1;justify-content:center" onclick="adminDelete('${u.uid}')">🗑️ حذف</button>
+      </div>
+    </div>`;
+};
+
+window.adminSaveUser = async function(uid) {
+  const data = {
+    displayName: document.getElementById("auName").value.trim(),
+    phone: document.getElementById("auPhone").value.trim(),
+    location: document.getElementById("auLoc").value.trim(),
+    status: document.getElementById("auStatus").value,
+    statusReason: document.getElementById("auReason").value.trim()
+  };
+  if (!data.displayName) { showToast("الاسم مطلوب", "error"); return; }
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (u && (u.role === "provider" || u.role === "tech")) {
+    const cats = getPickedCats("auCatList");
+    if (!cats.length) { showToast("اختر تخصصًا واحدًا على الأقل ✅", "error"); return; }
+    data.categories = cats;
+    data.category = cats[0];
+    data.services = document.getElementById("auServices").value.split(/[،,]/).map(x => x.trim()).filter(Boolean);
+  }
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const lu = users.find(x => x.uid === uid);
+      if (lu) { Object.assign(lu, data); localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+    showToast("تم حفظ ملف المستخدم ✅");
+    loadUsersTable();
+    loadLiveCompanies();
+  } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
+};
 
 // --- إجراءات الأدمن على المستخدمين ---
 async function updateUserStatus(uid, status, reason = "") {
