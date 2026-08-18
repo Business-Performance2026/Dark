@@ -691,7 +691,7 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
         <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
         <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
-        <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ ملف الشركة 💾</button>
+        <button type="submit" class="submit-btn" data-i18n="cp_save">حفظ 💾</button>
       </form>
     </div>  </div>
 </section>
@@ -883,7 +883,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 45)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 46)</small>
     </div>
   </div>
 </footer>
@@ -936,13 +936,10 @@ footer ul a:hover{color:var(--gold-2)}
           <div id="regCatList" class="cat-picks"></div>
           <small style="color:var(--muted);font-size:.74rem">✅ تقدر تختار أكثر من تخصص</small>
         </div>
-        <div class="form-group">
-          <label>📍 المحافظة</label>
-          <select id="regGov"></select>
-        </div>
-        <div class="form-group">
-          <label>الولاية</label>
-          <select id="regWilaya"></select>
+        <div class="form-group" id="regLocWrap" style="display:none">
+          <label>📍 منطقتك (المحافظة / الولاية / المنطقة)</label>
+          <input type="text" id="regLoc" placeholder="مثال: مسقط / السيب / المعبيلة">
+          <small style="color:var(--muted);font-size:.74rem">تظهر للعملاء عند تصفح منطقتك</small>
         </div>
       </div>
       <div class="form-group">
@@ -1407,7 +1404,7 @@ const I18N = {
     co_insta: "إنستجرام", co_web: "الموقع الإلكتروني", co_map: "الخريطة", co_no_eng: "لم تُضف بيانات المهندسين بعد",
     cp_title: "📇 ملف الشركة (يظهر للعملاء في صفحتك)", cp_phone2: "هاتف إضافي", cp_insta: "رابط إنستجرام",
     cp_web: "الموقع الإلكتروني", cp_map: "رابط خريطة جوجل", cp_bio: "نبذة عن الشركة",
-    cp_services: "خدمات الشركة (افصل بينها بفاصلة ،)", cp_save: "حفظ ملف الشركة 💾", cp_saved: "تم حفظ ملف الشركة ✅",
+    cp_services: "خدمات الشركة (افصل بينها بفاصلة ،)", cp_save: "حفظ 💾", cp_saved: "تم حفظ ملف الشركة ✅",
     emp_title: "👷 المهندسون والموظفون", emp_name: "الاسم", emp_job: "المسمى الوظيفي", emp_hours: "أوقات الدوام",
     emp_perm: "الصلاحية", emp_perm1: "مشاهدة الطلبات فقط", emp_perm2: "إرسال عروض الأسعار", emp_perm3: "صلاحية كاملة",
     emp_add: "إضافة ➕", emp_del: "حذف", emp_empty: "لا يوجد موظفون بعد", emp_added: "تمت إضافة الموظف ✅",
@@ -1482,7 +1479,7 @@ const I18N = {
     co_insta: "Instagram", co_web: "Website", co_map: "Map", co_no_eng: "No engineers added yet",
     cp_title: "📇 Company profile (shown to clients on your page)", cp_phone2: "Extra phone", cp_insta: "Instagram link",
     cp_web: "Website", cp_map: "Google Maps link", cp_bio: "About the company",
-    cp_services: "Company services (separate with a comma ,)", cp_save: "Save company profile 💾", cp_saved: "Company profile saved ✅",
+    cp_services: "Company services (separate with a comma ,)", cp_save: "Save 💾", cp_saved: "Company profile saved ✅",
     emp_title: "👷 Engineers & staff", emp_name: "Name", emp_job: "Job title", emp_hours: "Working hours",
     emp_perm: "Permission", emp_perm1: "View requests only", emp_perm2: "Send quotations", emp_perm3: "Full access",
     emp_add: "Add ➕", emp_del: "Delete", emp_empty: "No staff yet", emp_added: "Staff member added ✅",
@@ -1531,16 +1528,16 @@ window.openTechDir = async function() {
   if (!liveTechs.length) await loadLiveTechs();
   if (!RATINGS.length) { try { RATINGS = await fetchRatings(); } catch (e) {} }
   const groups = {};
-  liveTechs.forEach(u => { const loc = (u.location || "").split(" - ")[0].trim() || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
+  liveTechs.forEach(u => { const loc = ((u.location || "").split(/ - |\//)[0] || "").trim() || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
   const card = u => {
     const rt = ratingAvg(u.uid);
     const cats = userCatsArr(u).join(" • ") || "فني";
     const firstCat = (userCatsArr(u)[0] || "").replace(/'/g, "");
     return `<div class="co-card" style="cursor:default">
-      <div class="co-logo">🔧</div>
+      ${u.logo ? `<img class="co-logo-img" src="${u.logo}" alt="">` : `<div class="co-logo">🔧</div>`}
       <h3>${u.displayName || "فني"}</h3>
       <div class="co-cat">${cats}</div>
-      ${(u.location || "").includes(" - ") ? `<div style="color:var(--muted);font-size:.8rem">📍 ${u.location.split(" - ")[1].trim()}</div>` : ""}
+      ${(() => { const pr = (u.location || "").split(/ - |\//); return pr.length > 1 ? `<div style="color:var(--muted);font-size:.8rem">📍 ${pr.slice(1).join(" / ").trim()}</div>` : ""; })()}
       <div class="co-rate">${rt ? `★ ${rt.avg} (${rt.count})` : "✨ فني جديد"}</div>
       <button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="requestTechDirect('${u.uid}', '${(u.displayName || "").replace(/'/g, "")}', '${firstCat}')">📨 اطلب منه</button>
     </div>`;
@@ -1834,6 +1831,7 @@ document.querySelectorAll(".role-option").forEach(opt => {
     opt.classList.add("active");
     selectedRole = opt.dataset.role;
     document.getElementById("regCategoryWrap").style.display = (selectedRole === "provider" || selectedRole === "tech") ? "block" : "none";
+    document.getElementById("regLocWrap").style.display = (selectedRole === "provider" || selectedRole === "tech") ? "block" : "none";
     fillRegCats(selectedRole);
   });
 });
@@ -1929,9 +1927,6 @@ function roleLabel(r) {
   return r === "provider" ? "ملف الشركة 🛠️" : r === "tech" ? "ملف الفني 🔧" : "حساب العميل 🏠";
 }
 
-// تعبئة قوائم المحافظة/الولاية في نموذج التسجيل
-fillGovWilaya(document.getElementById("regGov"), document.getElementById("regWilaya"), "");
-
 // إرسال نموذج الدخول / التسجيل
 authForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -1949,9 +1944,10 @@ authForm.addEventListener("submit", async e => {
           btn.disabled = false; btn.textContent = t("register_go");
           return;
         }
-        const regLoc = govWilayaLoc(document.getElementById("regGov"), document.getElementById("regWilaya"));
+        const regLoc = (selectedRole === "provider" || selectedRole === "tech")
+          ? (document.getElementById("regLoc").value || "").trim() : "";
         if ((selectedRole === "provider" || selectedRole === "tech") && !regLoc) {
-          showToast("حدد المحافظة والولاية 📍 — عشان تظهر للعملاء في منطقتك", "error");
+          showToast("اكتب منطقتك 📍 — مثال: مسقط / السيب / المعبيلة", "error");
           btn.disabled = false; btn.textContent = t("register_go");
           return;
         }
@@ -2956,7 +2952,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
-        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${currentUser.role === "tech" ? "ملفي (الاسم، الهاتف، المنطقة)" : t("acc_profile")}</span></button>` : ""}
+        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${currentUser.role === "tech" ? "ملفي" : t("acc_profile")}</span></button>` : ""}
         ${currentUser.role === "client" ? `<button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
