@@ -883,7 +883,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 49)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 50)</small>
     </div>
   </div>
 </footer>
@@ -2550,6 +2550,7 @@ async function loadUsersTable() {
   const nC = users.filter(u => !u.role || u.role === "client").length;
   const nP = users.filter(u => u.role === "provider").length;
   const nT = users.filter(u => u.role === "tech").length;
+  const pending = users.filter(u => (u.status || "approved") === "pending");
   const card = (icon, lbl, n, color) => `<div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 8px;text-align:center">
     <div style="font-size:1.4rem">${icon}</div>
     <div style="font-size:1.5rem;font-weight:800;color:${color}">${n}</div>
@@ -2561,6 +2562,20 @@ async function loadUsersTable() {
       ${card("🛠️", "الشركات", nP, "var(--gold)")}
       ${card("🔧", "الفنيون", nT, "#16a34a")}
     </div>
+    ${pending.length ? `<div style="padding:0 12px 12px">
+      <div class="q-card" style="cursor:default;border:2px solid var(--gold);background:#fffaf0">
+        <b style="color:var(--navy)">⏳ بانتظار موافقتك (${pending.length})</b>
+        ${pending.map(u => `<div style="display:flex;align-items:center;gap:8px;border-top:1.5px dashed #eadfc8;margin-top:10px;padding-top:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <b>${u.displayName || "بدون اسم"}</b> <span class="status-badge status-pending">${adminRoleName(u.role)}</span><br>
+            <small style="color:var(--muted)" dir="ltr">${u.email || ""}</small><br>
+            <small style="color:var(--muted)">${u.phone || "—"} • 📍 ${u.location || "—"} • ${userCatsArr(u).join("، ") || "—"}</small>
+          </div>
+          <button class="action-btn action-approve" onclick="adminApprove('${u.uid}')">✅ تفعيل</button>
+          <button class="action-btn action-reject" onclick="adminReject('${u.uid}')">⛔ رفض</button>
+        </div>`).join("")}
+      </div>
+    </div>` : ""}
     <div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default">
         <b style="color:var(--navy)">🗂️ إدارة ملف مستخدم</b>
