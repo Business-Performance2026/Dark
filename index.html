@@ -883,7 +883,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 47)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 49)</small>
     </div>
   </div>
 </footer>
@@ -1206,7 +1206,7 @@ let addDocFn = null, collectionFn = null, serverTimestampFn = null;
 let getDocsFn = null, queryFn = null, whereFn = null;
 let docFn = null, getDocFn = null, updateDocFn = null, deleteDocFn = null, setDocFn = null;
 let storage = null, refFn = null, uploadBytesFn = null, getUrlFn = null;
-let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null, deleteUserFn = null, updateEmailFn = null;
+let createUserFn = null, signInFn = null, signOutFn = null, updateProfileFn = null, onAuthStateFn = null, sendResetFn = null, deleteUserFn = null, updateEmailFn = null, verifyEmailFn = null;
 let messaging = null, getTokenFn = null, onMessageFn = null, arrayUnionFn = null;
 
 let firebaseReadyResolve;
@@ -1244,6 +1244,7 @@ if (FIREBASE_READY) {
     sendResetFn = authMod.sendPasswordResetEmail;
     deleteUserFn = authMod.deleteUser;
     updateEmailFn = authMod.updateEmail;
+    verifyEmailFn = authMod.verifyBeforeUpdateEmail;
     arrayUnionFn = firestore.arrayUnion;
     try {
       const msgMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
@@ -1894,6 +1895,8 @@ function govWilayaLoc(govEl, wilEl) {
   return g ? (w && OMAN_GOV[g] ? g + " - " + w : g) : "";
 }
 
+let _registering = false; // 🛡️ أثناء إنشاء حساب جديد — مراقب الجلسة ما يتدخل
+
 // --- الأدوار المتعددة: لقطة بيانات كل دور عشان ما تضيع عند التبديل ---
 const ROLE_SNAP_FIELDS = ["phone", "whatsapp", "insta", "web", "map", "displayName", "nameEn", "location", "bio", "services", "categories", "category", "logo"];
 function snapshotRoleData(u) {
@@ -1952,6 +1955,7 @@ authForm.addEventListener("submit", async e => {
           return;
         }
         let cred;
+        _registering = true;
         try {
           cred = await createUserFn(auth, fd.email, fd.password);
         } catch (err) {
@@ -1978,7 +1982,7 @@ authForm.addEventListener("submit", async e => {
               btn.disabled = false; btn.textContent = t("register_go");
               return;
             }
-          } else throw err;
+          } else { _registering = false; throw err; }
         }
         if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
         currentUser = {
@@ -1996,6 +2000,7 @@ authForm.addEventListener("submit", async e => {
         };
         await addDocFn(collectionFn(db, "users"), { ...currentUser, createdAt: serverTimestampFn() });
         localStorage.setItem("darak_session", JSON.stringify(currentUser));
+        _registering = false;
       } else {
         const cred = await signInFn(auth, fd.email, fd.password);
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", cred.user.uid)));
@@ -2005,6 +2010,10 @@ authForm.addEventListener("submit", async e => {
         if (!snap.docs.length) {
           // إصلاح ذاتي: وثيقة المستخدم مفقودة — نعيد إنشاءها (يسترجع حساب الإدارة أيضًا)
           try { await addDocFn(collectionFn(db, "users"), { ...currentUser, restoredAt: serverTimestampFn() }); } catch (e) {}
+        } else if (cred.user.email && cred.user.email !== currentUser.email) {
+          // 📧 المستخدم أكّد إيميله الجديد من الرابط — نزامن وثيقته مع بريد الدخول الفعلي
+          try { await updateDocFn(snap.docs[0].ref, { email: cred.user.email }); } catch (e) {}
+          currentUser.email = cred.user.email;
         }
         localStorage.setItem("darak_session", JSON.stringify(currentUser));
       }
@@ -2684,6 +2693,32 @@ window.adminDelete = async uid => {
   } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
 };
 
+// 📧 تغيير إيميل الدخول بأمان — يرجع الإيميل المعتمد: الجديد إذا تغيّر فعليًا في حساب الدخول، والقديم إذا فشل
+async function changeLoginEmail(newEm) {
+  if (!newEm || newEm === currentUser.email) return { email: currentUser.email, changed: false };
+  if (ADMIN_EMAILS.includes(currentUser.email)) {
+    showToast("⛔ لا يمكن تغيير بريد حساب الإدارة", "error");
+    return { email: currentUser.email, changed: false };
+  }
+  if (!auth) return { email: newEm, changed: true }; // الوضع التجريبي المحلي
+  if (!auth.currentUser || !verifyEmailFn) {
+    showToast("🔐 ما تغيّر البريد — جلسة الدخول منتهية. سجّل خروج وادخل من جديد ثم عدّل بريدك", "error");
+    return { email: currentUser.email, changed: false };
+  }
+  try {
+    // الطريقة المعتمدة من Firebase: رابط تأكيد يوصل للبريد الجديد — أول ما يضغطه يتبدل إيميل الدخول رسميًا
+    await verifyEmailFn(auth.currentUser, newEm);
+    showToast("📧 أرسلنا رابط تأكيد إلى " + newEm + " — افتح بريدك الجديد واضغط الرابط، وبيتبدل إيميل دخولك رسميًا. بياناتك باقية ببريدك الحالي لين تأكّد", "success");
+    return { email: currentUser.email, changed: false, pending: true };
+  } catch (err) {
+    if (err && err.code === "auth/requires-recent-login") showToast("🔐 ما تغيّر البريد — Firebase يشترط دخولًا حديثًا: سجّل خروج وادخل من جديد ثم عدّل بريدك واحفظ فورًا", "error");
+    else if (err && err.code === "auth/email-already-in-use") showToast("هذا البريد مستخدم في حساب آخر — اختر بريدًا ثانيًا", "error");
+    else if (err && err.code === "auth/invalid-email") showToast("صيغة البريد غير صحيحة — تأكد منها", "error");
+    else { console.warn(err); showToast("تعذر تغيير البريد — بقي بريدك القديم كما هو", "error"); }
+    return { email: currentUser.email, changed: false };
+  }
+}
+
 // --- نافذة السبب ---
 let reasonCallback = null;
 function openReasonModal(title, cb) {
@@ -2737,26 +2772,9 @@ document.getElementById("meSave").addEventListener("click", async () => {
   const btn = document.getElementById("meSave");
   btn.disabled = true; btn.textContent = "لحظات…";
   try {
-    const emailChanged = em !== currentUser.email;
-    // تغيير الإيميل في حساب الدخول — يتطلب دخولًا حديثًا
-    if (emailChanged && auth && auth.currentUser && updateEmailFn) {
-      try {
-        await updateEmailFn(auth.currentUser, em);
-      } catch (err) {
-        if (err && err.code === "auth/requires-recent-login") {
-          showToast("🔐 تغيير البريد يتطلب دخولًا حديثًا — سجّل خروج وادخل من جديد ثم عدّل", "error");
-          btn.disabled = false; btn.textContent = "حفظ 💾";
-          return;
-        }
-        if (err && err.code === "auth/email-already-in-use") {
-          showToast("هذا البريد مستخدم في حساب آخر", "error");
-          btn.disabled = false; btn.textContent = "حفظ 💾";
-          return;
-        }
-        throw err;
-      }
-    }
-    const data = { displayName: nm, phone: ph, email: em, location: govWilayaLoc(document.getElementById("meGov"), document.getElementById("meWilaya")) };
+    const emRes = await changeLoginEmail(em);
+    // البريد في الملف = إيميل الدخول الفعلي فقط — لو ما تغيّر في الدخول، يبقى القديم (ما ينفصل الملف عن الدخول أبدًا)
+    const data = { displayName: nm, phone: ph, email: emRes.email, location: govWilayaLoc(document.getElementById("meGov"), document.getElementById("meWilaya")) };
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
@@ -2770,7 +2788,7 @@ document.getElementById("meSave").addEventListener("click", async () => {
     document.getElementById("myEditModal").classList.remove("open");
     renderAuthArea();
     renderAccountView();
-    showToast("تم حفظ ملفك ✅");
+    showToast(emRes.changed ? "✅ تم حفظ ملفك وتغيير إيميل الدخول — ادخل بالإيميل الجديد من المرة الجاية" : "تم حفظ ملفك ✅");
   } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
   btn.disabled = false; btn.textContent = "حفظ 💾";
 });
@@ -3623,16 +3641,10 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
   const logoFile = document.getElementById("cpLogo").files[0];
   const newEmail = document.getElementById("cpEmail").value.trim();
-  if (newEmail && newEmail !== currentUser.email && auth && auth.currentUser && updateEmailFn) {
-    try { await updateEmailFn(auth.currentUser, newEmail); }
-    catch (err) {
-      if (err && err.code === "auth/requires-recent-login") { showToast("🔐 تغيير البريد يتطلب دخولًا حديثًا — سجّل خروج وادخل من جديد ثم عدّل", "error"); return; }
-      if (err && err.code === "auth/email-already-in-use") { showToast("هذا البريد مستخدم في حساب آخر", "error"); return; }
-    }
-  }
+  const emRes = await changeLoginEmail(newEmail);
   const data = {
     phone: document.getElementById("cpPhone").value.trim(),
-    email: newEmail || currentUser.email,
+    email: emRes.email,
     whatsapp: document.getElementById("cpWhatsApp").value.trim(),
     insta: document.getElementById("cpInsta").value.trim(),
     web: document.getElementById("cpWeb").value.trim(),
@@ -3660,7 +3672,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     const list = JSON.parse(localStorage.getItem("darak_users") || "[]");
     const u = list.find(x => x.uid === currentUser.uid);
     if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(list)); }
-    showToast(t("cp_saved"));
+    showToast(emRes.changed ? "✅ تم الحفظ وتغيير إيميل الدخول — ادخل بالإيميل الجديد من المرة الجاية" : t("cp_saved"));
     addKeywordsToPool(data.services || []);
     loadLiveCompanies();
   } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
@@ -4359,6 +4371,7 @@ firebaseReady.then(() => {
 if (auth && onAuthStateFn) {
   onAuthStateFn(auth, async user => {
     if (user && !currentUser) {
+      if (_registering) return; // تسجيل جديد جارٍ — معالج التسجيل يتكفل بكل شيء
       try {
         const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", user.uid)));
         if (!snap.docs.length) {
@@ -4382,6 +4395,10 @@ if (auth && onAuthStateFn) {
           try { await signOutFn(auth); } catch (e) {}
           showToast("🚫 " + (st === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + (prof.statusReason || t("no_reason")), "error");
           return;
+        }
+        if (user.email && prof.email && user.email !== prof.email) {
+          try { await updateDocFn(snap.docs[0].ref, { email: user.email }); } catch (e) {}
+          prof.email = user.email;
         }
         currentUser = prof;
         localStorage.setItem("darak_session", JSON.stringify(prof));
