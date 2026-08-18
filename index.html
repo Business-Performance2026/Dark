@@ -685,7 +685,9 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
         <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="cpPhone" dir="ltr" placeholder="9XXXXXXX"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="cpEmail" dir="ltr"></div>
-        <div class="form-group"><label data-i18n="cp_loc">موقع الشركة (المدينة / المنطقة)</label><input type="text" id="cpLoc" placeholder="مسقط — الخوض"></div>
+        <div class="form-group"><label>📍 المحافظة</label><select id="cpGov"></select></div>
+        <div class="form-group"><label>الولاية</label><select id="cpWilaya"></select></div>
+        <input type="hidden" id="cpLoc">
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
         <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
         <div class="form-group"><label data-i18n="cp_web">الموقع الإلكتروني</label><input type="url" id="cpWeb" dir="ltr" placeholder="https://..."></div>
@@ -881,7 +883,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 44)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 45)</small>
     </div>
   </div>
 </footer>
@@ -933,6 +935,14 @@ footer ul a:hover{color:var(--gold-2)}
           <label data-i18n="cat_lbl">تخصصك</label>
           <div id="regCatList" class="cat-picks"></div>
           <small style="color:var(--muted);font-size:.74rem">✅ تقدر تختار أكثر من تخصص</small>
+        </div>
+        <div class="form-group">
+          <label>📍 المحافظة</label>
+          <select id="regGov"></select>
+        </div>
+        <div class="form-group">
+          <label>الولاية</label>
+          <select id="regWilaya"></select>
         </div>
       </div>
       <div class="form-group">
@@ -1128,6 +1138,8 @@ footer ul a:hover{color:var(--gold-2)}
     <div class="form-group"><label>الاسم</label><input type="text" id="meName"></div>
     <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="mePhone" dir="ltr" placeholder="9XXXXXXX"></div>
     <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="meEmail" dir="ltr"></div>
+    <div class="form-group"><label>📍 المحافظة</label><select id="meGov"></select></div>
+    <div class="form-group"><label>الولاية</label><select id="meWilaya"></select></div>
     <button class="submit-btn" id="meSave" type="button">حفظ 💾</button>
   </div>
 </div>
@@ -1519,7 +1531,7 @@ window.openTechDir = async function() {
   if (!liveTechs.length) await loadLiveTechs();
   if (!RATINGS.length) { try { RATINGS = await fetchRatings(); } catch (e) {} }
   const groups = {};
-  liveTechs.forEach(u => { const loc = u.location || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
+  liveTechs.forEach(u => { const loc = (u.location || "").split(" - ")[0].trim() || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
   const card = u => {
     const rt = ratingAvg(u.uid);
     const cats = userCatsArr(u).join(" • ") || "فني";
@@ -1528,6 +1540,7 @@ window.openTechDir = async function() {
       <div class="co-logo">🔧</div>
       <h3>${u.displayName || "فني"}</h3>
       <div class="co-cat">${cats}</div>
+      ${(u.location || "").includes(" - ") ? `<div style="color:var(--muted);font-size:.8rem">📍 ${u.location.split(" - ")[1].trim()}</div>` : ""}
       <div class="co-rate">${rt ? `★ ${rt.avg} (${rt.count})` : "✨ فني جديد"}</div>
       <button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="requestTechDirect('${u.uid}', '${(u.displayName || "").replace(/'/g, "")}', '${firstCat}')">📨 اطلب منه</button>
     </div>`;
@@ -1848,6 +1861,41 @@ function renderAuthArea() {
   }
 }
 
+// --- 📍 محافظات وولايات سلطنة عمان ---
+const OMAN_GOV = {
+  "مسقط": ["مسقط", "مطرح", "بوشر", "السيب", "العامرات", "قريات"],
+  "ظفار": ["صلالة", "طاقة", "مرباط", "ثمريت", "رخيوت", "ضلكوت", "سدح"],
+  "شمال الباطنة": ["صحار", "شناص", "لوى", "صحم", "الخابورة", "السويق"],
+  "جنوب الباطنة": ["الرستاق", "العوابي", "نخل", "وادي المعاول", "بركاء", "المصنعة"],
+  "الداخلية": ["نزوى", "بهلا", "منح", "الحمراء", "آدم", "إزكي", "بدبد", "سمائل"],
+  "شمال الشرقية": ["إبراء", "المضيبي", "بدية", "دماء والطائيين", "وادي بني خالد", "القابل"],
+  "جنوب الشرقية": ["صور", "جعلان بني بو علي", "جعلان بني بو حسن", "الكامل والوافي", "مصيرة"],
+  "الظاهرة": ["عبري", "ينقل", "ضنك"],
+  "الوسطى": ["هيماء", "محوت", "الدقم", "الجازر"],
+  "مسندم": ["خصب", "دبا", "بخاء", "مدحاء"],
+  "البريمي": ["البريمي", "محضة", "السنينة"]
+};
+function fillGovWilaya(govEl, wilEl, loc) {
+  if (!govEl || !wilEl) return;
+  const parts = (loc || "").split(" - ").map(x => x.trim());
+  const govKnown = OMAN_GOV[parts[0]] ? parts[0] : "";
+  let opts = `<option value="">اختر المحافظة…</option>` + Object.keys(OMAN_GOV).map(g => `<option${g === govKnown ? " selected" : ""}>${g}</option>`).join("");
+  // موقع قديم بصيغة حرة — نحافظ عليه كخيار عشان ما يضيع
+  if (loc && !govKnown) opts += `<option selected>${loc}</option>`;
+  govEl.innerHTML = opts;
+  const fillWil = () => {
+    const g = govEl.value;
+    const wilayas = OMAN_GOV[g] || [];
+    wilEl.innerHTML = `<option value="">${wilayas.length ? "اختر الولاية…" : "—"}</option>` + wilayas.map(w => `<option${w === parts[1] ? " selected" : ""}>${w}</option>`).join("");
+  };
+  govEl.onchange = fillWil;
+  fillWil();
+}
+function govWilayaLoc(govEl, wilEl) {
+  const g = govEl ? govEl.value : "", w = wilEl ? wilEl.value : "";
+  return g ? (w && OMAN_GOV[g] ? g + " - " + w : g) : "";
+}
+
 // --- الأدوار المتعددة: لقطة بيانات كل دور عشان ما تضيع عند التبديل ---
 const ROLE_SNAP_FIELDS = ["phone", "whatsapp", "insta", "web", "map", "displayName", "nameEn", "location", "bio", "services", "categories", "category", "logo"];
 function snapshotRoleData(u) {
@@ -1881,6 +1929,9 @@ function roleLabel(r) {
   return r === "provider" ? "ملف الشركة 🛠️" : r === "tech" ? "ملف الفني 🔧" : "حساب العميل 🏠";
 }
 
+// تعبئة قوائم المحافظة/الولاية في نموذج التسجيل
+fillGovWilaya(document.getElementById("regGov"), document.getElementById("regWilaya"), "");
+
 // إرسال نموذج الدخول / التسجيل
 authForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -1895,6 +1946,12 @@ authForm.addEventListener("submit", async e => {
         const regCats = (selectedRole === "provider" || selectedRole === "tech") ? getPickedCats("regCatList") : [];
         if ((selectedRole === "provider" || selectedRole === "tech") && !regCats.length) {
           showToast("اختر تخصصًا واحدًا على الأقل ⬇️", "error");
+          btn.disabled = false; btn.textContent = t("register_go");
+          return;
+        }
+        const regLoc = govWilayaLoc(document.getElementById("regGov"), document.getElementById("regWilaya"));
+        if ((selectedRole === "provider" || selectedRole === "tech") && !regLoc) {
+          showToast("حدد المحافظة والولاية 📍 — عشان تظهر للعملاء في منطقتك", "error");
           btn.disabled = false; btn.textContent = t("register_go");
           return;
         }
@@ -1937,6 +1994,7 @@ authForm.addEventListener("submit", async e => {
           category: regCats[0] || "",
           categories: regCats,
           phone: fd.phone || "",
+          location: regLoc,
           status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
         };
@@ -1994,6 +2052,7 @@ authForm.addEventListener("submit", async e => {
           category: regCats[0] || "",
           categories: regCats,
           phone: fd.phone || "",
+          location: regLoc,
           status: (selectedRole === "provider" || selectedRole === "tech") ? "pending" : "approved",
           statusReason: ""
         };
@@ -2242,6 +2301,8 @@ async function openDashboard() {
       if (!admin) rows = rows.filter(r => !quoted.has(r.id));
     }
   } catch (e) { console.warn(e); }
+  // 🧹 العميل: تُخفى الطلبات المنتهية (بلا عرض مقبول وغير مكتملة) عشان الصفحة ما تتربش
+  if (!admin && !isPro) rows = rows.filter(r => !(isExpiredReq(r) && !r._accName && r.status !== "completed"));
   lastRequests = rows;
 
   // الإحصائيات
@@ -2321,8 +2382,9 @@ async function openDashboard() {
 
 // 📊 شريط تقدم حالة الطلب للعميل: أرسلت ← وصلتك عروض ← اخترت العرض ← اكتمل
 function clientStatusCell(r) {
-  if (isExpiredReq(r)) return `<span class="status-badge status-rejected" style="white-space:normal;text-align:center">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`;
   const done = r.status === "completed", acc = !!r._accName, hasQ = (r._qCount || 0) > 0;
+  // "منتهية" فقط للطلب اليتيم: ما عنده عرض مقبول ولا مكتمل — المقبول يكمل شريط مراحله حتى بعد ٧ أيام
+  if (isExpiredReq(r) && !acc && !done) return `<span class="status-badge status-rejected" style="white-space:normal;text-align:center">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`;
   const stage = done ? 4 : acc ? 3 : hasQ ? 2 : 1;
   // شريط النقاط: موصلات مرنة تتمدد بعرض البطاقة، والمرحلة الحالية مضيئة
   const bar = `<div style="display:flex;align-items:center;direction:ltr;width:100%;max-width:170px;margin:2px auto 0">${[1, 2, 3, 4].map(i => {
@@ -2577,6 +2639,7 @@ window.openMyEdit = function() {
   document.getElementById("meName").value = currentUser.displayName || "";
   document.getElementById("mePhone").value = currentUser.phone || "";
   document.getElementById("meEmail").value = currentUser.email || "";
+  fillGovWilaya(document.getElementById("meGov"), document.getElementById("meWilaya"), currentUser.location || "");
   document.getElementById("myEditModal").classList.add("open");
 };
 document.getElementById("myEditClose").addEventListener("click", () => document.getElementById("myEditModal").classList.remove("open"));
@@ -2608,7 +2671,7 @@ document.getElementById("meSave").addEventListener("click", async () => {
         throw err;
       }
     }
-    const data = { displayName: nm, phone: ph, email: em };
+    const data = { displayName: nm, phone: ph, email: em, location: govWilayaLoc(document.getElementById("meGov"), document.getElementById("meWilaya")) };
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
@@ -2893,7 +2956,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
         ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
-        ${currentUser.role === "provider" ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${t("acc_profile")}</span></button>` : ""}
+        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${currentUser.role === "tech" ? "ملفي (الاسم، الهاتف، المنطقة)" : t("acc_profile")}</span></button>` : ""}
         ${currentUser.role === "client" ? `<button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
         <button class="acc-item" onclick="logout()">🚪 <span>${t("logout")}</span></button>
@@ -3462,7 +3525,7 @@ function fillCompanyProfileForm() {
   document.getElementById("cpInsta").value = currentUser.insta || "";
   document.getElementById("cpWeb").value = currentUser.web || "";
   document.getElementById("cpMap").value = currentUser.map || "";
-  document.getElementById("cpLoc").value = currentUser.location || "";
+  fillGovWilaya(document.getElementById("cpGov"), document.getElementById("cpWilaya"), currentUser.location || "");
   document.getElementById("cpNameAr").value = currentUser.displayName || "";
   document.getElementById("cpNameEn").value = currentUser.nameEn || "";
   document.getElementById("cpBio").value = currentUser.bio || "";
@@ -3491,7 +3554,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     map: document.getElementById("cpMap").value.trim(),
     displayName: document.getElementById("cpNameAr").value.trim() || currentUser.displayName,
     nameEn: document.getElementById("cpNameEn").value.trim(),
-    location: document.getElementById("cpLoc").value.trim(),
+    location: govWilayaLoc(document.getElementById("cpGov"), document.getElementById("cpWilaya")),
     bio: document.getElementById("cpBio").value.trim(),
     services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
   };
