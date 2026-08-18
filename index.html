@@ -680,6 +680,8 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group"><label data-i18n="cp_name_ar">اسم الشركة (عربي)</label><input type="text" id="cpNameAr"></div>
         <div class="form-group"><label data-i18n="cp_name_en">اسم الشركة (إنجليزي)</label><input type="text" id="cpNameEn" dir="ltr"></div>
         <div class="form-group"><label>تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
+        <div class="form-group"><label>⭐ التخصص الظاهر في بطاقتك</label><select id="cpPrimary"></select>
+          <small style="color:var(--muted);font-size:.74rem">هذا اللي يشوفه المستخدمون تحت شعارك عند تصفح الشركات والفنيين</small></div>
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
         <div class="form-group"><label data-i18n="cp_services">خدماتك (افصل بينها بفاصلة ، أو اختر من الاقتراحات)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"><div id="cpSvcSugs" style="margin-top:6px"></div></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
@@ -883,7 +885,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 50)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 51)</small>
     </div>
   </div>
 </footer>
@@ -1532,8 +1534,9 @@ window.openTechDir = async function() {
   liveTechs.forEach(u => { const loc = ((u.location || "").split(/ - |\//)[0] || "").trim() || "مناطق أخرى"; (groups[loc] = groups[loc] || []).push(u); });
   const card = u => {
     const rt = ratingAvg(u.uid);
-    const cats = userCatsArr(u).join(" • ") || "فني";
-    const firstCat = (userCatsArr(u)[0] || "").replace(/'/g, "");
+    const catsArr = userCatsArr(u);
+    const cats = u.category || catsArr[0] || "فني"; // ⭐ التخصص الرئيسي اللي حدده الفني في ملفه
+    const firstCat = (catsArr[0] || "").replace(/'/g, "");
     return `<div class="co-card" style="cursor:default">
       ${u.logo ? `<img class="co-logo-img" src="${u.logo}" alt="">` : `<div class="co-logo">🔧</div>`}
       <h3>${u.displayName || "فني"}</h3>
@@ -3553,19 +3556,31 @@ function restartAdTimer() {
   adTimer = setInterval(() => { adIdx = (adIdx + 1) % ADS.length; adApply(); }, 3000);
 }
 window.adTo = function(i) { adIdx = i; adApply(); restartAdTimer(); };
-// 👆 سحب الإعلانات باللمس — يمين/يسار
+// 👆 سحب الإعلانات باللمس — الشريط يتبع الإصبع مباشرة ثم يلتقط بسلاسة (بدون ارتداد)
 (function() {
   const sl = document.getElementById("adSlider");
-  if (!sl) return;
-  let sx = 0, dx = 0;
+  const track = document.getElementById("adTrack");
+  if (!sl || !track) return;
+  let sx = 0, dx = 0, dragging = false;
   sl.style.touchAction = "pan-y";
-  sl.addEventListener("touchstart", e => { sx = e.touches[0].clientX; dx = 0; clearInterval(adTimer); }, { passive: true });
-  sl.addEventListener("touchmove", e => { dx = e.touches[0].clientX - sx; }, { passive: true });
+  const basePx = () => (document.documentElement.dir === "rtl" ? 1 : -1) * adIdx * sl.clientWidth;
+  sl.addEventListener("touchstart", e => {
+    sx = e.touches[0].clientX; dx = 0; dragging = true;
+    clearInterval(adTimer);
+    track.style.transition = "none"; // أثناء السحب: بدون حركة انتقالية — يتبع الإصبع حرفيًا
+  }, { passive: true });
+  sl.addEventListener("touchmove", e => {
+    if (!dragging) return;
+    dx = e.touches[0].clientX - sx;
+    track.style.transform = `translateX(${basePx() + dx}px)`;
+  }, { passive: true });
   sl.addEventListener("touchend", () => {
-    if (Math.abs(dx) > 40 && ADS.length > 1) {
-      adIdx = (adIdx + (dx < 0 ? 1 : -1) + ADS.length) % ADS.length;
-      adApply();
-    }
+    if (!dragging) return;
+    dragging = false;
+    track.style.transition = ""; // نرجّع الانتقال السلس للالتقاط
+    const th = sl.clientWidth * 0.18; // سحب 18% من العرض يكفي للانتقال
+    if (Math.abs(dx) > th && ADS.length > 1) adIdx = (adIdx + (dx < 0 ? 1 : -1) + ADS.length) % ADS.length;
+    adApply();
     restartAdTimer();
   });
 })();
@@ -3649,8 +3664,23 @@ function fillCompanyProfileForm() {
   document.getElementById("cpBio").value = currentUser.bio || "";
   document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
   const cpList = document.getElementById("cpCatList");
-  if (cpList) cpList.innerHTML = catPickHtml(currentUser.role === "tech" ? TECHS : CATEGORIES, userCatsArr(currentUser));
+  if (cpList) {
+    cpList.innerHTML = catPickHtml(currentUser.role === "tech" ? TECHS : CATEGORIES, userCatsArr(currentUser));
+    cpList.onchange = refreshPrimarySel;
+  }
+  refreshPrimarySel();
   renderSvcSuggestions();
+}
+// ⭐ قائمة التخصص الظاهر تتعبى من التخصصات المختارة
+function refreshPrimarySel() {
+  const sel = document.getElementById("cpPrimary");
+  if (!sel) return;
+  const cats = getPickedCats("cpCatList");
+  const cur = currentUser.category || "";
+  sel.innerHTML = cats.length
+    ? cats.map(c => `<option${c === cur ? " selected" : ""}>${c}</option>`).join("")
+    : `<option value="">— اختر تخصصاتك أولًا من الأعلى —</option>`;
+  if (!cur && cats.length) sel.value = cats[0];
 }
 document.getElementById("cpForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -3674,7 +3704,8 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     const cpCats = getPickedCats("cpCatList");
     if (!cpCats.length) { showToast("اختر تخصصًا واحدًا على الأقل ✅", "error"); return; }
     data.categories = cpCats;
-    data.category = cpCats[0];
+    const prim = (document.getElementById("cpPrimary").value || "").trim();
+    data.category = (prim && cpCats.includes(prim)) ? prim : cpCats[0];
   }
   try {
     if (logoFile) data.logo = await uploadImage(logoFile, "logos");
@@ -3853,7 +3884,7 @@ async function loadLiveCompanies() {
     liveCompanies = users.filter(u => (u.status || "approved") === "approved").map(u => {
       const rt = ratingAvg(u.uid);
       return {
-        id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || "", catEn: u.category || "", cats: userCatsArr(u),
+        id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || (userCatsArr(u)[0] || ""), catEn: u.category || (userCatsArr(u)[0] || ""), cats: userCatsArr(u),
         icon: "🏢", rating: rt ? rt.avg : "", ratingCount: rt ? rt.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
         web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
       };
