@@ -4602,14 +4602,14 @@ if ("serviceWorker" in navigator) {
   </div>
 </div>
 <script>
-// يظهر فقط لأجهزة آيفون/آيباد غير مثبتة كتطبيق — مرة وحدة لكل مستخدم
+// يظهر فقط لأجهزة آيفون/آيباد غير مثبتة كتطبيق — يتكرر كل زيارة لين يثبت التطبيق
 (function () {
   try {
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     var isStandalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
     if (!isIOS || isStandalone) return;
-    if (localStorage.getItem("darak_ios_hint") === "1") return;
+    if (sessionStorage.getItem("darak_ios_hint_closed") === "1") return;
     setTimeout(function () {
       var h = document.getElementById("iosHint");
       if (h) h.style.display = "flex";
@@ -4619,7 +4619,7 @@ if ("serviceWorker" in navigator) {
 function closeIosHint() {
   var h = document.getElementById("iosHint");
   if (h) h.style.display = "none";
-  try { localStorage.setItem("darak_ios_hint", "1"); } catch (e) {}
+  try { sessionStorage.setItem("darak_ios_hint_closed", "1"); } catch (e) {}
 }
 window.closeIosHint = closeIosHint;
 </script>
