@@ -545,6 +545,18 @@ footer ul a:hover{color:var(--gold-2)}
 #companyProfileWrap h3,#employeesWrap h3{font-size:.95rem !important}
 #companyProfileWrap .submit-btn,#employeesWrap .submit-btn{padding:9px 14px;font-size:.8rem}
 
+/* 📱 بطاقة تعليمات تثبيت دارك لأجهزة آيفون */
+.ios-hint-overlay{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:1400;display:flex;align-items:center;justify-content:center;padding:20px}
+.ios-hint-card{background:#f6f1e7;border-radius:22px;max-width:430px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:iosPop .35s ease}
+@keyframes iosPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.ios-hint-head{background:var(--gold);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ios-hint-head h3{margin:0;color:#16283a;font-size:1rem;font-weight:800;line-height:1.5}
+.ios-hint-close{background:#16283a;color:#f6f1e7;border:none;width:30px;height:30px;border-radius:50%;font-size:.95rem;cursor:pointer;line-height:1;flex:0 0 auto}
+.ios-hint-close:active{transform:scale(.92)}
+.ios-hint-body{padding:18px}
+.ios-step{background:#fff;border:1.5px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:10px;color:#16283a;font-size:.9rem;font-weight:600}
+.ios-hint-foot{text-align:center;color:#7a6a4f;font-size:.82rem;margin-top:6px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
@@ -885,7 +897,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 51)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 52)</small>
     </div>
   </div>
 </footer>
@@ -4571,6 +4583,45 @@ firebaseReady.then(() => { bootData(); handleShareParam(); });
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
+</script>
+
+<!-- 📱 بطاقة تعليمات تثبيت دارك لأصحاب آيفون (تظهر مرة وحدة) -->
+<div class="ios-hint-overlay" id="iosHint" style="display:none">
+  <div class="ios-hint-card">
+    <div class="ios-hint-head">
+      <h3>📱 عندك آيفون؟ ثبّت دارك على شاشتك الرئيسية</h3>
+      <button class="ios-hint-close" onclick="closeIosHint()" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="ios-hint-body">
+      <div class="ios-step">١. افتح رابط دارك في متصفح Safari</div>
+      <div class="ios-step">٢. اضغط زر المشاركة ⎋ (السهم اللي فوق)</div>
+      <div class="ios-step">٣. اختر "إضافة إلى الشاشة الرئيسية"</div>
+      <div class="ios-step">٤. اضغط "إضافة" في أعلى الشاشة</div>
+      <div class="ios-hint-foot">بتجد أيقونة دارك بين تطبيقاتك، وافتحها مثل أي تطبيق ✨</div>
+    </div>
+  </div>
+</div>
+<script>
+// يظهر فقط لأجهزة آيفون/آيباد غير مثبتة كتطبيق — مرة وحدة لكل مستخدم
+(function () {
+  try {
+    var ua = navigator.userAgent || "";
+    var isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var isStandalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+    if (!isIOS || isStandalone) return;
+    if (localStorage.getItem("darak_ios_hint") === "1") return;
+    setTimeout(function () {
+      var h = document.getElementById("iosHint");
+      if (h) h.style.display = "flex";
+    }, 2500);
+  } catch (e) {}
+})();
+function closeIosHint() {
+  var h = document.getElementById("iosHint");
+  if (h) h.style.display = "none";
+  try { localStorage.setItem("darak_ios_hint", "1"); } catch (e) {}
+}
+window.closeIosHint = closeIosHint;
 </script>
 </body>
 </html>
