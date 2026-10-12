@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 67)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 68)</small>
     </div>
   </div>
 </footer>
@@ -1665,9 +1665,9 @@ function coCard(p) {
   return `
   <div class="co-card" data-open="${p.id}" data-kind="co">
     ${p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="">` : `<div class="co-logo">${p.icon || "🏢"}</div>`}
-    <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
+    <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}${p.verified ? " " + verifyBadgeHtml(20) : ""}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
-    <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"} ${p.demo ? "" : " · ✅"}</div>
+    <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"}</div>
     ${p.location ? `<div class="co-loc">📍 ${p.location}</div>` : ""}
   </div>`;
 }
@@ -2440,15 +2440,52 @@ async function openDashboard() {
       </tr>`).join("")}</tbody>
     </table>${moreBtn(rows.length - 5, "الطلبات")}`;
   }
-  if (isProvider) {
-    document.getElementById("employeesWrap").style.display = "";
-    loadEmployees();
+  if (isPro) {
+    if (isProvider) {
+      document.getElementById("employeesWrap").style.display = "";
+      loadEmployees();
+    }
+    const vCard = buildVerifyCard();
+    if (vCard) content.insertAdjacentHTML("afterbegin", vCard);
   }
   loadQuotesSection();
   buildNotifs();
   
 }
 
+// 🏅 نظام التوثيق — الشركة تطلب الشارة والأدمن يديرها
+function buildVerifyCard() {
+  if (!currentUser) return "";
+  const v = !!currentUser.verified, req = currentUser.verifyReq || "";
+  if (v) return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#16283a,#2a4159);border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px">
+    <span style="font-size:1.6rem">🏅</span>
+    <div style="flex:1;color:#fff;font-size:.82rem;font-weight:800;line-height:1.6">أنت <span style="color:#e3c67f">شركة موثّقة من دارك</span><br><small style="font-weight:600;color:#c9d4e0">شارتك الذهبية ظاهرة للعملاء في كل التطبيق ✓</small></div>
+    ${verifyBadgeHtml(30).replace('style="','style="flex:0 0 auto;')}
+  </div></div>`;
+  if (req === "pending") return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏳ طلب التوثيق قيد المراجعة — بنتواصل معك واتساب قريبًا 💬</div></div>`;
+  const rejectNote = req === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin-top:4px">تم رفض الطلب سابقًا — تواصل معنا لمعرفة السبب</div>` : "";
+  return `<div style="padding:12px 18px 0"><div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 14px">
+    <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px">🏅 وثّق شركتك وتميّز عن البقية</div>
+    <div style="font-size:.74rem;color:var(--muted);margin-bottom:8px;line-height:1.6">شارة ذهبية باسم شركتك تظهر للعملاء في كل التطبيق وتزيد ثقتهم فيك ✨ الدفع يدوي — نتواصل معك واتساب.</div>
+    ${rejectNote}
+    <button type="button" onclick="requestVerify()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 اطلب شارة التوثيق الآن</button>
+  </div></div>`;
+}
+window.requestVerify = async function() {
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), { verifyReq: "pending", verifyReqAt: serverTimestampFn() });
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const lu = users.find(x => x.uid === currentUser.uid);
+      if (lu) { lu.verifyReq = "pending"; lu.verifyReqAt = new Date().toISOString(); localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+    currentUser.verifyReq = "pending";
+    showToast("تم إرسال طلب التوثيق — بنتواصل معك واتساب قريبًا 🏅");
+    openDashboard();
+  } catch (e) { console.error(e); showToast("تعذر إرسال الطلب — حاول مرة أخرى", "error"); }
+};
 // 📊 شريط تقدم حالة الطلب للعميل: أرسلت ← وصلتك عروض ← اخترت العرض ← اكتمل
 function clientStatusCell(r) {
   const done = r.status === "completed", acc = !!r._accName, hasQ = (r._qCount || 0) > 0;
@@ -2603,6 +2640,7 @@ const STATUS_LABELS = {
 let adminUsersCache = [];
 let adminRoleFilter = "";
 function cleanTxt(s) { return String(s == null ? "" : s).replace(/[<>]/g, ""); }
+function verifyBadgeHtml(sz) { return `<span title="شركة موثّقة من دارك" style="display:inline-grid;place-items:center;width:${sz||20}px;height:${sz||20}px;border-radius:50%;background:linear-gradient(135deg,#b98d4e,#e3c67f);color:#fff;font-size:${(sz||20)*.62}px;font-weight:900;vertical-align:-3px;box-shadow:0 2px 6px rgba(185,141,78,.45)">✓</span>`; }
 async function loadUsersTable() {
   const box = document.getElementById("usersContent");
   box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
@@ -2643,6 +2681,22 @@ async function loadUsersTable() {
         </div>`).join("")}
       </div>
     </div>` : ""}
+    ${(() => { const vr = users.filter(u => u.verifyReq === "pending" && !u.verified);
+      return vr.length ? `<div style="padding:0 12px 12px">
+      <div class="q-card" style="cursor:default;border:2px solid #b98d4e;background:#fffaf0">
+        <b style="color:var(--navy)">🏅 طلبات التوثيق (${vr.length})</b>
+        ${vr.map(u => `<div style="display:flex;align-items:center;gap:8px;border-top:1.5px dashed #eadfc8;margin-top:10px;padding-top:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <b>${u.displayName || "بدون اسم"}</b> <span class="status-badge status-pending">${adminRoleName(u.role)}</span><br>
+            <small style="color:var(--muted)" dir="ltr">${u.email || ""}</small><br>
+            <small style="color:var(--muted)">${u.phone || "—"} • 📍 ${u.location || "—"}</small>
+          </div>
+          <button class="action-btn action-approve" style="background:#25d366" onclick="adminWhatsApp('${u.uid}')">💬 واتساب</button>
+          <button class="action-btn action-approve" onclick="adminVerify('${u.uid}')">🏅 توثيق</button>
+          <button class="action-btn action-reject" onclick="adminVerifyReject('${u.uid}')">⛔ رفض</button>
+        </div>`).join("")}
+      </div>
+    </div>` : ""; })()}
     <div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default">
         <b style="color:var(--navy)">🗂️ إدارة ملف مستخدم</b>
@@ -2743,6 +2797,11 @@ window.adminPickUser = function() {
         </select>
       </div>
       <div class="form-group"><label>سبب الإيقاف/الرفض (اختياري)</label><input type="text" id="auReason" value="${(u.statusReason || "").replace(/"/g, "&quot;")}"></div>
+      ${isProv ? `<div style="display:flex;align-items:center;gap:8px;background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:12px;padding:10px 12px;margin-bottom:10px">
+        <span style="font-size:1.2rem">🏅</span>
+        <span style="flex:1;font-size:.8rem;font-weight:800;color:var(--navy)">${u.verified ? "شركة موثّقة ✓" : (u.verifyReq === "pending" ? "طلب توثيق قيد المراجعة ⏳" : "غير موثّقة")}</span>
+        <button type="button" class="action-btn ${u.verified ? "action-delete" : "action-approve"}" style="justify-content:center" onclick="adminToggleVerify('${u.uid}')">${u.verified ? "إزالة الشارة" : "منح التوثيق"}</button>
+      </div>` : ""}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="submit-btn" style="flex:2" onclick="adminSaveUser('${u.uid}')">💾 حفظ التعديلات</button>
         <button class="action-btn action-delete" style="flex:1;justify-content:center" onclick="adminDelete('${u.uid}')">🗑️ حذف</button>
@@ -2800,6 +2859,38 @@ async function updateUserStatus(uid, status, reason = "") {
 window.adminApprove = uid => updateUserStatus(uid, "approved", "").catch(e => showToast("تعذر التحديث", "error"));
 window.adminReject = uid => openReasonModal("⛔ رفض مقدم الخدمة", reason => updateUserStatus(uid, "rejected", reason).catch(e => showToast("تعذر التحديث", "error")));
 window.adminSuspend = uid => openReasonModal("🚫 إيقاف الحساب", reason => updateUserStatus(uid, "suspended", reason).catch(e => showToast("تعذر التحديث", "error")));
+window.adminVerify = async function(uid) {
+  try { await updateVerifyFields(uid, { verified: true, verifyReq: "approved" }); showToast("تم توثيق الشركة 🏅"); } catch (e) { console.error(e); showToast("تعذر التوثيق", "error"); }
+};
+window.adminVerifyReject = async function(uid) {
+  try { await updateVerifyFields(uid, { verified: false, verifyReq: "rejected" }); showToast("تم رفض طلب التوثيق ⛔"); } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
+};
+window.adminToggleVerify = async function(uid) {
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (!u) return;
+  if (u.verified) {
+    darakConfirm("إزالة شارة التوثيق من " + (u.displayName || "هذه الشركة") + "؟ بتختفي الشارة فورًا", async () => {
+      try { await updateVerifyFields(uid, { verified: false, verifyReq: "" }); } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
+    });
+  } else {
+    try { await updateVerifyFields(uid, { verified: true, verifyReq: "approved" }); } catch (e) { console.error(e); showToast("تعذر التوثيق", "error"); }
+  }
+};
+async function updateVerifyFields(uid, fields) {
+  if (db && getDocsFn) {
+    const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
+    if (!snap.docs.length) throw new Error("user_not_found");
+    await updateDocFn(docFn(db, "users", snap.docs[0].id), fields);
+  } else {
+    const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+    const u = users.find(x => x.uid === uid);
+    if (u) { Object.assign(u, fields); localStorage.setItem("darak_users", JSON.stringify(users)); }
+  }
+  const cu = adminUsersCache.find(x => x.uid === uid);
+  if (cu) Object.assign(cu, fields);
+  loadUsersTable();
+  loadLiveCompanies();
+}
 window.adminDelete = async uid => {
   try {
     const usnap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", uid)));
@@ -3371,9 +3462,10 @@ window.openCompany = async function(id) {
     <div class="co-hero">
       ${p.logo ? `<img src="${p.logo}" alt="" style="width:88px;height:88px;border-radius:22px;object-fit:cover;flex:0 0 auto">` : `<div class="co-big-logo">${p.icon || "🏢"}</div>`}
       <div style="flex:1;min-width:200px">
-        <h2>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h2>
+        <h2>${LANG === "en" && p.nameEn ? p.nameEn : p.name}${p.verified ? " " + verifyBadgeHtml(26) : ""}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
         <div class="co-rate2">${p.ratingCount ? `★ ${p.rating} (${p.ratingCount} تقييم)` : "✨ شركة جديدة"}</div>
+        ${p.verified ? `<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#16283a,#2a4159);color:#e3c67f;border:1.5px solid #b98d4e;border-radius:999px;padding:5px 14px;font-size:.74rem;font-weight:800">🏅 شركة موثّقة من دارك</span></div>` : ""}
         ${p.location ? `<div class="co-loc" style="font-size:.85rem;color:#7a6a4d">📍 ${p.location}</div>` : ""}
       </div>
       <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
@@ -3994,7 +4086,7 @@ async function loadLiveCompanies() {
       return {
         id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || (userCatsArr(u)[0] || ""), catEn: u.category || (userCatsArr(u)[0] || ""), cats: userCatsArr(u),
         icon: "🏢", rating: rt ? rt.avg : "", ratingCount: rt ? rt.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
-        web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false
+        web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false, verified: !!u.verified
       };
     });
     renderProviders();
@@ -4460,9 +4552,10 @@ async function loadQuotesSection() {
     if (!list || list.length < 2) return "";
     return `<div style="padding:0 4px 4px"><div style="font-size:.78rem;font-weight:800;color:var(--navy);margin-bottom:6px">⚖️ قارن العروض واختر الأنسب — نفس الأرقام من العروض الرسمية</div>
     <div style="overflow-x:auto"><table class="cmp-table">
-      <tr><th style="text-align:right;padding-right:8px">الشركة</th><th>العرض</th><th>القيمة</th><th>التقييم</th><th>قرارك</th></tr>
+      <tr><th style="text-align:right;padding-right:8px">الشركة</th><th>التوثيق</th><th>العرض</th><th>القيمة</th><th>التقييم</th><th>قرارك</th></tr>
       ${list.map(q => `<tr>
         <td class="co">${cleanTxt(q.providerName) || "—"}</td>
+        <td>${(liveCompanies.find(c => c.uid === q.providerUid) || {}).verified ? verifyBadgeHtml(18) : `<span style="color:#c9c0ab">—</span>`}</td>
         <td>${q.pdfUrl ? `<a class="cmp-doc" href="${q.pdfUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📄 عرض</a>` : `<span style="color:#c9c0ab">—</span>`}</td>
         <td class="cmp-price">${q.amount ? (+q.amount).toLocaleString("ar") + " ر.ع" : "—"}</td>
         <td class="cmp-stars">${provAvg(q.providerUid) || "—"}</td>
