@@ -911,7 +911,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 63)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 64)</small>
     </div>
   </div>
 </footer>
@@ -1076,7 +1076,7 @@ footer ul a:hover{color:var(--gold-2)}
         <input type="file" id="quoteFile" accept="application/pdf" required style="padding:10px">
       </div>
       <div class="form-group">
-        <label data-i18n="quote_amount">قيمة العرض (ر.ع)</label>
+        <label data-i18n="quote_amount">قيمة العرض (ر.ع)</label> <span id="qAmountStar" style="color:#b91c1c;font-weight:900">*</span>
         <input type="number" id="quoteAmount" min="0" data-i18n-ph="ph_optional" placeholder="اختياري">
       </div>
       <div class="form-group">
@@ -4096,6 +4096,8 @@ window.openQuoteModal = function(requestId) {
   const qf = document.getElementById("quoteFile");
   qf.required = !isTechRole;
   qf.previousElementSibling.textContent = isTechRole ? t("quote_file_opt") : t("quote_file");
+  const amtStar = document.getElementById("qAmountStar");
+  if (amtStar) amtStar.style.display = isTechRole ? "none" : "";
   document.getElementById("quoteModal").classList.add("open");
 };
 document.getElementById("quoteClose").addEventListener("click", () => document.getElementById("quoteModal").classList.remove("open"));
@@ -4106,7 +4108,11 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   const file = document.getElementById("quoteFile").files[0];
   const isTechRole = currentUser?.role === "tech";
   if (file && file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
+  if (file && file.size > 10 * 1024 * 1024) { showToast("حجم ملف العرض أكبر من 10 ميجا — صغّر الملف وحاول مرة أخرى", "error"); return; }
   if (!file && !isTechRole) { showToast(t("pdf_required"), "error"); return; }
+  // 💰 قيمة العرض إجبارية للشركات — عشان المقارنة تظهر فيها الأرقام دائمًا (الفني: اختياري)
+  const amountVal = document.getElementById("quoteAmount").value;
+  if (!isTechRole && !amountVal) { showToast("اكتب قيمة العرض بالريال أولًا — العميل يقارن فيها 💰", "error"); return; }
   const btn = document.getElementById("quoteSubmit");
   const r = lastRequests.find(x => x.id === document.getElementById("quoteModal").dataset.requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
@@ -4130,6 +4136,10 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
         if (file.size < 700 * 1024) pdfUrl = await toDataUrl();
       }
     }
+    if (file && !pdfUrl) {
+      showToast("تعذر إرفاق الملف (غالبًا حجمه كبير أو انقطع الاتصال) — لم يُرسل العرض، جرّب ملفًا أصغر أو أعد المحاولة", "error");
+      return;
+    }
     const quote = {
       requestId: r.id,
       clientUid: r.ownerUid || "",
@@ -4138,7 +4148,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
       category: r.category || "",
       providerUid: currentUser?.uid || "",
       providerName: currentUser?.displayName || "",
-      amount: document.getElementById("quoteAmount").value || "",
+      amount: amountVal || "",
       note: cleanTxt(document.getElementById("quoteNote").value.trim()),
       pdfUrl, pdfName,
       status: "sent",
