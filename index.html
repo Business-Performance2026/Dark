@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 60)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 61)</small>
     </div>
   </div>
 </footer>
@@ -1070,9 +1070,14 @@ footer ul a:hover{color:var(--gold-2)}
         <label data-i18n="quote_amount">قيمة العرض (ر.ع)</label>
         <input type="number" id="quoteAmount" min="0" data-i18n-ph="ph_optional" placeholder="اختياري">
       </div>
+      <div class="form-group" id="qTplWrap" style="display:none">
+        <label data-i18n="quote_tpl">💾 قوالبي الجاهزة (اضغط للتعبئة — تقدر تعدل قبل الإرسال)</label>
+        <div id="qTplChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+      </div>
       <div class="form-group">
-        <label data-i18n="quote_note">ملاحظة للعميل</label>
-        <textarea id="quoteNote" rows="2" placeholder="شروط، مدة التنفيذ، الضمان…"></textarea>
+        <label data-i18n="quote_note">ملاحظة للعميل (المدة، الضمان، الشروط…)</label>
+        <textarea id="quoteNote" rows="3" placeholder="مثال: مدة التنفيذ ١٥ يوم — ضمان سنة على التشطيب — الدفعة ٤٠٪ مقدم…"></textarea>
+        <button type="button" id="qTplSave" style="margin-top:6px;background:none;border:1.5px dashed var(--gold);color:var(--gold);border-radius:10px;padding:6px 12px;font-size:.72rem;font-weight:800;cursor:pointer;font-family:inherit">💾 احفظ هالصيغة كقالب</button>
       </div>
       <button type="submit" class="submit-btn" id="quoteSubmit" data-i18n="quote_send">إرسال العرض 🚀</button>
     </form>
@@ -1417,7 +1422,7 @@ const I18N = {
     q_sent: "بانتظار ردك ⏳", q_waiting: "بانتظار رد العميل ⏳", q_accepted: "مقبول ✅", q_rejected: "مرفوض ⛔",
     q_empty: "لا توجد عروض أسعار بعد", aq_comment: "تعليق العميل", q_send: "أرسل عرض سعرك للعميل",
     quote_modal_title: "📄 إرسال عرض سعر", quote_file: "ملف العرض (PDF) *", quote_amount: "قيمة العرض (ر.ع)",
-    quote_note: "ملاحظة للعميل", quote_send: "إرسال العرض 🚀", quote_uploading: "جارٍ رفع الملف…",
+    quote_note: "ملاحظة للعميل (المدة، الضمان، الشروط…)", quote_tpl: "💾 قوالبي الجاهزة", quote_send: "إرسال العرض 🚀", quote_uploading: "جارٍ رفع الملف…",
     quote_done: "تم إرسال عرض السعر للعميل ✅", quote_err: "تعذر الإرسال — حاول مرة أخرى",
     pdf_only: "اختر ملف PDF أولًا", comment_accept_title: "✅ موافقة على العرض — اكتب تعليقًا للشركة",
     comment_reject_title: "⛔ رفض العرض — اكتب سبب الرفض", comment_sent: "تم إرسال ردك للشركة ✅",
@@ -1492,7 +1497,7 @@ const I18N = {
     q_sent: "Awaiting you ⏳", q_waiting: "Awaiting client ⏳", q_accepted: "Accepted ✅", q_rejected: "Rejected ⛔",
     q_empty: "No price quotes yet", aq_comment: "Client comment", q_send: "Send your quote to the client",
     quote_modal_title: "📄 Send a Quote", quote_file: "Quote file (PDF) *", quote_amount: "Quote amount (OMR)",
-    quote_note: "Note to client", quote_send: "Send quote 🚀", quote_uploading: "Uploading file…",
+    quote_note: "Note to client (duration, warranty, terms…)", quote_tpl: "💾 My templates", quote_send: "Send quote 🚀", quote_uploading: "Uploading file…",
     quote_done: "Quote sent to the client ✅", quote_err: "Could not send — try again",
     pdf_only: "Choose a PDF file first", comment_accept_title: "✅ Accept quote — write a comment to the company",
     comment_reject_title: "⛔ Reject quote — write the reason", comment_sent: "Your response was sent to the company ✅",
@@ -4075,6 +4080,45 @@ document.getElementById("rateSubmit").addEventListener("click", async () => {
 // ============================================================
 let lastRequests = [];
 
+function renderQuoteTemplates() {
+  const wrap = document.getElementById("qTplWrap");
+  const chips = document.getElementById("qTplChips");
+  if (!wrap || !chips) return;
+  const tpls = Array.isArray(currentUser?.quoteTemplates) ? currentUser.quoteTemplates : [];
+  if (!tpls.length) { wrap.style.display = "none"; chips.innerHTML = ""; return; }
+  wrap.style.display = "";
+  chips.innerHTML = tpls.map((tp, i) => `<span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:16px;padding:4px 6px 4px 10px;font-size:.72rem;font-weight:700">
+    <a href="#" onclick="applyQuoteTemplate(${i});return false" style="color:inherit;text-decoration:none">${cleanTxt(tp.name) || "قالب " + (i + 1)}</a>
+    <a href="#" onclick="deleteQuoteTemplate(${i});return false" title="حذف" style="color:#b04040;text-decoration:none;font-weight:900;padding:0 3px">✕</a>
+  </span>`).join("");
+}
+window.applyQuoteTemplate = function(i) {
+  const tp = (currentUser?.quoteTemplates || [])[i];
+  if (!tp) return;
+  document.getElementById("quoteNote").value = tp.note || "";
+  if (tp.amount) document.getElementById("quoteAmount").value = tp.amount;
+  showToast("تمت تعبئة القالب — عدّل قبل الإرسال إذا تبغى ✏️");
+};
+window.deleteQuoteTemplate = async function(i) {
+  const tpls = (currentUser?.quoteTemplates || []).slice();
+  tpls.splice(i, 1);
+  await persistQuoteTemplates(tpls);
+  showToast("تم حذف القالب 🗑️");
+};
+async function persistQuoteTemplates(tpls) {
+  currentUser.quoteTemplates = tpls;
+  try {
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), { quoteTemplates: tpls });
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const u = users.find(x => x.uid === currentUser.uid);
+      if (u) { u.quoteTemplates = tpls; localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+  } catch (e) { console.warn("تعذر حفظ القوالب", e); }
+  renderQuoteTemplates();
+}
 window.openQuoteModal = function(requestId) {
   const r = lastRequests.find(x => x.id === requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
@@ -4082,6 +4126,7 @@ window.openQuoteModal = function(requestId) {
   document.getElementById("quoteModal").dataset.requestId = requestId;
   document.getElementById("quoteFor").textContent = t("q_client") + ": " + (r.name || "—") + " • " + (r.category || "");
   document.getElementById("quoteForm").reset();
+  renderQuoteTemplates();
   // الفني: ملف PDF اختياري — طلبات الصيانة تحتاج سرعة، والشركات: إلزامي
   const isTechRole = currentUser?.role === "tech";
   const qf = document.getElementById("quoteFile");
@@ -4092,6 +4137,16 @@ window.openQuoteModal = function(requestId) {
 document.getElementById("quoteClose").addEventListener("click", () => document.getElementById("quoteModal").classList.remove("open"));
 document.getElementById("quoteModal").addEventListener("click", e => { if (e.target.id === "quoteModal") e.target.classList.remove("open"); });
 
+document.getElementById("qTplSave").addEventListener("click", async () => {
+  const note = cleanTxt(document.getElementById("quoteNote").value.trim());
+  if (!note) { showToast("اكتب الملاحظة أولًا ثم احفظها كقالب ✍️", "error"); return; }
+  const amount = document.getElementById("quoteAmount").value || "";
+  const tpls = (Array.isArray(currentUser?.quoteTemplates) ? currentUser.quoteTemplates : []).slice();
+  if (tpls.length >= 5) { showToast("أقصى عدد ٥ قوالب — احذف واحدًا ثم أضف", "error"); return; }
+  tpls.push({ name: note.slice(0, 18) + (note.length > 18 ? "…" : ""), amount, note });
+  await persistQuoteTemplates(tpls);
+  showToast("تم حفظ القالب 💾 — بيطلع لك بالمرة الجاية");
+});
 document.getElementById("quoteForm").addEventListener("submit", async e => {
   e.preventDefault();
   const file = document.getElementById("quoteFile").files[0];
