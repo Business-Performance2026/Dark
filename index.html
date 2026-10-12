@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 54)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 55)</small>
     </div>
   </div>
 </footer>
@@ -1617,11 +1617,11 @@ document.getElementById("techModalForm").addEventListener("submit", async e => {
   btn.disabled = true;
   btn.textContent = t("sending");
   const data = {
-    ...Object.fromEntries(new FormData(e.target).entries()),
+    ...Object.fromEntries(Array.from(new FormData(e.target).entries()).map(([k, v]) => [k, cleanTxt(v)])),
     ownerUid: currentUser?.uid || null,
     ownerEmail: currentUser?.email || ""
   };
-  if (pendingTargetUid) { data.targetUid = pendingTargetUid; data.targetName = pendingTargetName; }
+  if (pendingTargetUid) { data.targetUid = pendingTargetUid; data.targetName = cleanTxt(pendingTargetName); }
   try {
     const mode = await saveToDB("tech_requests", data);
     pendingTargetUid = null; pendingTargetName = ""; pendingTargetRole = "";
@@ -1763,11 +1763,11 @@ document.getElementById("requestModalForm").addEventListener("submit", async e =
   btn.disabled = true;
   btn.textContent = "جارٍ الإرسال…";
   const data = {
-    ...Object.fromEntries(new FormData(e.target).entries()),
+    ...Object.fromEntries(Array.from(new FormData(e.target).entries()).map(([k, v]) => [k, cleanTxt(v)])),
     ownerUid: currentUser?.uid || null,
     ownerEmail: currentUser?.email || ""
   };
-  if (pendingTargetUid && pendingTargetRole !== "tech") { data.targetUid = pendingTargetUid; data.targetName = pendingTargetName; }
+  if (pendingTargetUid && pendingTargetRole !== "tech") { data.targetUid = pendingTargetUid; data.targetName = cleanTxt(pendingTargetName); }
   try {
     const mode = await saveToDB(pendingTargetUid && pendingTargetRole === "tech" ? "tech_requests" : "service_requests", data);
     pendingTargetUid = null; pendingTargetName = ""; pendingTargetRole = "";
@@ -2004,11 +2004,11 @@ authForm.addEventListener("submit", async e => {
             }
           } else { _registering = false; throw err; }
         }
-        if (fd.displayName) await updateProfileFn(cred.user, { displayName: fd.displayName });
+        if (fd.displayName) await updateProfileFn(cred.user, { displayName: cleanTxt(fd.displayName) });
         currentUser = {
           uid: cred.user.uid,
           email: fd.email,
-          displayName: fd.displayName || fd.email,
+          displayName: cleanTxt(fd.displayName) || fd.email,
           role: selectedRole,
           roles: [selectedRole],
           category: regCats[0] || "",
@@ -2072,7 +2072,7 @@ authForm.addEventListener("submit", async e => {
           uid: "local_" + Date.now(),
           email: fd.email,
           password: fd.password,
-          displayName: fd.displayName || fd.email,
+          displayName: cleanTxt(fd.displayName) || fd.email,
           role: selectedRole,
           category: regCats[0] || "",
           categories: regCats,
@@ -2557,6 +2557,7 @@ const STATUS_LABELS = {
 
 let adminUsersCache = [];
 let adminRoleFilter = "";
+function cleanTxt(s) { return String(s == null ? "" : s).replace(/[<>]/g, ""); }
 async function loadUsersTable() {
   const box = document.getElementById("usersContent");
   box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
@@ -2706,7 +2707,7 @@ window.adminPickUser = function() {
 
 window.adminSaveUser = async function(uid) {
   const data = {
-    displayName: document.getElementById("auName").value.trim(),
+    displayName: cleanTxt(document.getElementById("auName").value.trim()),
     phone: document.getElementById("auPhone").value.trim(),
     location: document.getElementById("auLoc").value.trim(),
     status: document.getElementById("auStatus").value,
@@ -2719,7 +2720,7 @@ window.adminSaveUser = async function(uid) {
     if (!cats.length) { showToast("اختر تخصصًا واحدًا على الأقل ✅", "error"); return; }
     data.categories = cats;
     data.category = cats[0];
-    data.services = document.getElementById("auServices").value.split(/[،,]/).map(x => x.trim()).filter(Boolean);
+    data.services = document.getElementById("auServices").value.split(/[،,]/).map(x => cleanTxt(x.trim())).filter(Boolean);
   }
   try {
     if (db && getDocsFn) {
@@ -2851,7 +2852,7 @@ document.getElementById("meSave").addEventListener("click", async () => {
   try {
     const emRes = await changeLoginEmail(em);
     // البريد في الملف = إيميل الدخول الفعلي فقط — لو ما تغيّر في الدخول، يبقى القديم (ما ينفصل الملف عن الدخول أبدًا)
-    const data = { displayName: nm, phone: ph, email: emRes.email, location: govWilayaLoc(document.getElementById("meGov"), document.getElementById("meWilaya")) };
+    const data = { displayName: cleanTxt(nm), phone: ph, email: emRes.email, location: govWilayaLoc(document.getElementById("meGov"), document.getElementById("meWilaya")) };
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
@@ -2890,7 +2891,7 @@ document.getElementById("userEditModal").addEventListener("click", e => { if (e.
 document.getElementById("ueSave").addEventListener("click", async () => {
   if (!editingUid) return;
   const ueCats = getPickedCats("ueCatList");
-  const data = { displayName: document.getElementById("ueName").value.trim(), category: ueCats[0] || "", categories: ueCats };
+  const data = { displayName: cleanTxt(document.getElementById("ueName").value.trim()), category: ueCats[0] || "", categories: ueCats };
   try {
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", editingUid)));
@@ -3432,7 +3433,7 @@ document.getElementById("reSave").addEventListener("click", async () => {
   const data = {
     stars: +document.getElementById("reStars").value,
     clientName: document.getElementById("reClient").value.trim(),
-    comment: document.getElementById("reComment").value.trim()
+    comment: cleanTxt(document.getElementById("reComment").value.trim())
   };
   try {
     if (db && updateDocFn) await updateDocFn(docFn(db, "ratings", _editRatingId), data);
@@ -3460,7 +3461,7 @@ document.getElementById("arAdd").addEventListener("click", async () => {
     clientUid: "admin",
     clientName: document.getElementById("arClient").value.trim() || "عميل دارك",
     stars: +document.getElementById("arStars").value,
-    comment: document.getElementById("arComment").value.trim()
+    comment: cleanTxt(document.getElementById("arComment").value.trim())
   };
   try {
     if (db && addDocFn) await addDocFn(collectionFn(db, "ratings"), { ...rec, createdAt: serverTimestampFn() });
@@ -3749,15 +3750,15 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
   const data = {
     phone: document.getElementById("cpPhone").value.trim(),
     email: emRes.email,
-    whatsapp: document.getElementById("cpWhatsApp").value.trim(),
+    whatsapp: cleanTxt(document.getElementById("cpWhatsApp").value.trim()),
     insta: document.getElementById("cpInsta").value.trim(),
     web: document.getElementById("cpWeb").value.trim(),
     map: document.getElementById("cpMap").value.trim(),
     displayName: document.getElementById("cpNameAr").value.trim() || currentUser.displayName,
     nameEn: document.getElementById("cpNameEn").value.trim(),
     location: govWilayaLoc(document.getElementById("cpGov"), document.getElementById("cpWilaya")),
-    bio: document.getElementById("cpBio").value.trim(),
-    services: document.getElementById("cpServices").value.split(/[،,]/).map(s => s.trim()).filter(Boolean)
+    bio: cleanTxt(document.getElementById("cpBio").value.trim()),
+    services: document.getElementById("cpServices").value.split(/[،,]/).map(s => cleanTxt(s.trim())).filter(Boolean)
   };
   if (currentUser.role === "provider" || currentUser.role === "tech") {
     const cpCats = getPickedCats("cpCatList");
@@ -4022,7 +4023,7 @@ document.getElementById("rateSubmit").addEventListener("click", async () => {
       clientUid: currentUser?.uid || "",
       clientName: currentUser?.displayName || "",
       stars: ratingStars,
-      comment: document.getElementById("rateComment").value.trim()
+      comment: cleanTxt(document.getElementById("rateComment").value.trim())
     };
     if (db && addDocFn) await addDocFn(collectionFn(db, "ratings"), { ...rec, createdAt: serverTimestampFn() });
     else {
@@ -4099,7 +4100,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
       providerUid: currentUser?.uid || "",
       providerName: currentUser?.displayName || "",
       amount: document.getElementById("quoteAmount").value || "",
-      note: document.getElementById("quoteNote").value.trim(),
+      note: cleanTxt(document.getElementById("quoteNote").value.trim()),
       pdfUrl, pdfName,
       status: "sent",
       clientComment: ""
