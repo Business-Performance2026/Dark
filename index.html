@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 77)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 78)</small>
     </div>
   </div>
 </footer>
@@ -1203,6 +1203,23 @@ footer ul a:hover{color:var(--gold-2)}
     <div style="display:flex;gap:8px">
       <button onclick="closeSubWarnAndOpenSub()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
       <button onclick="document.getElementById('subWarnModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= بوب الإيقاف — السبب + تجديد الاشتراك ================= -->
+<div class="modal-overlay" id="susModal">
+  <div class="modal" style="width:min(340px,92%);text-align:center;padding:26px 20px 20px">
+    <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;font-size:1.9rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">🚫</div>
+    <h3 style="color:var(--navy);margin:0 0 8px;font-size:1rem">حسابك موقوف</h3>
+    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:11px 13px;margin-bottom:8px">
+      <small style="color:#b91c1c;font-weight:800;font-size:.72rem">سبب الإيقاف</small>
+      <div id="susReason" style="color:#7f1d1d;font-size:.85rem;font-weight:800;margin-top:3px;line-height:1.6"></div>
+    </div>
+    <p style="color:var(--muted);font-size:.76rem;line-height:1.7;margin:0 0 14px">بعد حل السبب راح يرجع حسابك يشتغل بشكل طبيعي ✅</p>
+    <div style="display:flex;gap:8px">
+      <button id="susRenewBtn" onclick="document.getElementById('susModal').classList.remove('open');openSubModal()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
+      <button onclick="document.getElementById('susModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">✕</button>
     </div>
   </div>
 </div>
@@ -2351,6 +2368,14 @@ async function openDashboard() {
   document.getElementById("adminTabs").style.display = admin ? "flex" : "none";
   if (admin) switchAdminTab(currentAdminTab);
 
+  // ⛔ إيقاف تلقائي: انتهى تاريخ اشتراك الشركة → يتوقف الحساب فورًا (فقط إذا نظام الاشتراك مفعّل من الأدمن)
+  if (isProvider && !admin && _subEnabled && currentUser.subStatus === "active" && isSubExpired(currentUser) && (currentUser.status || "approved") === "approved") {
+    try {
+      await updateVerifyFields(currentUser.uid, { status: "suspended", statusReason: SUB_EXPIRE_REASON });
+      Object.assign(currentUser, { status: "suspended", statusReason: SUB_EXPIRE_REASON });
+    } catch (e) { console.warn("تعذر الإيقاف التلقائي", e); }
+  }
+
   // بوابة حالة الحساب (قيد المراجعة / مرفوض / موقوف)
   const st = currentUser.status || "approved";
   if (!admin && st !== "approved") {
@@ -2366,6 +2391,7 @@ async function openDashboard() {
     document.getElementById("dashActionBtn").style.display = "none";
     document.getElementById("dashContent").innerHTML = `<div class="dash-empty"><div class="big">${icon}</div><h3 style="color:var(--navy);margin-bottom:8px">${title}</h3><p>${sub}</p></div>`;
     
+    if (st === "suspended") showSuspendedPopup(currentUser.statusReason);
     return;
   }
 
@@ -2562,7 +2588,7 @@ function buildVerifyCard() {
 
 // 💳 كرت الاشتراك الشهري في لوحة تحكم الشركة
 function buildSubCard() {
-  if (!currentUser) return "";
+  if (!currentUser || !_subEnabled) return "";
   const active = isSubActive(currentUser);
   const expired = currentUser.subStatus === "active" && isSubExpired(currentUser);
   const pending = currentUser.subStatus === "pending";
@@ -2593,6 +2619,7 @@ let _subSettingsCache = null;
 window.openSubModal = async function() {
   const m = document.getElementById("subModal");
   if (!m) return;
+  if (!_subEnabled) { showToast("نظام الاشتراك غير مفعّل حاليًا — التسجيل مجاني 🎉"); return; }
   document.getElementById("subName").value = currentUser.companyName || currentUser.displayName || "";
   document.getElementById("subWhats").value = currentUser.subWhats || currentUser.phone || "";
   document.getElementById("subReceipt").value = "";
@@ -2657,7 +2684,7 @@ window.submitSubRequest = async function() {
 // 🔔 بوب اب تحذير انتهاء الاشتراك — قبل 5 أيام أو بعده (مرة بالجلسة)
 let _subWarned = false;
 function maybeShowSubWarning() {
-  if (_subWarned || !currentUser) return;
+  if (_subWarned || !currentUser || !_subEnabled) return;
   const active = isSubActive(currentUser);
   const expired = currentUser.subStatus === "active" && isSubExpired(currentUser);
   if (!active && !expired) return;
@@ -2670,6 +2697,15 @@ function maybeShowSubWarning() {
     ? `انتهى اشتراكك الشهري يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده الآن واستمر بلا انقطاع 💳`
     : `باقي <b>${dl} ${dl === 1 ? "يوم" : dl === 2 ? "يومين" : "أيام"}</b> وينتهي اشتراكك يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده قبل لا ينتهي ✨`;
   document.getElementById("subWarnModal").classList.add("open");
+}
+// 🚫 بوب الإيقاف — يظهر لصاحب الحساب الموقوف مع السبب، يغلقه بـ ✕ بنفسه
+function showSuspendedPopup(reason) {
+  const m = document.getElementById("susModal");
+  if (!m) return;
+  document.getElementById("susReason").textContent = reason || "تواصل مع الإدارة لمعرفة السبب";
+  const isSubReason = (reason || "").includes("اشتراك");
+  document.getElementById("susRenewBtn").style.display = isSubReason ? "" : "none";
+  m.classList.add("open");
 }
 window.requestVerify = async function() {
   try {
@@ -2884,7 +2920,10 @@ function subTs(u) { const v = u && u.subscribedUntil; if (!v) return 0; return v
 function isSubExpired(u) { const t = subTs(u); return t > 0 && Date.now() > t; }
 function isSubActive(u) { return !!(u && u.subStatus === "active") && !isSubExpired(u); }
 function subDaysLeft(u) { const t = subTs(u); return t > 0 ? Math.ceil((t - Date.now()) / 86400000) : null; }
-const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "" };
+const SUB_EXPIRE_REASON = "انتهى اشتراكك الشهري";
+const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "", enabled: false };
+let _subEnabled = false; // مفتاح تفعيل نظام الاشتراك — يتحكم فيه الأدمن
+getSubSettings().then(cfg => { _subSettingsCache = cfg; _subEnabled = cfg.enabled === true; }).catch(() => {});
 async function getSubSettings() {
   if (db && getDocsFn) {
     try {
@@ -2972,6 +3011,10 @@ async function loadUsersTable() {
     <div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default;border:1.5px solid #d8cdb8;background:#fbf9f4">
         <b style="color:var(--navy)">⚙️ إعدادات الاشتراك البنكي</b>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;background:#fff;border:1.5px solid #e7dfd0;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:.8rem;font-weight:800;color:var(--navy)">
+          <input type="checkbox" id="subSetEnabled" style="width:18px;height:18px;accent-color:#b98d4e;cursor:pointer">
+          🔛 تفعيل نظام الاشتراك للشركات <small style="color:var(--muted);font-weight:600">(إذا مطفي — الاشتراك مخفي والكل يشتغل مجانًا)</small>
+        </label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
           <input type="text" id="subSetBank" placeholder="اسم البنك / المستفيد" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
           <input type="text" id="subSetAccount" placeholder="رقم الحساب البنكي" dir="ltr" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
@@ -3010,6 +3053,8 @@ async function fillSubSettingsForm() {
     if (b) b.value = cfg.bankName || "";
     if (a) a.value = cfg.bankAccount || "";
     if (p) p.value = cfg.price || "";
+    const en = document.getElementById("subSetEnabled");
+    if (en) en.checked = cfg.enabled === true;
   } catch (e) { console.warn(e); }
 }
 
@@ -3208,8 +3253,11 @@ window.adminSubApprove = async function(uid) {
   const base = cur > Date.now() ? cur : Date.now(); // تمديد فوق المدة السارية إن وجدت
   const until = new Date(base);
   until.setMonth(until.getMonth() + months);
+  const fields = { subStatus: "active", subscribedUntil: until };
+  // إذا كان الحساب موقوفًا بسبب انتهاء الاشتراك — يرجع مفعّل تلقائيًا
+  if (u.status === "suspended" && (u.statusReason || "").includes("اشتراك")) { fields.status = "approved"; fields.statusReason = ""; }
   try {
-    await updateVerifyFields(uid, { subStatus: "active", subscribedUntil: until });
+    await updateVerifyFields(uid, fields);
     showToast("تم تفعيل الاشتراك ✅ " + months + (months === 1 ? " شهر" : " أشهر") + " — ينتهي " + until.toLocaleDateString("ar-OM"));
   } catch (e) { console.error(e); showToast("تعذر التفعيل", "error"); }
 };
@@ -3220,10 +3268,12 @@ window.adminSubReject = async function(uid) {
   } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
 };
 window.adminSaveSubSettings = async function() {
+  const enEl = document.getElementById("subSetEnabled");
   const data = {
     bankName: (document.getElementById("subSetBank").value || "").trim(),
     bankAccount: (document.getElementById("subSetAccount").value || "").trim(),
-    price: (document.getElementById("subSetPrice").value || "").trim()
+    price: (document.getElementById("subSetPrice").value || "").trim(),
+    enabled: !!(enEl && enEl.checked)
   };
   try {
     if (db && setDocFn) {
@@ -3232,7 +3282,8 @@ window.adminSaveSubSettings = async function() {
       localStorage.setItem("darak_subsettings", JSON.stringify(data));
     }
     _subSettingsCache = { ...DEFAULT_SUB_SETTINGS, ...data };
-    showToast("تم حفظ إعدادات الاشتراك ✅ بتظهر للشركات فورًا");
+    _subEnabled = data.enabled;
+    showToast(data.enabled ? "تم حفظ إعدادات الاشتراك ✅ النظام مفعّل الآن" : "تم الحفظ ✅ نظام الاشتراك مطفي — التسجيل مجاني");
   } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
 };
 async function updateVerifyFields(uid, fields) {
