@@ -238,6 +238,11 @@ footer ul a:hover{color:var(--gold-2)}
 .q-count{background:var(--navy);color:#fff;border-radius:20px;padding:1px 10px;font-size:.8rem}
 .q-group.closed .q-group-body{display:none}
 .q-group-body{padding:8px}
+.q-act{display:flex;gap:6px;margin-top:8px}
+.q-act button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:3px;border-radius:9px;padding:6px 4px;font-size:.68rem;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid}
+.q-act .rt{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+.q-act .ed{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
+.q-act .dl{background:#fff;border-color:#fecaca;color:#b91c1c}
 .cmp-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(22,40,58,.06);font-size:.72rem;margin-bottom:12px}
 .cmp-table th{background:#f0e9da;color:var(--navy);padding:8px 4px;font-size:.68rem;white-space:nowrap}
 .cmp-table td{padding:8px 4px;text-align:center;border-top:1px solid #f0e9da;vertical-align:middle;white-space:nowrap}
@@ -911,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 64)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 65)</small>
     </div>
   </div>
 </footer>
@@ -1418,7 +1423,7 @@ const I18N = {
     forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase",
     quotes_title: "💰 عروض الأسعار", q_sent_title: "💰 عروضي المرسلة",
     acc_suspended: "حسابك موقوف", acc_rejected: "تم رفض حسابك", reason_lbl: "السبب", no_reason: "غير محدد",
-    q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة",
+    q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة", q_grp_draft: "📝 مسودات (عروض مسحوبة)", q_retract: "↩️ استرجاع", q_edit: "✏️ تعديل", q_del: "🗑️ حذف", q_retracted: "تم استرجاع العرض من العميل — بتلقاه في المسودات", q_edit_hint: "عدّل العرض وأرسله مرة ثانية", q_deleted: "تم حذف العرض", q_confirm_del: "متأكد تحذف هالعرض نهائي؟ ما يقدر العميل يشوفه بعدها", q_updated: "تم إرسال العرض المعدل للعميل 🚀", q_draft_resent: "تم إرسال العرض من جديد",
     q_empty_grp: "لا توجد عروض هنا",
     badge_expired: "منتهية ⏳", expired_hint: "انتهت مدة الطلب — يمكنك تقديم طلب جديد", req_expired: "انتهت صلاحية هذا الطلب (7 أيام)",
     q_company: "الشركة", q_client: "العميل", q_amount: "المبلغ", q_note: "ملاحظات", q_file: "الملف",
@@ -1493,7 +1498,7 @@ const I18N = {
     forgot_demo: "Password reset requires Firebase",
     quotes_title: "💰 Price Quotes", q_sent_title: "💰 My Sent Quotes",
     acc_suspended: "Your account is suspended", acc_rejected: "Your account was rejected", reason_lbl: "Reason", no_reason: "Not specified",
-    q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes",
+    q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes", q_grp_draft: "📝 Drafts (retracted)", q_retract: "↩️ Recall", q_edit: "✏️ Edit", q_del: "🗑️ Delete", q_retracted: "Quote recalled — find it in Drafts", q_edit_hint: "Edit and resend", q_deleted: "Quote deleted", q_confirm_del: "Delete this quote permanently?", q_updated: "Updated quote sent 🚀", q_draft_resent: "Quote re-sent",
     q_empty_grp: "No quotes here",
     badge_expired: "Expired ⏳", expired_hint: "Request expired — you can submit a new one", req_expired: "This request has expired (7 days)",
     q_company: "Company", q_client: "Client", q_amount: "Amount", q_note: "Notes", q_file: "File",
@@ -4084,11 +4089,69 @@ document.getElementById("rateSubmit").addEventListener("click", async () => {
 // ============================================================
 let lastRequests = [];
 
+// ↩️ استرجاع عرض مرسل — يختفي من العميل ويتحول لمسودة عند الشركة
+window.retractQuote = async function(quoteId) {
+  const q = (_lastQuotes || []).find(x => x.id === quoteId);
+  if (!q || q.status !== "sent") return;
+  try {
+    if (db && updateDocFn) {
+      await updateDocFn(docFn(db, "quotes", quoteId), { status: "draft" });
+    } else {
+      const list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+      const x = list.find(i => i.id === quoteId);
+      if (x) { x.status = "draft"; localStorage.setItem("darak_quotes", JSON.stringify(list)); }
+    }
+    showToast(t("q_retracted"));
+    loadQuotesSection();
+  } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+};
+// 🗑️ حذف نهائي لعرض مسودة أو مرسل
+window.deleteQuoteForever = async function(quoteId) {
+  if (!confirm(t("q_confirm_del"))) return;
+  try {
+    if (db && deleteDocFn) {
+      await deleteDocFn(docFn(db, "quotes", quoteId));
+    } else {
+      let list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+      list = list.filter(i => i.id !== quoteId);
+      localStorage.setItem("darak_quotes", JSON.stringify(list));
+    }
+    showToast(t("q_deleted"));
+    loadQuotesSection();
+  } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+};
+// ✏️ تعديل عرض — يعبئ نافذة العرض ويرسله كتحديث (resend)
+window.openEditQuote = function(quoteId) {
+  const q = (_lastQuotes || []).find(x => x.id === quoteId);
+  if (!q) { showToast(t("quote_err"), "error"); return; }
+  if (q.status !== "sent" && q.status !== "draft") return;
+  const r = lastRequests.find(x => x.id === q.requestId);
+  if (!r || isExpiredReq(r)) { showToast(t("req_expired"), "error"); return; }
+  const modal = document.getElementById("quoteModal");
+  modal.dataset.quoteId = quoteId;
+  modal.dataset.requestId = q.requestId;
+  document.getElementById("quoteFor").textContent = t("q_client") + ": " + (q.clientName || r.name || "—") + " • " + (q.category || r.category || "") + " — " + t("q_edit_hint");
+  document.getElementById("quoteForm").reset();
+  document.getElementById("quoteAmount").value = q.amount || "";
+  document.getElementById("quoteNote").value = q.note || "";
+  const isTechRole = currentUser?.role === "tech";
+  const qf = document.getElementById("quoteFile");
+  qf.required = false; // عند التعديل: الملف القديم يبقى إذا ما اختاروا جديد
+  qf.previousElementSibling.textContent = isTechRole ? t("quote_file_opt") : "ملف العرض (PDF) — اختياري عند التعديل";
+  const amtStar = document.getElementById("qAmountStar");
+  if (amtStar) amtStar.style.display = isTechRole ? "none" : "";
+  document.getElementById("quoteSubmit").textContent = "إرسال العرض المعدل 🚀";
+  modal.classList.add("open");
+};
+
 window.openQuoteModal = function(requestId) {
   const r = lastRequests.find(x => x.id === requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
   if (isExpiredReq(r)) { showToast(t("req_expired"), "error"); return; }
-  document.getElementById("quoteModal").dataset.requestId = requestId;
+  const qm = document.getElementById("quoteModal");
+  delete qm.dataset.quoteId;
+  qm.dataset.requestId = requestId;
+  document.getElementById("quoteSubmit").textContent = t("quote_send");
   document.getElementById("quoteFor").textContent = t("q_client") + ": " + (r.name || "—") + " • " + (r.category || "");
   document.getElementById("quoteForm").reset();
   // الفني: ملف PDF اختياري — طلبات الصيانة تحتاج سرعة، والشركات: إلزامي
@@ -4109,18 +4172,21 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   const isTechRole = currentUser?.role === "tech";
   if (file && file.type !== "application/pdf") { showToast(t("pdf_only"), "error"); return; }
   if (file && file.size > 10 * 1024 * 1024) { showToast("حجم ملف العرض أكبر من 10 ميجا — صغّر الملف وحاول مرة أخرى", "error"); return; }
-  if (!file && !isTechRole) { showToast(t("pdf_required"), "error"); return; }
+  const qmEl = document.getElementById("quoteModal");
+  const editingId = qmEl.dataset.quoteId || "";
+  const exQ = editingId ? (_lastQuotes || []).find(x => x.id === editingId) : null;
+  if (!file && !isTechRole && !exQ) { showToast(t("pdf_required"), "error"); return; }
   // 💰 قيمة العرض إجبارية للشركات — عشان المقارنة تظهر فيها الأرقام دائمًا (الفني: اختياري)
   const amountVal = document.getElementById("quoteAmount").value;
   if (!isTechRole && !amountVal) { showToast("اكتب قيمة العرض بالريال أولًا — العميل يقارن فيها 💰", "error"); return; }
   const btn = document.getElementById("quoteSubmit");
-  const r = lastRequests.find(x => x.id === document.getElementById("quoteModal").dataset.requestId);
+  const r = lastRequests.find(x => x.id === qmEl.dataset.requestId);
   if (!r) { showToast(t("quote_err"), "error"); return; }
   btn.disabled = true;
   btn.textContent = t("quote_uploading");
   try {
-    let pdfUrl = "";
-    const pdfName = file ? file.name : "";
+    let pdfUrl = exQ ? (exQ.pdfUrl || "") : "";
+    const pdfName = file ? file.name : (exQ ? (exQ.pdfName || "") : "");
     if (file) {
       const toDataUrl = () => new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
       try {
@@ -4138,6 +4204,23 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
     }
     if (file && !pdfUrl) {
       showToast("تعذر إرفاق الملف (غالبًا حجمه كبير أو انقطع الاتصال) — لم يُرسل العرض، جرّب ملفًا أصغر أو أعد المحاولة", "error");
+      return;
+    }
+    // ✏️ وضع التعديل: تحديث العرض الموجود وإعادة إرساله
+    if (editingId && exQ) {
+      const upd = { amount: amountVal || "", note: cleanTxt(document.getElementById("quoteNote").value.trim()), pdfUrl, pdfName, status: "sent", clientComment: "", createdAt: serverTimestampFn() };
+      if (db && updateDocFn) {
+        await updateDocFn(docFn(db, "quotes", editingId), upd);
+      } else {
+        const list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+        const x = list.find(i => i.id === editingId);
+        if (x) Object.assign(x, upd, { createdAt: new Date().toISOString() });
+        localStorage.setItem("darak_quotes", JSON.stringify(list));
+      }
+      delete qmEl.dataset.quoteId;
+      document.getElementById("quoteModal").classList.remove("open");
+      showToast(exQ.status === "draft" ? t("q_draft_resent") : t("q_updated"));
+      loadQuotesSection();
       return;
     }
     const quote = {
@@ -4163,6 +4246,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
       list.push(quote);
       localStorage.setItem("darak_quotes", JSON.stringify(list));
     }
+    delete qmEl.dataset.quoteId;
     document.getElementById("quoteModal").classList.remove("open");
     showToast(t("quote_done"));
     loadQuotesSection();
@@ -4324,9 +4408,10 @@ async function loadQuotesSection() {
     const groups = [
       { key: "sent",     icon: "📤", title: t("q_grp_sent"), list: quotes.filter(q => q.status === "sent") },
       { key: "accepted", icon: "✅", title: t("q_grp_acc"),  list: quotes.filter(q => q.status === "accepted") },
-      { key: "rejected", icon: "⛔", title: t("q_grp_rej"),  list: quotes.filter(q => q.status === "rejected") }
+      { key: "rejected", icon: "⛔", title: t("q_grp_rej"),  list: quotes.filter(q => q.status === "rejected") },
+      { key: "draft",    icon: "📝", title: t("q_grp_draft"), list: quotes.filter(q => q.status === "draft") }
     ];
-    const stBadge2 = s => s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
+    const stBadge2 = s => s === "draft" ? `<span class="status-badge" style="background:#f0e9da;color:#7a6a45">📝 ${t("q_grp_draft").split(" ")[0]}</span>` : s === "accepted" ? `<span class="status-badge status-approved">${t("q_accepted")}</span>`
       : s === "rejected" ? `<span class="status-badge status-rejected">${t("q_rejected")}</span>`
       : `<span class="status-badge status-pending">${t("q_waiting")}</span>`;
     box.innerHTML = autoHideNote + menuHtml(groups) + groups.map(g => pageShell(g, `
@@ -4337,6 +4422,11 @@ async function loadQuotesSection() {
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
               </div>
               ${expiryLine(q)}
+              ${q.status === "sent" ? `<div class="q-act">
+                <button class="rt" onclick="event.stopPropagation();retractQuote('${q.id}')">${t("q_retract")}</button>
+                <button class="ed" onclick="event.stopPropagation();openEditQuote('${q.id}')">${t("q_edit")}</button>
+                <button class="dl" onclick="event.stopPropagation();deleteQuoteForever('${q.id}')">${t("q_del")}</button>
+              </div>` : ""}
               ${contactBlock(q)}
               <div class="q-det">
                 <div>🗂 ${q.category || "—"}</div>
