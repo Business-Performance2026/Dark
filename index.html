@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 76)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 77)</small>
     </div>
   </div>
 </footer>
@@ -1153,6 +1153,56 @@ footer ul a:hover{color:var(--gold-2)}
     <div style="display:flex;gap:8px">
       <button id="renewBtn" onclick="requestRenew()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 تجديد الشارة</button>
       <button onclick="document.getElementById('renewModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= نافذة الاشتراك الشهري (شركات فقط) ================= -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal" style="width:min(360px,94%);padding:24px 20px 20px">
+    <button class="modal-close" onclick="document.getElementById('subModal').classList.remove('open')" aria-label="إغلاق">✕</button>
+    <div style="text-align:center">
+      <div style="font-size:2rem">💳</div>
+      <h3 style="margin:6px 0 4px;color:var(--navy);font-size:1rem">الاشتراك الشهري</h3>
+      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7">اختر عدد الشهور، حوّل المبلغ على الحساب أدناه، وارفع صورة الإيصال — بنفعّل اشتراكك بعد تأكيد الدفع ✅</p>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>عدد الشهور</label>
+      <select id="subMonths" onchange="updateSubTotal()" style="width:100%;padding:10px 12px;border:2px solid #e8e2d5;border-radius:12px;font-family:inherit;font-size:.9rem;color:var(--navy)">
+        <option value="1">شهر واحد</option>
+        <option value="3">3 أشهر</option>
+        <option value="6">6 أشهر</option>
+        <option value="12">سنة كاملة</option>
+      </select>
+    </div>
+    <div id="subBankBox" style="display:none;background:#f6f1e7;border:1.5px solid var(--gold);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:.8rem;line-height:1.9;color:var(--navy)"></div>
+    <div id="subTotalLine" style="display:none;text-align:center;font-size:.85rem;font-weight:900;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;margin-bottom:12px"></div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>اسم الشركة</label>
+      <input type="text" id="subName" placeholder="اسم شركتك">
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>رقم الواتساب</label>
+      <input type="tel" id="subWhats" placeholder="9XXXXXXX" dir="ltr" style="text-align:left">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>صورة الإيصال (سكرين شوت الحوالة)</label>
+      <input type="file" id="subReceipt" accept="image/*" style="padding:9px 12px;border:2px dashed #d8cdb8;border-radius:12px;font-family:inherit;font-size:.8rem;width:100%;box-sizing:border-box;background:#fff">
+      <small style="color:var(--muted);font-size:.7rem">صورة فقط — أقل من 5 ميجا 📎</small>
+    </div>
+    <button type="button" onclick="submitSubRequest()" id="subSubmitBtn" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال طلب الاشتراك 🚀</button>
+  </div>
+</div>
+
+<!-- ================= بوب اب تحذير انتهاء الاشتراك ================= -->
+<div class="modal-overlay" id="subWarnModal">
+  <div class="modal" style="width:min(340px,92%);text-align:center;padding:26px 20px 20px">
+    <div id="subWarnIcon" style="width:64px;height:64px;border-radius:50%;background:#fee2e2;color:#b91c1c;font-size:1.9rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">⚠️</div>
+    <h3 id="subWarnTitle" style="color:var(--navy);margin:0 0 8px;font-size:1rem"></h3>
+    <p id="subWarnMsg" style="color:var(--muted);font-size:.83rem;line-height:1.8;margin:0 0 16px"></p>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeSubWarnAndOpenSub()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
+      <button onclick="document.getElementById('subWarnModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
     </div>
   </div>
 </div>
@@ -2470,6 +2520,11 @@ async function openDashboard() {
     const vCard = buildVerifyCard();
     if (vCard) content.insertAdjacentHTML("afterbegin", vCard);
     maybeShowRenewWarning();
+    if (isProvider) {
+      const sCard = buildSubCard();
+      if (sCard) content.insertAdjacentHTML("afterbegin", sCard);
+      maybeShowSubWarning();
+    }
   }
   loadQuotesSection();
   buildNotifs();
@@ -2503,6 +2558,118 @@ function buildVerifyCard() {
     ${rejectNote}
     <button type="button" onclick="requestVerify()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 اطلب شارة التوثيق الآن</button>
   </div></div>`;
+}
+
+// 💳 كرت الاشتراك الشهري في لوحة تحكم الشركة
+function buildSubCard() {
+  if (!currentUser) return "";
+  const active = isSubActive(currentUser);
+  const expired = currentUser.subStatus === "active" && isSubExpired(currentUser);
+  const pending = currentUser.subStatus === "pending";
+  if (active) {
+    const dl = subDaysLeft(currentUser);
+    const warn = dl !== null && dl <= 5;
+    const until = new Date(subTs(currentUser)).toLocaleDateString("ar-OM");
+    return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;background:${warn ? "#fffaf0" : "#f0fdf4"};border:1.5px solid ${warn ? "#f59e0b" : "#86efac"};border-radius:14px;padding:12px 14px">
+      <span style="font-size:1.6rem">💳</span>
+      <div style="flex:1;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">اشتراكك الشهري <span style="color:#16a34a">فعّال ✅</span><br><small style="font-weight:600;color:var(--muted)">ينتهي بتاريخ <b>${until}</b>${dl !== null ? " — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") : ""}</small></div>
+      <button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">تمديد ➕</button>
+    </div></div>`;
+  }
+  if (pending) return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏳ طلب الاشتراك قيد المراجعة — بنفعّله بعد تأكيد الحوالة 💳</div></div>`;
+  const rejectNote = currentUser.subStatus === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin:4px 0 6px">تم رفض الإيصال السابق — تواصل معنا واتساب أو أعد الإرسال</div>` : "";
+  const title = expired ? "انتهى اشتراكك الشهري" : "الاشتراك الشهري للشركات";
+  const desc = expired
+    ? "اشتراكك انتهى — جدّده الآن حتى تستمر بلا انقطاع 💳"
+    : "اشتراك شهري يدعم استمرار منصة دارك ويمنح شركتك أولوية الظهور ✨ الدفع يدوي بالتحويل البنكي.";
+  return `<div style="padding:12px 18px 0"><div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 14px">
+    <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px">💳 ${title}</div>
+    <div style="font-size:.74rem;color:var(--muted);margin-bottom:8px;line-height:1.6">${desc}</div>
+    ${rejectNote}
+    <button type="button" onclick="openSubModal()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 ${expired ? "جدّد الاشتراك" : "اشترك الآن"}</button>
+  </div></div>`;
+}
+let _subSettingsCache = null;
+window.openSubModal = async function() {
+  const m = document.getElementById("subModal");
+  if (!m) return;
+  document.getElementById("subName").value = currentUser.companyName || currentUser.displayName || "";
+  document.getElementById("subWhats").value = currentUser.subWhats || currentUser.phone || "";
+  document.getElementById("subReceipt").value = "";
+  if (!_subSettingsCache) _subSettingsCache = await getSubSettings();
+  const cfg = _subSettingsCache;
+  const box = document.getElementById("subBankBox");
+  if (cfg.bankName || cfg.bankAccount) {
+    box.style.display = "";
+    box.innerHTML = `<b>🏦 حوّل المبلغ على:</b><br>المستفيد: <b>${cleanTxt(cfg.bankName) || "—"}</b><br>رقم الحساب: <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
+  } else box.style.display = "none";
+  updateSubTotal();
+  document.getElementById("subWarnModal").classList.remove("open");
+  m.classList.add("open");
+};
+window.updateSubTotal = function() {
+  const months = +document.getElementById("subMonths").value || 1;
+  const line = document.getElementById("subTotalLine");
+  const price = +(_subSettingsCache && _subSettingsCache.price) || 0;
+  if (price > 0) {
+    line.style.display = "";
+    line.textContent = "💰 المبلغ الإجمالي: " + (months * price).toLocaleString("ar") + " ر.ع (" + months + (months === 1 ? " شهر" : " أشهر") + ")";
+  } else line.style.display = "none";
+};
+window.closeSubWarnAndOpenSub = function() {
+  document.getElementById("subWarnModal").classList.remove("open");
+  openSubModal();
+};
+window.submitSubRequest = async function() {
+  const btn = document.getElementById("subSubmitBtn");
+  const months = +document.getElementById("subMonths").value || 1;
+  const name = document.getElementById("subName").value.trim();
+  const whats = document.getElementById("subWhats").value.trim();
+  const file = document.getElementById("subReceipt").files[0];
+  if (!name) { showToast("اكتب اسم شركتك 🏢", "error"); return; }
+  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast("اكتب رقم الواتساب صحيحًا 📱", "error"); return; }
+  if (!file) { showToast("ارفع صورة الإيصال أولًا 📎", "error"); return; }
+  if (!file.type.startsWith("image/")) { showToast("الإيصال لازم يكون صورة 📷", "error"); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast("الصورة أكبر من 5 ميجا — صغّرها 🗜️", "error"); return; }
+  btn.disabled = true; btn.textContent = "جارٍ الإرسال… ⏳";
+  try {
+    const receiptUrl = await uploadImage(file, "subscriptions/" + (currentUser.uid || "u"));
+    if (!receiptUrl) throw new Error("upload_failed");
+    const fields = { subStatus: "pending", subMonths: months, subName: name, subWhats: whats, subReceipt: receiptUrl, subReqAt: serverTimestampFn ? serverTimestampFn() : new Date().toISOString() };
+    if (db && getDocsFn) {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), fields);
+    } else {
+      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
+      const lu = users.find(x => x.uid === currentUser.uid);
+      if (lu) { Object.assign(lu, fields); localStorage.setItem("darak_users", JSON.stringify(users)); }
+    }
+    Object.assign(currentUser, fields);
+    document.getElementById("subModal").classList.remove("open");
+    showToast("وصل طلب اشتراكك للإدارة — بنفعّله بعد تأكيد الحوالة ✅");
+    openDashboard();
+  } catch (e) {
+    console.error(e);
+    showToast("تعذر إرسال الطلب — تأكد من النت وحاول مرة أخرى", "error");
+  }
+  btn.disabled = false; btn.textContent = "إرسال طلب الاشتراك 🚀";
+};
+// 🔔 بوب اب تحذير انتهاء الاشتراك — قبل 5 أيام أو بعده (مرة بالجلسة)
+let _subWarned = false;
+function maybeShowSubWarning() {
+  if (_subWarned || !currentUser) return;
+  const active = isSubActive(currentUser);
+  const expired = currentUser.subStatus === "active" && isSubExpired(currentUser);
+  if (!active && !expired) return;
+  const dl = subDaysLeft(currentUser);
+  if (!expired && (dl === null || dl > 5)) return;
+  _subWarned = true;
+  document.getElementById("subWarnIcon").textContent = expired ? "✖️" : "⚠️";
+  document.getElementById("subWarnTitle").textContent = expired ? "انتهى اشتراكك الشهري" : "اشتراكك بيخلص قريبًا";
+  document.getElementById("subWarnMsg").innerHTML = expired
+    ? `انتهى اشتراكك الشهري يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده الآن واستمر بلا انقطاع 💳`
+    : `باقي <b>${dl} ${dl === 1 ? "يوم" : dl === 2 ? "يومين" : "أيام"}</b> وينتهي اشتراكك يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده قبل لا ينتهي ✨`;
+  document.getElementById("subWarnModal").classList.add("open");
 }
 window.requestVerify = async function() {
   try {
@@ -2712,6 +2879,23 @@ function verifyTs(u) { const v = u && u.verifiedUntil; if (!v) return 0; return 
 function isVerifyExpired(u) { const t = verifyTs(u); return t > 0 && Date.now() > t; }
 function verifyDaysLeft(u) { const t = verifyTs(u); return t > 0 ? Math.ceil((t - Date.now()) / 86400000) : null; }
 function isEffectivelyVerified(u) { return !!(u && u.verified) && !isVerifyExpired(u); }
+// 💳 نظام الاشتراك الشهري — للشركات فقط (الفنيون مجانًا)
+function subTs(u) { const v = u && u.subscribedUntil; if (!v) return 0; return v.seconds ? v.seconds * 1000 : new Date(v).getTime(); }
+function isSubExpired(u) { const t = subTs(u); return t > 0 && Date.now() > t; }
+function isSubActive(u) { return !!(u && u.subStatus === "active") && !isSubExpired(u); }
+function subDaysLeft(u) { const t = subTs(u); return t > 0 ? Math.ceil((t - Date.now()) / 86400000) : null; }
+const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "" };
+async function getSubSettings() {
+  if (db && getDocsFn) {
+    try {
+      const snap = await getDocsFn(queryFn(collectionFn(db, "settings")));
+      const d = snap.docs.find(x => x.id === "subscription");
+      if (d) return { ...DEFAULT_SUB_SETTINGS, ...d.data() };
+    } catch (e) { console.warn(e); }
+    return { ...DEFAULT_SUB_SETTINGS };
+  }
+  return { ...DEFAULT_SUB_SETTINGS, ...JSON.parse(localStorage.getItem("darak_subsettings") || "{}") };
+}
 async function loadUsersTable() {
   const box = document.getElementById("usersContent");
   box.innerHTML = `<div class="dash-empty"><div class="big">⏳</div>جارٍ تحميل المستخدمين…</div>`;
@@ -2769,6 +2953,36 @@ async function loadUsersTable() {
         </div>`).join("")}
       </div>
     </div>` : ""; })()}
+    ${(() => { const sr = users.filter(u => u.subStatus === "pending");
+      return sr.length ? `<div style="padding:0 12px 12px">
+      <div class="q-card" style="cursor:default;border:2px solid #16a34a;background:#f0fdf4">
+        <b style="color:var(--navy)">💳 طلبات الاشتراك (${sr.length})</b>
+        ${sr.map(u => `<div style="display:flex;align-items:center;gap:8px;border-top:1.5px dashed #c7e8cf;margin-top:10px;padding-top:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <b>${cleanTxt(u.subName) || u.displayName || "بدون اسم"}</b> <span class="status-badge status-pending">${adminRoleName(u.role)}</span><br>
+            <small style="color:var(--muted)">${+(u.subMonths || 1)} ${+(u.subMonths || 1) === 1 ? "شهر" : "أشهر"}${u.subReqAt ? " • " + new Date(u.subReqAt.seconds ? u.subReqAt.seconds * 1000 : u.subReqAt).toLocaleDateString("ar-OM") : ""} • واتساب: <span dir="ltr">${cleanTxt(u.subWhats) || u.phone || "—"}</span></small><br>
+            ${u.subReceipt ? `<a href="${u.subReceipt}" target="_blank" rel="noopener" style="display:inline-block;margin-top:5px;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:9px;padding:5px 12px;font-size:.72rem;font-weight:800;text-decoration:none">🧾 عرض الإيصال</a>` : `<small style="color:#b91c1c;font-size:.72rem">بدون إيصال ⛔</small>`}
+          </div>
+          <button class="action-btn action-approve" style="background:#25d366" onclick="adminSubWhats('${u.uid}')">💬 واتساب</button>
+          <button class="action-btn action-approve" onclick="adminSubApprove('${u.uid}')">✅ تفعيل</button>
+          <button class="action-btn action-reject" onclick="adminSubReject('${u.uid}')">⛔ رفض</button>
+        </div>`).join("")}
+      </div>
+    </div>` : ""; })()}
+    <div style="padding:0 12px 12px">
+      <div class="q-card" style="cursor:default;border:1.5px solid #d8cdb8;background:#fbf9f4">
+        <b style="color:var(--navy)">⚙️ إعدادات الاشتراك البنكي</b>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <input type="text" id="subSetBank" placeholder="اسم البنك / المستفيد" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
+          <input type="text" id="subSetAccount" placeholder="رقم الحساب البنكي" dir="ltr" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <input type="number" id="subSetPrice" placeholder="سعر الشهر (ر.ع)" min="0" style="flex:1;border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
+          <button type="button" class="action-btn action-approve" onclick="adminSaveSubSettings()">💾 حفظ</button>
+        </div>
+        <small style="color:var(--muted);font-size:.7rem;display:block;margin-top:6px">بيظهر الحساب وسعر الشهر تلقائيًا لأي شركة تفتح نموذج الاشتراك 💳</small>
+      </div>
+    </div>
     <div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default">
         <b style="color:var(--navy)">🗂️ إدارة ملف مستخدم</b>
@@ -2787,6 +3001,16 @@ async function loadUsersTable() {
       </div>
     </div>`;
   adminFilterUsers();
+  fillSubSettingsForm();
+}
+async function fillSubSettingsForm() {
+  try {
+    const cfg = await getSubSettings();
+    const b = document.getElementById("subSetBank"), a = document.getElementById("subSetAccount"), p = document.getElementById("subSetPrice");
+    if (b) b.value = cfg.bankName || "";
+    if (a) a.value = cfg.bankAccount || "";
+    if (p) p.value = cfg.price || "";
+  } catch (e) { console.warn(e); }
 }
 
 function adminRoleName(r) {
@@ -2966,6 +3190,49 @@ window.auSaveVerifyUntil = async function(uid) {
   try {
     await updateVerifyFields(uid, { verifiedUntil: new Date(dEl.value + "T23:59:59") });
     showToast("تم حفظ تاريخ الانتهاء 📅 — " + dEl.value);
+  } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
+};
+window.adminSubWhats = function(uid) {
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (!u) return;
+  const num = waNormalize(u.subWhats || u.phone);
+  if (!num || num.length < 10) { showToast("رقم الواتساب غير مكتمل 💬", "error"); return; }
+  const msg = encodeURIComponent("مرحبًا " + (u.subName || u.displayName || "") + "، معك إدارة تطبيق دارك 👋 بخصوص طلب الاشتراك");
+  window.open("https://wa.me/" + num.replace("+", "") + "?text=" + msg, "_blank");
+};
+window.adminSubApprove = async function(uid) {
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (!u) return;
+  const months = Math.max(1, Math.min(36, +(u.subMonths || 1)));
+  const cur = subTs(u);
+  const base = cur > Date.now() ? cur : Date.now(); // تمديد فوق المدة السارية إن وجدت
+  const until = new Date(base);
+  until.setMonth(until.getMonth() + months);
+  try {
+    await updateVerifyFields(uid, { subStatus: "active", subscribedUntil: until });
+    showToast("تم تفعيل الاشتراك ✅ " + months + (months === 1 ? " شهر" : " أشهر") + " — ينتهي " + until.toLocaleDateString("ar-OM"));
+  } catch (e) { console.error(e); showToast("تعذر التفعيل", "error"); }
+};
+window.adminSubReject = async function(uid) {
+  try {
+    await updateVerifyFields(uid, { subStatus: "rejected" });
+    showToast("تم رفض طلب الاشتراك ⛔");
+  } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
+};
+window.adminSaveSubSettings = async function() {
+  const data = {
+    bankName: (document.getElementById("subSetBank").value || "").trim(),
+    bankAccount: (document.getElementById("subSetAccount").value || "").trim(),
+    price: (document.getElementById("subSetPrice").value || "").trim()
+  };
+  try {
+    if (db && setDocFn) {
+      await setDocFn(docFn(db, "settings", "subscription"), data, { merge: true });
+    } else {
+      localStorage.setItem("darak_subsettings", JSON.stringify(data));
+    }
+    _subSettingsCache = { ...DEFAULT_SUB_SETTINGS, ...data };
+    showToast("تم حفظ إعدادات الاشتراك ✅ بتظهر للشركات فورًا");
   } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
 };
 async function updateVerifyFields(uid, fields) {
