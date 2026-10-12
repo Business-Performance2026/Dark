@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 57)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 58)</small>
     </div>
   </div>
 </footer>
@@ -1415,7 +1415,7 @@ const I18N = {
     q_company: "الشركة", q_client: "العميل", q_amount: "المبلغ", q_note: "ملاحظات", q_file: "الملف",
     q_view: "📄 عرض", q_actions: "القرار", q_accept: "✅ موافق", q_reject: "⛔ رفض",
     q_sent: "بانتظار ردك ⏳", q_waiting: "بانتظار رد العميل ⏳", q_accepted: "مقبول ✅", q_rejected: "مرفوض ⛔",
-    q_empty: "لا توجد عروض أسعار بعد", aq_comment: "تعليق العميل", q_send: "عرض سعر",
+    q_empty: "لا توجد عروض أسعار بعد", aq_comment: "تعليق العميل", q_send: "أرسل عرض سعرك للعميل",
     quote_modal_title: "📄 إرسال عرض سعر", quote_file: "ملف العرض (PDF) *", quote_amount: "قيمة العرض (ر.ع)",
     quote_note: "ملاحظة للعميل", quote_send: "إرسال العرض 🚀", quote_uploading: "جارٍ رفع الملف…",
     quote_done: "تم إرسال عرض السعر للعميل ✅", quote_err: "تعذر الإرسال — حاول مرة أخرى",
@@ -1490,7 +1490,7 @@ const I18N = {
     q_company: "Company", q_client: "Client", q_amount: "Amount", q_note: "Notes", q_file: "File",
     q_view: "📄 View", q_actions: "Decision", q_accept: "✅ Accept", q_reject: "⛔ Reject",
     q_sent: "Awaiting you ⏳", q_waiting: "Awaiting client ⏳", q_accepted: "Accepted ✅", q_rejected: "Rejected ⛔",
-    q_empty: "No price quotes yet", aq_comment: "Client comment", q_send: "Quote",
+    q_empty: "No price quotes yet", aq_comment: "Client comment", q_send: "Send your quote to the client",
     quote_modal_title: "📄 Send a Quote", quote_file: "Quote file (PDF) *", quote_amount: "Quote amount (OMR)",
     quote_note: "Note to client", quote_send: "Send quote 🚀", quote_uploading: "Uploading file…",
     quote_done: "Quote sent to the client ✅", quote_err: "Could not send — try again",
@@ -2422,7 +2422,7 @@ async function openDashboard() {
           ? clientStatusCell(r)
           : (isExpiredReq(r) && !isPro
             ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`
-            : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button class="action-btn action-approve" style="margin-top:6px" onclick="openQuoteModal('${r.id}')">📄 ${t("q_send")}</button>` : ""}</td>
+            : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button onclick="openQuoteModal('${r.id}')" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:10px 18px;font-size:.84rem;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
     </table>${moreBtn(rows.length - 5, "الطلبات")}`;
   }
