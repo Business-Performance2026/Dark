@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 70)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 71)</small>
     </div>
   </div>
 </footer>
@@ -1676,10 +1676,11 @@ document.getElementById("techModalForm").addEventListener("submit", async e => {
 let liveCompanies = [];
 function allCompanies() { return [...liveCompanies]; }
 function coCard(p) {
+  const logoHtml = p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="" style="margin:0">` : `<div class="co-logo" style="margin:0">${p.icon || "🏢"}</div>`;
   return `
   <div class="co-card" data-open="${p.id}" data-kind="co">
-    ${p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="">` : `<div class="co-logo">${p.icon || "🏢"}</div>`}
-    <h4>${p.verified ? verifyBadgeHtml(28) + " " : ""}${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
+    <div style="position:relative;display:table;margin:0 auto 10px">${logoHtml}${p.verified ? `<img src="${VERIFIED_BADGE}" alt="موثّقة" title="شركة موثّقة من دارك" style="position:absolute;top:50%;right:-14px;transform:translateY(-50%);width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(185,141,78,.55));z-index:2">` : ""}</div>
+    <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
     <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"}</div>
     ${p.location ? `<div class="co-loc">📍 ${p.location}</div>` : ""}
