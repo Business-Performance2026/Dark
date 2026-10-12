@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 53)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 54)</small>
     </div>
   </div>
 </footer>
@@ -2621,6 +2621,25 @@ function adminRoleName(r) {
   return r === "provider" ? "🛠️ شركة" : r === "tech" ? "🔧 فني" : "🏠 عميل";
 }
 
+// تحويل رقم الجوال لصيغة دولية تفهمها واتساب (أرقام عُمان: 9xxxxxxx → +9689xxxxxxx)
+function waNormalize(p) {
+  let d = (p || "").replace(/\D/g, "");
+  if (d.startsWith("00968")) d = d.slice(2);
+  if (d.startsWith("968")) return "+" + d;
+  if (d.startsWith("0") && d.length === 9) return "+968" + d.slice(1);
+  if (d.length === 8) return "+968" + d;
+  return d ? "+" + d : "";
+}
+
+window.adminWhatsApp = function(uid) {
+  const u = adminUsersCache.find(x => x.uid === uid);
+  if (!u) return;
+  const num = waNormalize(u.phone);
+  if (!num || num.length < 10) { showToast("رقم الجوال غير مكتمل — أضف الرقم ثم جرّب 💬", "error"); return; }
+  const msg = encodeURIComponent("مرحبًا " + (u.displayName || "") + "، معك إدارة تطبيق دارك 👋");
+  window.open("https://wa.me/" + num.replace("+", "") + "?text=" + msg, "_blank");
+};
+
 window.adminSetRoleFilter = function(role) {
   adminRoleFilter = (adminRoleFilter === role) ? "" : role;
   document.querySelectorAll(".au-rfilter").forEach(b => b.classList.toggle("on", b.dataset.rfilter === adminRoleFilter));
@@ -2659,7 +2678,12 @@ window.adminPickUser = function() {
   ed.innerHTML = `
     <div style="border-top:1.5px dashed #e7e3da;margin-top:10px;padding-top:12px">
       <div class="form-group"><label>الاسم</label><input type="text" id="auName" value="${(u.displayName || "").replace(/"/g, "&quot;")}"></div>
-      <div class="form-group"><label>رقم الجوال</label><input type="tel" id="auPhone" dir="ltr" value="${u.phone || ""}"></div>
+      <div class="form-group"><label>رقم الجوال</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="tel" id="auPhone" dir="ltr" value="${u.phone || ""}" style="flex:1">
+          ${u.phone ? `<button type="button" onclick="adminWhatsApp('${u.uid}')" title="مراسلة عبر واتساب" style="flex:0 0 auto;border:none;cursor:pointer;background:#25d366;color:#fff;border-radius:10px;padding:9px 12px;font-weight:800;font-size:.85rem;font-family:inherit">💬 واتساب</button>` : ""}
+        </div>
+      </div>
       <div class="form-group"><label>📍 المنطقة</label><input type="text" id="auLoc" value="${(u.location || "").replace(/"/g, "&quot;")}" placeholder="مسقط / السيب / المعبيلة"></div>
       <div class="form-group"><label>البريد (للقراءة فقط)</label><input type="email" dir="ltr" value="${u.email || ""}" disabled style="opacity:.6"></div>
       ${isProv ? `<div class="form-group"><label>التخصصات</label><div id="auCatList" class="cat-picks">${catPickHtml(u.role === "tech" ? TECHS : CATEGORIES, userCatsArr(u))}</div></div>
