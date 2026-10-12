@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 66)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 67)</small>
     </div>
   </div>
 </footer>
@@ -2559,11 +2559,12 @@ window.adminCatEdit = function(kind, i) {
   document.getElementById("aceEn").value = c.en || "";
   document.getElementById("aceSave").textContent = "حفظ التعديل 💾";
 };
-window.adminCatDel = async function(kind, i) {
-  if (!confirm("حذف هذا العنصر؟")) return;
-  const list = (kind === "techcats" ? TECHS : CATEGORIES).slice();
-  list.splice(i, 1);
-  await persistCatList(kind, list);
+window.adminCatDel = function(kind, i) {
+  darakConfirm("حذف هذا العنصر؟", async () => {
+    const list = (kind === "techcats" ? TECHS : CATEGORIES).slice();
+    list.splice(i, 1);
+    await persistCatList(kind, list);
+  });
 };
 async function adminCatSave(kind) {
   const name = document.getElementById("aceName").value.trim();
@@ -2807,12 +2808,13 @@ window.adminDelete = async uid => {
       return;
     }
   } catch (e) {}
-  if (!confirm("متأكد من حذف هذا المستخدم؟ لن يقدر يدخل أو يظهر في التطبيق")) return;
-  try {
-    // حذف منطقي — قواعد Firestore تمنع الحذف النهائي من التطبيق
-    await updateUserStatus(uid, "deleted", "حذفته الإدارة");
-    showToast("تم حذف المستخدم 🗑️ — لن يظهر أو يدخل بعد الآن");
-  } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
+  darakConfirm("متأكد من حذف هذا المستخدم؟ لن يقدر يدخل أو يظهر في التطبيق", async () => {
+    try {
+      // حذف منطقي — قواعد Firestore تمنع الحذف النهائي من التطبيق
+      await updateUserStatus(uid, "deleted", "حذفته الإدارة");
+      showToast("تم حذف المستخدم 🗑️ — لن يظهر أو يدخل بعد الآن");
+    } catch (e) { console.error(e); showToast("تعذر الحذف", "error"); }
+  });
 };
 
 // 📧 تغيير إيميل الدخول بأمان — يرجع الإيميل المعتمد: الجديد إذا تغيّر فعليًا في حساب الدخول، والقديم إذا فشل
@@ -2865,6 +2867,7 @@ function closeConfirmModal() { document.getElementById("confirmModal").classList
 document.getElementById("confirmCancel").addEventListener("click", closeConfirmModal);
 document.getElementById("confirmModal").addEventListener("click", e => { if (e.target.id === "confirmModal") closeConfirmModal(); });
 document.getElementById("confirmOk").addEventListener("click", () => { const cb = confirmCb; closeConfirmModal(); if (cb) cb(); });
+window.darakConfirm = function(msg, cb) { openConfirmModal("🗑️", "تأكيد الحذف", msg, "نعم، احذف", cb); };
 document.getElementById("reasonClose").addEventListener("click", closeReasonModal);
 document.getElementById("reasonModal").addEventListener("click", e => { if (e.target.id === "reasonModal") closeReasonModal(); });
 document.getElementById("reasonConfirm").addEventListener("click", () => {
@@ -3405,9 +3408,9 @@ window.openCompany = async function(id) {
 };
 
 // 🗑️ حذف تقييم مسيء — للأدمن فقط
-window.deleteRating = async function(ratingId, companyId) {
+window.deleteRating = function(ratingId, companyId) {
   if (!isAdmin()) return;
-  if (!confirm("حذف هذا التقييم نهائياً؟")) return;
+  darakConfirm("حذف هذا التقييم نهائياً؟", async () => {
   try {
     if (db && deleteDocFn) await deleteDocFn(docFn(db, "ratings", ratingId));
     else localStorage.setItem("darak_ratings", JSON.stringify((JSON.parse(localStorage.getItem("darak_ratings") || "[]")).filter(x => x.id !== ratingId)));
@@ -3416,6 +3419,7 @@ window.deleteRating = async function(ratingId, companyId) {
     await loadLiveCompanies();
     openCompany(companyId);
   } catch (e) { console.error(e); showToast("تعذر الحذف — تحقق من القواعد", "error"); }
+  });
 };
 
 // ====== ⭐ إدارة التقييمات من لوحة الأدمن: عرض + إضافة + تعديل + حذف ======
@@ -4106,19 +4110,20 @@ window.retractQuote = async function(quoteId) {
   } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
 };
 // 🗑️ حذف نهائي لعرض مسودة أو مرسل
-window.deleteQuoteForever = async function(quoteId) {
-  if (!confirm(t("q_confirm_del"))) return;
-  try {
-    if (db && deleteDocFn) {
-      await deleteDocFn(docFn(db, "quotes", quoteId));
-    } else {
-      let list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
-      list = list.filter(i => i.id !== quoteId);
-      localStorage.setItem("darak_quotes", JSON.stringify(list));
-    }
-    showToast(t("q_deleted"));
-    loadQuotesSection();
-  } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+window.deleteQuoteForever = function(quoteId) {
+  darakConfirm(t("q_confirm_del"), async () => {
+    try {
+      if (db && deleteDocFn) {
+        await deleteDocFn(docFn(db, "quotes", quoteId));
+      } else {
+        let list = JSON.parse(localStorage.getItem("darak_quotes") || "[]");
+        list = list.filter(i => i.id !== quoteId);
+        localStorage.setItem("darak_quotes", JSON.stringify(list));
+      }
+      showToast(t("q_deleted"));
+      loadQuotesSection();
+    } catch (e) { console.error(e); showToast(t("quote_err"), "error"); }
+  });
 };
 // ✏️ تعديل عرض — يعبئ نافذة العرض ويرسله كتحديث (resend)
 window.openEditQuote = function(quoteId) {
@@ -4837,5 +4842,6 @@ function closeIosHint() {
 }
 window.closeIosHint = closeIosHint;
 </script>
+<!-- ================= نافذة تأكيد الحذف (ستايل دارك — بدل نافذة المتصفح) ================= -->
 </body>
 </html>
