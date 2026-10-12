@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 55)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 56)</small>
     </div>
   </div>
 </footer>
@@ -1271,10 +1271,8 @@ if (FIREBASE_READY) {
         messaging = msgMod.getMessaging(app);
         getTokenFn = msgMod.getToken;
         onMessageFn = msgMod.onMessage;
-        console.log("✅ إشعارات Push جاهزة");
       }
     } catch (e) { console.warn("⚠️ إشعارات Push غير مدعومة على هذا المتصفح", e); }
-    console.log("✅ Firebase متصل");
   } catch (e) {
     console.warn("⚠️ تعذر الاتصال بـ Firebase — الوضع التجريبي", e);
   }
