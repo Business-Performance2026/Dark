@@ -902,7 +902,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 56)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 57)</small>
     </div>
   </div>
 </footer>
@@ -1013,6 +1013,11 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="form-group">
         <label data-i18n="details_lbl">تفاصيل المشروع *</label>
         <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
+      </div>
+      <div class="form-group">
+        <label data-i18n="attach_lbl">📎 إرفاق مخطط أو مستند (PDF) — اختياري</label>
+        <input type="file" id="reqAttachment" accept="application/pdf,.pdf" style="padding:8px;background:#fbf9f4;border:1.5px solid #e7dfd0;border-radius:10px;font-size:.8rem">
+        <small id="reqAttachName" style="color:var(--muted);font-size:.72rem;display:none"></small>
       </div>
       <button type="submit" class="submit-btn" id="reqSubmit" data-i18n="send_req">إرسال الطلب 🚀</button>
     </form>
@@ -1395,7 +1400,7 @@ const I18N = {
     modal_welcome: "مرحبًا بك في دارك 🏠", modal_sub: "سجّل دخولك أو أنشئ حسابًا جديدًا",
     tab_login: "تسجيل الدخول", tab_register: "حساب جديد", name_lbl: "الاسم الكامل / اسم المنشأة", email_lbl: "البريد الإلكتروني", pass_lbl: "كلمة المرور", cat_lbl: "تخصصك",
     req_title: "📋 اطلب خدمة لمشروعك", req_sub: "عبّئ التفاصيل وبيشوف طلبك مقدمو الخدمة في التخصص المطلوب",
-    req_name: "الاسم الكامل *", phone_lbl: "رقم الجوال *", city_lbl: "المدينة *", req_cat: "التخصص المطلوب *", budget_lbl: "الميزانية التقريبية (ر.ع)", details_lbl: "تفاصيل المشروع *", send_req: "إرسال الطلب 🚀",
+    req_name: "الاسم الكامل *", phone_lbl: "رقم الجوال *", city_lbl: "المدينة *", req_cat: "التخصص المطلوب *", budget_lbl: "الميزانية التقريبية (ر.ع)", details_lbl: "تفاصيل المشروع *", attach_lbl: "📎 إرفاق مخطط أو مستند (PDF) — اختياري", send_req: "إرسال الطلب 🚀",
     f_cats: "التخصصات", f_platform: "المنصة", f_contact: "تواصل معنا", rights: "جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠",
     reg_phone: "رقم الجوال", forgot: "نسيت كلمة المرور؟",
     forgot_need_email: "اكتب بريدك الإلكتروني أولًا في الخانة ثم اضغط نسيت كلمة المرور",
@@ -1470,7 +1475,7 @@ const I18N = {
     modal_welcome: "Welcome to Darak 🏠", modal_sub: "Sign in or create a new account",
     tab_login: "Sign in", tab_register: "New account", name_lbl: "Full name / Business name", email_lbl: "Email", pass_lbl: "Password", cat_lbl: "Your trade",
     req_title: "📋 Request a service", req_sub: "Fill the details and providers in this trade will see your request",
-    req_name: "Full name *", phone_lbl: "Phone *", city_lbl: "City *", req_cat: "Required trade *", budget_lbl: "Approx. budget (OMR)", details_lbl: "Project details *", send_req: "Send request 🚀",
+    req_name: "Full name *", phone_lbl: "Phone *", city_lbl: "City *", req_cat: "Required trade *", budget_lbl: "Approx. budget (OMR)", details_lbl: "Project details *", attach_lbl: "📎 Attach plan or document (PDF) — optional", send_req: "Send request 🚀",
     f_cats: "Services", f_platform: "Platform", f_contact: "Contact us", rights: "All rights reserved | From the first step to your dream home 🏠",
     reg_phone: "Phone number", forgot: "Forgot password?",
     forgot_need_email: "Enter your email in the field first, then tap Forgot password",
@@ -1755,6 +1760,13 @@ function closeRequestModal() { requestModal.classList.remove("open"); }
 document.getElementById("requestClose").addEventListener("click", closeRequestModal);
 requestModal.addEventListener("click", e => { if (e.target === requestModal) closeRequestModal(); });
 
+document.getElementById("reqAttachment").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  const lbl = document.getElementById("reqAttachName");
+  if (!lbl) return;
+  if (f) { lbl.style.display = ""; lbl.textContent = "📄 " + f.name + " (" + Math.round(f.size / 1024) + " KB)"; }
+  else lbl.style.display = "none";
+});
 document.getElementById("requestModalForm").addEventListener("submit", async e => {
   e.preventDefault();
   const btn = document.getElementById("reqSubmit");
@@ -1766,11 +1778,30 @@ document.getElementById("requestModalForm").addEventListener("submit", async e =
     ownerEmail: currentUser?.email || ""
   };
   if (pendingTargetUid && pendingTargetRole !== "tech") { data.targetUid = pendingTargetUid; data.targetName = cleanTxt(pendingTargetName); }
+  const attachEl = document.getElementById("reqAttachment");
+  const attachFile = attachEl && attachEl.files && attachEl.files[0] ? attachEl.files[0] : null;
+  if (attachFile) {
+    if (attachFile.size > 10 * 1024 * 1024) { showToast("حجم الملف أكبر من 10 ميجا — جرّب ملفًا أصغر", "error"); btn.disabled = false; btn.textContent = "إرسال الطلب 🚀"; return; }
+    if (attachFile.type !== "application/pdf" && !/\.pdf$/i.test(attachFile.name)) { showToast("الصيغة المقبولة PDF فقط 📄", "error"); btn.disabled = false; btn.textContent = "إرسال الطلب 🚀"; return; }
+  }
   try {
+    if (attachFile && storage && refFn && uploadBytesFn && getUrlFn && currentUser) {
+      try {
+        const safeName = cleanTxt(attachFile.name).replace(/[^\w.\-]+/g, "_") || "plan.pdf";
+        const path = "request_attachments/" + currentUser.uid + "/" + Date.now() + "_" + safeName;
+        await uploadBytesFn(refFn(storage, path), attachFile, { contentType: "application/pdf" });
+        data.attachmentUrl = await getUrlFn(refFn(storage, path));
+        data.attachmentName = safeName;
+      } catch (upErr) {
+        console.warn("تعذر رفع الملف — يُرسل الطلب بدونه", upErr.code || upErr);
+        showToast("تعذر رفع الملف — تم إرسال الطلب بدونه ⚠️", "error");
+      }
+    }
     const mode = await saveToDB(pendingTargetUid && pendingTargetRole === "tech" ? "tech_requests" : "service_requests", data);
     pendingTargetUid = null; pendingTargetName = ""; pendingTargetRole = "";
     showToast("تم استلام طلبك! بيشوفه مقدمو الخدمة في التخصص المطلوب" + (mode === "local" ? " (وضع تجريبي)" : ""));
     e.target.reset();
+    const an = document.getElementById("reqAttachName"); if (an) an.style.display = "none";
     closeRequestModal();
     openDashboard();
   } catch (err) {
@@ -2351,6 +2382,7 @@ async function openDashboard() {
       </div>
       <div style="font-size:.79rem;color:var(--muted);margin-top:3px">📍 ${r.city || "—"}${r.budget ? ` &nbsp;•&nbsp; 💰 ${(+r.budget).toLocaleString("ar")} ر.ع` : ""}</div>
       ${r.details ? `<div style="font-size:.8rem;margin-top:3px">${r.details}</div>` : ""}
+      ${r.attachmentUrl ? `<a href="${r.attachmentUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:5px;background:#f6f1e7;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:4px 10px;font-size:.74rem;font-weight:800;text-decoration:none">📄 ${LANG === "ar" ? "المخطط المرفق" : "Attached plan"}</a>` : ""}
       <div style="margin-top:8px;display:flex">${clientStatusCell(r)}</div>
     </div>`).join("");
     content.innerHTML = `
@@ -2385,7 +2417,7 @@ async function openDashboard() {
         <td data-lbl="${t("th_city")}">${r.city || "—"}</td>
         <td data-lbl="${t("th_cat")}">${r.category || "—"}</td>
         <td data-lbl="${t("th_budget")}">${r.budget ? (+r.budget).toLocaleString("ar") + " ر.ع" : "—"}</td>
-        <td data-lbl="${t("th_details")}" style="max-width:240px">${r.details || "—"}</td>
+        <td data-lbl="${t("th_details")}" style="max-width:240px">${r.details || "—"}${r.attachmentUrl ? `<div style="margin-top:5px"><a href="${r.attachmentUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;background:#f6f1e7;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:4px 10px;font-size:.74rem;font-weight:800;text-decoration:none">📄 ${LANG === "ar" ? "عرض المخطط المرفق" : "View attached plan"}</a></div>` : ""}</td>
         <td data-lbl="${t("th_status")}">${!isPro && !admin
           ? clientStatusCell(r)
           : (isExpiredReq(r) && !isPro
