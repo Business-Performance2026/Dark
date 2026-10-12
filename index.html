@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 65)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 66)</small>
     </div>
   </div>
 </footer>
@@ -1423,7 +1423,7 @@ const I18N = {
     forgot_demo: "استعادة كلمة المرور تحتاج ربط Firebase",
     quotes_title: "💰 عروض الأسعار", q_sent_title: "💰 عروضي المرسلة",
     acc_suspended: "حسابك موقوف", acc_rejected: "تم رفض حسابك", reason_lbl: "السبب", no_reason: "غير محدد",
-    q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة", q_grp_draft: "📝 مسودات (عروض مسحوبة)", q_retract: "↩️ استرجاع", q_edit: "✏️ تعديل", q_del: "🗑️ حذف", q_retracted: "تم استرجاع العرض من العميل — بتلقاه في المسودات", q_edit_hint: "عدّل العرض وأرسله مرة ثانية", q_deleted: "تم حذف العرض", q_confirm_del: "متأكد تحذف هالعرض نهائي؟ ما يقدر العميل يشوفه بعدها", q_updated: "تم إرسال العرض المعدل للعميل 🚀", q_draft_resent: "تم إرسال العرض من جديد",
+    q_grp_sent: "📤 عروضي المرسلة", q_grp_acc: "✅ عروضي الموافق عليها", q_grp_rej: "⛔ عروضي المرفوضة", q_grp_draft: "📝 مسودات (عروض مسحوبة)", q_retract: "↩️ استرجاع", q_edit: "✏️ تعديل", q_edit_resend: "تعديل وإرسال", q_del: "🗑️ حذف", q_retracted: "تم استرجاع العرض من العميل — بتلقاه في المسودات", q_edit_hint: "عدّل العرض وأرسله مرة ثانية", q_deleted: "تم حذف العرض", q_confirm_del: "متأكد تحذف هالعرض نهائي؟ ما يقدر العميل يشوفه بعدها", q_updated: "تم إرسال العرض المعدل للعميل 🚀", q_draft_resent: "تم إرسال العرض من جديد",
     q_empty_grp: "لا توجد عروض هنا",
     badge_expired: "منتهية ⏳", expired_hint: "انتهت مدة الطلب — يمكنك تقديم طلب جديد", req_expired: "انتهت صلاحية هذا الطلب (7 أيام)",
     q_company: "الشركة", q_client: "العميل", q_amount: "المبلغ", q_note: "ملاحظات", q_file: "الملف",
@@ -1498,7 +1498,7 @@ const I18N = {
     forgot_demo: "Password reset requires Firebase",
     quotes_title: "💰 Price Quotes", q_sent_title: "💰 My Sent Quotes",
     acc_suspended: "Your account is suspended", acc_rejected: "Your account was rejected", reason_lbl: "Reason", no_reason: "Not specified",
-    q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes", q_grp_draft: "📝 Drafts (retracted)", q_retract: "↩️ Recall", q_edit: "✏️ Edit", q_del: "🗑️ Delete", q_retracted: "Quote recalled — find it in Drafts", q_edit_hint: "Edit and resend", q_deleted: "Quote deleted", q_confirm_del: "Delete this quote permanently?", q_updated: "Updated quote sent 🚀", q_draft_resent: "Quote re-sent",
+    q_grp_sent: "📤 Sent Quotes", q_grp_acc: "✅ Accepted Quotes", q_grp_rej: "⛔ Rejected Quotes", q_grp_draft: "📝 Drafts (retracted)", q_retract: "↩️ Recall", q_edit: "✏️ Edit", q_edit_resend: "Edit & resend", q_del: "🗑️ Delete", q_retracted: "Quote recalled — find it in Drafts", q_edit_hint: "Edit and resend", q_deleted: "Quote deleted", q_confirm_del: "Delete this quote permanently?", q_updated: "Updated quote sent 🚀", q_draft_resent: "Quote re-sent",
     q_empty_grp: "No quotes here",
     badge_expired: "Expired ⏳", expired_hint: "Request expired — you can submit a new one", req_expired: "This request has expired (7 days)",
     q_company: "Company", q_client: "Client", q_amount: "Amount", q_note: "Notes", q_file: "File",
@@ -4125,12 +4125,13 @@ window.openEditQuote = function(quoteId) {
   const q = (_lastQuotes || []).find(x => x.id === quoteId);
   if (!q) { showToast(t("quote_err"), "error"); return; }
   if (q.status !== "sent" && q.status !== "draft") return;
+  // الفحص على العرض نفسه (مو على الطلب) — عشان ما يطلع "منتهي" بالغلط لو الطلب مو محمّل بالذاكرة
+  if (isExpiredReq(q)) { showToast(t("req_expired"), "error"); return; }
   const r = lastRequests.find(x => x.id === q.requestId);
-  if (!r || isExpiredReq(r)) { showToast(t("req_expired"), "error"); return; }
   const modal = document.getElementById("quoteModal");
   modal.dataset.quoteId = quoteId;
   modal.dataset.requestId = q.requestId;
-  document.getElementById("quoteFor").textContent = t("q_client") + ": " + (q.clientName || r.name || "—") + " • " + (q.category || r.category || "") + " — " + t("q_edit_hint");
+  document.getElementById("quoteFor").textContent = t("q_client") + ": " + (q.clientName || (r && r.name) || "—") + " • " + (q.category || (r && r.category) || "") + " — " + t("q_edit_hint");
   document.getElementById("quoteForm").reset();
   document.getElementById("quoteAmount").value = q.amount || "";
   document.getElementById("quoteNote").value = q.note || "";
@@ -4181,7 +4182,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
   if (!isTechRole && !amountVal) { showToast("اكتب قيمة العرض بالريال أولًا — العميل يقارن فيها 💰", "error"); return; }
   const btn = document.getElementById("quoteSubmit");
   const r = lastRequests.find(x => x.id === qmEl.dataset.requestId);
-  if (!r) { showToast(t("quote_err"), "error"); return; }
+  if (!r && !exQ) { showToast(t("quote_err"), "error"); return; }
   btn.disabled = true;
   btn.textContent = t("quote_uploading");
   try {
@@ -4224,7 +4225,7 @@ document.getElementById("quoteForm").addEventListener("submit", async e => {
       return;
     }
     const quote = {
-      requestId: r.id,
+      requestId: (r && r.id) || qmEl.dataset.requestId,
       clientUid: r.ownerUid || "",
       clientName: r.name || "",
       clientPhone: r.phone || "",
@@ -4422,9 +4423,10 @@ async function loadQuotesSection() {
                 <span style="display:flex;gap:6px;align-items:center">${q.amount ? `<span style="color:var(--gold);font-weight:700">${(+q.amount).toLocaleString("ar")} ر.ع</span>` : ""}${stBadge2(q.status)}</span>
               </div>
               ${expiryLine(q)}
-              ${q.status === "sent" ? `<div class="q-act">
-                <button class="rt" onclick="event.stopPropagation();retractQuote('${q.id}')">${t("q_retract")}</button>
-                <button class="ed" onclick="event.stopPropagation();openEditQuote('${q.id}')">${t("q_edit")}</button>
+              ${q.status === "sent" || q.status === "draft" ? `<div class="q-act">
+                ${q.status === "sent"
+                  ? `<button class="rt" onclick="event.stopPropagation();retractQuote('${q.id}')">${t("q_retract")}</button>`
+                  : `<button class="ed" style="flex:2" onclick="event.stopPropagation();openEditQuote('${q.id}')">✏️ ${t("q_edit_resend")}</button>`}
                 <button class="dl" onclick="event.stopPropagation();deleteQuoteForever('${q.id}')">${t("q_del")}</button>
               </div>` : ""}
               ${contactBlock(q)}
