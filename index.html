@@ -378,7 +378,7 @@ footer ul a:hover{color:var(--gold-2)}
 .cat-chip:hover .chip-ico{border-color:var(--gold);transform:translateY(-3px)}
 .cat-chip span{font-size:.8rem;font-weight:700;color:var(--navy);display:block;line-height:1.3}
 /* بطاقة شركة مدمجة */
-.co-card{flex:0 0 auto;width:170px;background:#fff;border-radius:18px;padding:16px 12px;text-align:center;cursor:pointer;border:1.5px solid #f0ece4;transition:.25s;box-shadow:0 4px 14px rgba(22,40,58,.05)}
+.co-card{position:relative;flex:0 0 auto;width:170px;background:#fff;border-radius:18px;padding:16px 12px;text-align:center;cursor:pointer;border:1.5px solid #f0ece4;transition:.25s;box-shadow:0 4px 14px rgba(22,40,58,.05)}
 .co-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 10px 22px rgba(185,141,78,.18)}
 .co-card .co-logo{width:64px;height:64px;margin:0 auto 10px;border-radius:18px;background:linear-gradient(135deg,var(--navy),#25425f);display:grid;place-items:center;font-size:1.7rem;color:#fff}
 .co-card h4{font-size:.85rem;color:var(--navy);margin-bottom:4px;line-height:1.35;min-height:2.3em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 71)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 72)</small>
     </div>
   </div>
 </footer>
@@ -1679,7 +1679,8 @@ function coCard(p) {
   const logoHtml = p.logo ? `<img class="co-logo-img" src="${p.logo}" alt="" style="margin:0">` : `<div class="co-logo" style="margin:0">${p.icon || "🏢"}</div>`;
   return `
   <div class="co-card" data-open="${p.id}" data-kind="co">
-    <div style="position:relative;display:table;margin:0 auto 10px">${logoHtml}${p.verified ? `<img src="${VERIFIED_BADGE}" alt="موثّقة" title="شركة موثّقة من دارك" style="position:absolute;top:50%;right:-14px;transform:translateY(-50%);width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(185,141,78,.55));z-index:2">` : ""}</div>
+    <div style="position:relative;display:table;margin:0 auto 10px">${logoHtml}</div>
+    ${p.verified ? `<img src="${VERIFIED_BADGE}" alt="موثّقة" title="شركة موثّقة من دارك" style="position:absolute;top:8px;right:8px;width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(185,141,78,.55));z-index:2">` : ""}
     <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
     <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"}</div>
