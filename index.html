@@ -916,7 +916,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 72)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 73)</small>
     </div>
   </div>
 </footer>
@@ -1680,7 +1680,7 @@ function coCard(p) {
   return `
   <div class="co-card" data-open="${p.id}" data-kind="co">
     <div style="position:relative;display:table;margin:0 auto 10px">${logoHtml}</div>
-    ${p.verified ? `<img src="${VERIFIED_BADGE}" alt="موثّقة" title="شركة موثّقة من دارك" style="position:absolute;top:8px;right:8px;width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(185,141,78,.55));z-index:2">` : ""}
+    ${p.verified ? `<img src="${VERIFIED_BADGE}" alt="موثّقة" title="شركة موثّقة من دارك" style="position:absolute;top:10px;right:10px;width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(185,141,78,.55));z-index:2">` : ""}
     <h4>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h4>
     <div class="co-cat">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
     <div class="co-rate">${p.ratingCount ? `★ ${p.rating} <small>(${p.ratingCount})</small>` : "✨ جديد"}</div>
