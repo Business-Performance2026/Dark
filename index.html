@@ -708,6 +708,12 @@ footer ul a:hover{color:var(--gold-2)}
       <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
       <form id="cpForm" style="padding:6px 14px 14px">
         <div class="form-group"><label data-i18n="cp_logo">شعار الشركة (صورة)</label><input type="file" id="cpLogo" accept="image/*"></div>
+        <div class="form-group"><label>🏗️ سنوات الخبرة</label><input type="number" id="cpExpYears" min="0" max="60" placeholder="مثال: 5"></div>
+        <div class="form-group"><label>🖼️ معرض أعمال الشركة (صور من مشاريعك)</label>
+          <input type="file" id="cpGallery" accept="image/*" multiple>
+          <small style="color:var(--muted);font-size:.72rem">لحد 8 صور — كل صورة أقل من 5 ميجا — اضغط حفظ عشان ترفع</small>
+          <div id="cpGalleryPrev" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+        </div>
         <div class="form-group"><label data-i18n="cp_name_ar">اسم الشركة (عربي)</label><input type="text" id="cpNameAr"></div>
         <div class="form-group"><label data-i18n="cp_name_en">اسم الشركة (إنجليزي)</label><input type="text" id="cpNameEn" dir="ltr"></div>
         <div class="form-group"><label>تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
@@ -916,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 73)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 74)</small>
     </div>
   </div>
 </footer>
@@ -3535,6 +3541,16 @@ window.openCompany = async function(id) {
     team = JSON.parse(localStorage.getItem("darak_employees") || "[]").filter(x => x.companyUid === p.uid);
   }
   const svcs = Array.isArray(p.services) ? p.services : [];
+  // ✅ مشاريع منجزة: عدّ العروض المقبولة للشركة
+  let doneN = 0;
+  try {
+    if (p.uid && db && getDocsFn) {
+      const qs = await getDocsFn(queryFn(collectionFn(db, "quotes"), whereFn("providerUid", "==", p.uid), whereFn("status", "==", "accepted")));
+      doneN = qs.size;
+    } else if (p.uid) {
+      doneN = (JSON.parse(localStorage.getItem("darak_quotes") || "[]")).filter(q => q.providerUid === p.uid && q.status === "accepted").length;
+    }
+  } catch (e) { console.warn(e); }
   const waNum = (p.whatsapp || p.phone || "").replace(/\D/g, "");
   const waFull = waNum.length === 8 ? "968" + waNum : waNum;
   const links = [
@@ -3552,12 +3568,14 @@ window.openCompany = async function(id) {
         <h2>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
         <div class="co-rate2">${p.ratingCount ? `★ ${p.rating} (${p.ratingCount} تقييم)` : "✨ شركة جديدة"}</div>
+        ${(+p.expYears > 0 || doneN > 0) ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${+p.expYears > 0 ? `<span style="background:#fff;border:1.5px solid #eadfc6;border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:800;color:var(--navy)">🏗️ خبرة ${+p.expYears}+ سنة</span>` : ""}${doneN > 0 ? `<span style="background:#fff;border:1.5px solid #eadfc6;border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:800;color:var(--navy)">✅ ${doneN} ${doneN === 1 ? "مشروع منجز" : doneN === 2 ? "مشروعين منجزين" : "مشاريع منجزة"}</span>` : ""}</div>` : ""}
         ${p.verified ? `<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#16283a,#2a4159);color:#e3c67f;border:1.5px solid #b98d4e;border-radius:999px;padding:5px 14px;font-size:.74rem;font-weight:800">🏅 شركة موثّقة من دارك</span></div>` : ""}
         ${p.location ? `<div class="co-loc" style="font-size:.85rem;color:#7a6a4d">📍 ${p.location}</div>` : ""}
       </div>
       <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
     </div>
-    <div class="co-actions">${links}</div>
+    <div class="co-actions">${links}${p.uid ? `<button type="button" class="co-link" onclick="shareCompanyPage('${p.uid}')" style="cursor:pointer;background:#fff;font-family:inherit;font-size:.8rem">🔗 مشاركة الصفحة</button>` : ""}</div>
+    ${(Array.isArray(p.gallery) && p.gallery.length) ? `<div class="co-block"><h3>🖼️ معرض الأعمال (${p.gallery.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch">${p.gallery.map(u => `<a href="${u}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${u}" loading="lazy" style="width:132px;height:96px;object-fit:cover;border-radius:12px;border:1.5px solid #eadfc6;display:block"></a>`).join("")}</div></div>` : ""}
     ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
     ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip" onclick="searchByService('${String(s).replace(/'/g, "")}')">${s}</span>`).join("")}</div>` : ""}
     <div class="co-block"><h3>💬 آراء العملاء ${revs.length ? `(${revs.length})` : ""}</h3>
@@ -3584,6 +3602,25 @@ window.openCompany = async function(id) {
       </div>`).join("") : `<p>${t("co_no_eng")}</p>`}
     </div>`;
   showView("company");
+};
+
+// 🔗 مشاركة صفحة الشركة — ينسخ الرابط الخاص ويرسله واتساب أو مشاركة
+window.shareCompanyPage = async function(uid) {
+  const url = "https://darakom.app/?p=" + uid;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "دارك — " + document.title, text: "تعرف على هذي الشركة بتطبيق دارك 🏗️", url });
+      return;
+    }
+    throw new Error("no-share");
+  } catch (e) {
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("تم نسخ رابط الصفحة — الصقه بواتساب وأرسله 🔗");
+    } catch (e2) {
+      window.prompt("انسخ رابط الصفحة:", url);
+    }
+  }
 };
 
 // 🗑️ حذف تقييم مسيء — للأدمن فقط
@@ -3936,6 +3973,19 @@ async function uploadImage(file, folder) {
   return "";
 }
 
+// 🖼️ معرض أعمال الشركة — حالة محلية للصور المختارة
+let cpGalleryImgs = [];
+let cpGalleryNewFiles = [];
+function renderCpGalleryPrev() {
+  const box = document.getElementById("cpGalleryPrev");
+  if (!box) return;
+  let html = cpGalleryImgs.map((u, i) => `<div style="position:relative;flex:0 0 auto"><img src="${u}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--gold)"><button type="button" onclick="cpGalleryRemove(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#b91c1c;color:#fff;font-size:.7rem;font-weight:900;cursor:pointer;line-height:1">✕</button></div>`).join("");
+  html += cpGalleryNewFiles.map((f, i) => `<div style="position:relative;flex:0 0 auto"><img src="${URL.createObjectURL(f)}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px dashed var(--gold);opacity:.85"><button type="button" onclick="cpGalleryRemoveNew(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#b91c1c;color:#fff;font-size:.7rem;font-weight:900;cursor:pointer;line-height:1">✕</button></div>`).join("");
+  box.innerHTML = html || '<small style="color:var(--muted)">لا توجد صور بعد — أضف صور مشاريعك وتبهر العملاء ✨</small>';
+}
+window.cpGalleryRemove = function(i) { cpGalleryImgs.splice(i, 1); renderCpGalleryPrev(); };
+window.cpGalleryRemoveNew = function(i) { cpGalleryNewFiles.splice(i, 1); renderCpGalleryPrev(); };
+
 // ---- ملف الشركة (تعدله الشركة من لوحتها) ----
 function fillCompanyProfileForm() {
   if (!currentUser) return;
@@ -3949,6 +3999,24 @@ function fillCompanyProfileForm() {
   document.getElementById("cpNameAr").value = currentUser.displayName || "";
   document.getElementById("cpNameEn").value = currentUser.nameEn || "";
   document.getElementById("cpBio").value = currentUser.bio || "";
+  document.getElementById("cpExpYears").value = currentUser.expYears || "";
+  cpGalleryImgs = Array.isArray(currentUser.gallery) ? [...currentUser.gallery] : [];
+  cpGalleryNewFiles = [];
+  renderCpGalleryPrev();
+  const galInput = document.getElementById("cpGallery");
+  if (galInput && !galInput._bound) {
+    galInput._bound = true;
+    galInput.addEventListener("change", () => {
+      const files = Array.from(galInput.files || []);
+      for (const f of files) {
+        if (cpGalleryImgs.length + cpGalleryNewFiles.length >= 8) { showToast("لحد 8 صور بس بالمعرض 📸", "error"); break; }
+        if (f.size > 5 * 1024 * 1024) { showToast("الصورة " + f.name + " أكبر من 5 ميجا — صغّرها وحاول 💡", "error"); continue; }
+        cpGalleryNewFiles.push(f);
+      }
+      galInput.value = "";
+      renderCpGalleryPrev();
+    });
+  }
   document.getElementById("cpServices").value = Array.isArray(currentUser.services) ? currentUser.services.join("، ") : (currentUser.services || "");
   const cpList = document.getElementById("cpCatList");
   if (cpList) {
@@ -3994,8 +4062,19 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     const prim = (document.getElementById("cpPrimary").value || "").trim();
     data.category = (prim && cpCats.includes(prim)) ? prim : cpCats[0];
   }
+  data.expYears = Math.max(0, Math.min(60, +document.getElementById("cpExpYears").value || 0));
   try {
     if (logoFile) data.logo = await uploadImage(logoFile, "logos");
+    if (cpGalleryNewFiles.length) {
+      showToast("جارٍ رفع صور المعرض… 🖼️");
+      for (const f of cpGalleryNewFiles) {
+        const url = await uploadImage(f, "company_gallery");
+        if (url) cpGalleryImgs.push(url);
+        else { showToast("تعذر رفع صورة — حجمها كبير أو ما فيه اتصال ⚠️", "error"); }
+      }
+      cpGalleryNewFiles = [];
+    }
+    data.gallery = cpGalleryImgs.slice(0, 8);
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), data);
@@ -4173,7 +4252,7 @@ async function loadLiveCompanies() {
       return {
         id: "u_" + u.uid, uid: u.uid, name: u.displayName || t("q_company"), nameEn: u.nameEn || "", cat: u.category || (userCatsArr(u)[0] || ""), catEn: u.category || (userCatsArr(u)[0] || ""), cats: userCatsArr(u),
         icon: "🏢", rating: rt ? rt.avg : "", ratingCount: rt ? rt.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "",
-        web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false, verified: !!u.verified && !isVerifyExpired(u)
+        web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false, verified: !!u.verified && !isVerifyExpired(u), gallery: Array.isArray(u.gallery) ? u.gallery : [], expYears: u.expYears || 0
       };
     });
     renderProviders();
