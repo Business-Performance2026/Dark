@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 84)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 85)</small>
     </div>
   </div>
 </footer>
@@ -949,11 +949,11 @@ footer ul a:hover{color:var(--gold-2)}
       <div id="registerFields" style="display:none">
         <div class="form-group">
           <label data-i18n="name_lbl">الاسم الكامل / اسم المنشأة</label>
-          <input type="text" name="displayName" placeholder="مثال: محمد العتيبي">
+          <input type="text" name="displayName" required placeholder="مثال: محمد العتيبي">
         </div>
         <div class="form-group">
           <label data-i18n="reg_phone">رقم الجوال</label>
-          <input type="tel" name="phone" placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
+          <input type="tel" name="phone" required placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
         </div>
         <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px">نوع الحساب</label>
         <div class="role-picker">
@@ -2114,6 +2114,17 @@ authForm.addEventListener("submit", async e => {
   e.preventDefault();
   const fd = Object.fromEntries(new FormData(authForm).entries());
   const btn = document.getElementById("authSubmit");
+  // ✅ كل بيانات التسجيل إجبارية — عميل/شركة/فني
+  if (authMode === "register") {
+    if (!fd.displayName || !fd.displayName.trim()) {
+      showToast("اكتب اسمك الكامل / اسم المنشأة ✍️", "error");
+      return;
+    }
+    if (!fd.phone || fd.phone.replace(/\D/g, "").length < 8) {
+      showToast("اكتب رقم الجوال صحيحًا 📱 — مثال: 9xxxxxxx", "error");
+      return;
+    }
+  }
   btn.disabled = true;
   btn.textContent = "لحظات…";
   try {
