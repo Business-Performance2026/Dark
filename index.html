@@ -258,6 +258,9 @@ footer ul a:hover{color:var(--gold-2)}
 .q-det{display:none;margin-top:8px;border-top:1px dashed #e6ddc9;padding-top:8px;font-size:.85rem;color:#444}
 .q-det div{margin-bottom:4px}
 .q-card.open .q-det{display:block}
+.req-sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1.5px solid #eadfc6;border-radius:14px;padding:13px 16px;margin:14px 18px 0;cursor:pointer;font-weight:800;color:var(--navy);font-size:.9rem;box-shadow:0 2px 8px rgba(22,40,58,.05);user-select:none}
+.req-sec-head:active{transform:scale(.99)}
+.req-sec-arrow{color:var(--gold);font-size:1rem;transition:transform .2s;display:inline-block}
 .dash-empty{text-align:center;padding:50px 20px;color:var(--muted)}
 .dash-empty .big{font-size:2.6rem;margin-bottom:10px}
 .user-chip{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:.95rem}
@@ -922,7 +925,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 89)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 90)</small>
     </div>
   </div>
 </footer>
@@ -1088,7 +1091,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <div class="form-group">
         <label data-i18n="quote_amount">قيمة العرض (ر.ع)</label> <span id="qAmountStar" style="color:#b91c1c;font-weight:900">*</span>
-        <input type="number" id="quoteAmount" min="0" data-i18n-ph="ph_optional" placeholder="اختياري">
+        <input type="number" id="quoteAmount" min="0" data-i18n-ph="quote_amount_ph" placeholder="أضف سعر العرض">
       </div>
       <div class="form-group">
         <label data-i18n="quote_note">ملاحظة للعميل</label>
@@ -1657,6 +1660,8 @@ const I18N = {
     ios_s1: "١. افتح رابط دارك في متصفح Safari", ios_s2: "٢. اضغط زر المشاركة ⎋ (السهم اللي فوق)",
     ios_s3: "٣. اختر \"إضافة إلى الشاشة الرئيسية\"", ios_s4: "٤. اضغط \"إضافة\" في أعلى الشاشة",
     ios_foot: "بتجد أيقونة دارك بين تطبيقاتك، وافتحها مثل أي تطبيق ✨",
+    req_new_sec: "الطلبات الجديدة", req_7days_note: "الطلب الذي لا يحصل على موافقة خلال 7 أيام يُحذف تلقائيًا",
+    quote_amount_ph: "أضف سعر العرض",
     reg_name_ph: "مثال: محمد العتيبي", reg_role_lbl: "نوع الحساب", reg_multi_hint: "✅ تقدر تختار أكثر من تخصص",
     reg_loc_lbl: "📍 منطقتك (المحافظة / الولاية / المنطقة)", reg_loc_ph: "مثال: مسقط / السيب / المعبيلة",
     reg_loc_hint: "تظهر للعملاء عند تصفح منطقتك", reg_pass_ph: "6 أحرف على الأقل",
@@ -1824,6 +1829,8 @@ const I18N = {
     ios_s1: "1. Open Darak's link in Safari", ios_s2: "2. Tap the Share button ⎋ (the arrow at the top)",
     ios_s3: "3. Choose \"Add to Home Screen\"", ios_s4: "4. Tap \"Add\" at the top",
     ios_foot: "You'll find the Darak icon among your apps — open it like any app ✨",
+    req_new_sec: "New Requests", req_7days_note: "Requests that don't get accepted within 7 days are deleted automatically",
+    quote_amount_ph: "Enter quote amount",
     reg_name_ph: "e.g. Mohammed Al-otaibi", reg_role_lbl: "Account type", reg_multi_hint: "✅ You can pick more than one trade",
     reg_loc_lbl: "📍 Your area (governorate / wilaya / district)", reg_loc_ph: "e.g. Muscat / Seeb / Mabela",
     reg_loc_hint: "Shown to clients browsing your area", reg_pass_ph: "At least 6 characters",
@@ -2752,7 +2759,7 @@ async function openDashboard() {
         : "لم ترسل أي طلب بعد — ابدأ بطلب خدمة لمشروعك من الأسفل"}
     </div>`;
   } else {
-    content.innerHTML = `${!admin ? `<div style="padding:12px 18px 0"><small style="color:var(--muted);font-size:.75rem">ℹ️ الطلب الذي لا يحصل على موافقة خلال 7 أيام يُحذف تلقائيًا</small></div>` : ""}<table class="dash-table">
+    const tblHtml = `${!admin ? `<div style="padding:12px 18px 0"><small style="color:var(--muted);font-size:.75rem">ℹ️ ${t("req_7days_note")}</small></div>` : ""}<table class="dash-table">
       <thead><tr>
         <th>${t("th_client")}</th><th>${t("th_phone")}</th><th>${t("th_city")}</th><th>${t("th_cat")}</th><th>${t("th_budget")}</th><th>${t("th_details")}</th><th>${t("th_status")}</th>
       </tr></thead>
@@ -2769,7 +2776,16 @@ async function openDashboard() {
             ? `<span class="status-badge status-rejected">${t("badge_expired")}</span><br><small style="color:var(--muted);font-size:.72rem">${t("expired_hint")}</small>`
             : `<span class="status-badge status-new">${t("badge_new")}</span>`)}${isPro ? `<br><button onclick="openQuoteModal('${r.id}')" style="margin-top:8px;display:inline-flex;align-items:center;justify-content:center;gap:5px;width:168px;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:10px;padding:7px 8px;font-size:.72rem;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">📄 ${t("q_send")}</button>` : ""}</td>
       </tr>`).join("")}</tbody>
-    </table>${moreBtn(rows.length - 5, "الطلبات")}`;
+    </table>${moreBtn(rows.length - 5, t("req_new_sec"))}`;
+    content.innerHTML = !admin
+      ? `<div class="req-sec" id="reqSecMain">
+          <div class="req-sec-head" onclick="toggleReqSec('reqSecMain')">
+            <span>📋 ${t("req_new_sec")} <span class="q-count">${rows.length}</span></span>
+            <span class="req-sec-arrow" id="reqSecMainArrow">◂</span>
+          </div>
+          <div class="req-sec-body" id="reqSecMainBody" style="display:none">${tblHtml}</div>
+        </div>`
+      : tblHtml;
   }
   if (isPro) {
     if (isProvider) {
@@ -5188,6 +5204,15 @@ const isExpiredReq = r => { const t = tsq(r); return t && (Date.now() - t) > REQ
 function moreBtn(n, label) {
   return n > 0 ? `<button class="more-bar" data-open="" data-label="${label}" onclick="toggleDashRows(this)">⌄ عرض كل ${label} — باقي ${n}</button>` : "";
 }
+// 📋 قسم الطلبات الجديدة المنطوي — ينفتح بالضغط ويرجع منطوي مع كل تحديث للوحة
+window.toggleReqSec = function(id) {
+  const body = document.getElementById(id + "Body");
+  const arrow = document.getElementById(id + "Arrow");
+  if (!body) return;
+  const open = body.style.display === "none";
+  body.style.display = open ? "" : "none";
+  if (arrow) arrow.style.transform = open ? "rotate(-90deg)" : "";
+};
 // 🔀 تنقل صفحات العروض: القائمة ↔ صفحة النوع
 window.openQGroup = function(key) {
   const m = document.getElementById("qMenu"); if (m) m.style.display = "none";
