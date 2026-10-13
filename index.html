@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 78)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 80)</small>
     </div>
   </div>
 </footer>
@@ -2335,6 +2335,7 @@ function waNumber(phone) {
 // ============================================================
 async function openDashboard() {
   if (!currentUser) { openAuth(); return; }
+  try { await ensureSubSettings(); } catch (e) { console.warn("تعذر تحميل إعدادات الاشتراك", e); }
   const dash = document.getElementById("dashboard");
   dash.classList.add("open");
   const _dc = document.getElementById("dashContent");
@@ -2623,7 +2624,7 @@ window.openSubModal = async function() {
   document.getElementById("subName").value = currentUser.companyName || currentUser.displayName || "";
   document.getElementById("subWhats").value = currentUser.subWhats || currentUser.phone || "";
   document.getElementById("subReceipt").value = "";
-  if (!_subSettingsCache) _subSettingsCache = await getSubSettings();
+  await ensureSubSettings();
   const cfg = _subSettingsCache;
   const box = document.getElementById("subBankBox");
   if (cfg.bankName || cfg.bankAccount) {
@@ -2923,7 +2924,14 @@ function subDaysLeft(u) { const t = subTs(u); return t > 0 ? Math.ceil((t - Date
 const SUB_EXPIRE_REASON = "انتهى اشتراكك الشهري";
 const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "", enabled: false };
 let _subEnabled = false; // مفتاح تفعيل نظام الاشتراك — يتحكم فيه الأدمن
-getSubSettings().then(cfg => { _subSettingsCache = cfg; _subEnabled = cfg.enabled === true; }).catch(() => {});
+// نحمّل الإعدادات بعد جاهزية Firebase فقط — القراءة قبلها ترجع قيمًا فاضية من التخزين المحلي
+async function ensureSubSettings() {
+  if (_subSettingsCache) return _subSettingsCache;
+  _subSettingsCache = await getSubSettings();
+  _subEnabled = _subSettingsCache.enabled === true;
+  return _subSettingsCache;
+}
+firebaseReady.then(() => ensureSubSettings()).catch(() => {});
 async function getSubSettings() {
   if (db && getDocsFn) {
     try {
@@ -3148,6 +3156,16 @@ window.adminPickUser = function() {
           <label style="font-size:.72rem;color:var(--muted);font-weight:700;white-space:nowrap">تاريخ الانتهاء:</label>
           <input type="date" id="auVerifyUntil" value="${verifyTs(u) ? new Date(verifyTs(u)).toISOString().slice(0,10) : new Date(Date.now() + 365*86400000).toISOString().slice(0,10)}" onchange="auSaveVerifyUntil('${u.uid}')" style="flex:1;border:1.5px solid #e7dfd0;border-radius:8px;padding:7px 6px;font-family:inherit;font-size:.75rem;color:var(--navy)">
         </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;border-top:1.5px dashed #eadfc8;padding-top:10px">
+          <span style="font-size:1.1rem">💳</span>
+          <span style="font-size:.78rem;font-weight:800;color:var(--navy);flex:1">الاشتراك: ${u.subStatus === "active" ? (isSubExpired(u) ? '<b style="color:#b91c1c">منتهي ⛔</b>' : '<b style="color:#16a34a">فعّال ✅</b>') : (u.subStatus === "pending" ? "قيد المراجعة ⏳" : "غير مشترك")}${subTs(u) && u.subStatus === "active" && !isSubExpired(u) ? " — ينتهي " + new Date(subTs(u)).toLocaleDateString("ar-OM") : ""}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <label style="font-size:.72rem;color:var(--muted);font-weight:700;white-space:nowrap">تاريخ انتهاء الاشتراك:</label>
+          <input type="date" id="auSubUntil" value="${subTs(u) ? new Date(subTs(u)).toISOString().slice(0,10) : new Date(Date.now() + 30*86400000).toISOString().slice(0,10)}" onchange="auSaveSubUntil('${u.uid}')" style="flex:1;border:1.5px solid #e7dfd0;border-radius:8px;padding:7px 6px;font-family:inherit;font-size:.75rem;color:var(--navy)">
+          <button type="button" class="action-btn action-delete" style="justify-content:center;${u.subStatus === "active" ? "" : "display:none"}" onclick="auStopSub('${u.uid}')">إيقاف</button>
+        </div>
+        <small style="display:block;color:var(--muted);font-size:.68rem;margin-top:6px;line-height:1.6">حدد تاريخًا واضغط حفظ (أو غيّر التاريخ) — بيصير الاشتراك فعّال لحد هذا التاريخ، وبعده يتوقف الحساب تلقائيًا (إذا نظام الاشتراك مفعّل). تقدر تعطي أي شركة فترة مجانية بهالطريقة 🎁</small>
       </div>` : ""}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="submit-btn" style="flex:2" onclick="adminSaveUser('${u.uid}')">💾 حفظ التعديلات</button>
@@ -3236,6 +3254,25 @@ window.auSaveVerifyUntil = async function(uid) {
     await updateVerifyFields(uid, { verifiedUntil: new Date(dEl.value + "T23:59:59") });
     showToast("تم حفظ تاريخ الانتهاء 📅 — " + dEl.value);
   } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
+};
+window.auSaveSubUntil = async function(uid) {
+  const dEl = document.getElementById("auSubUntil");
+  if (!dEl || !dEl.value) { showToast("اختر تاريخًا صحيحًا 📅", "error"); return; }
+  try {
+    const until = new Date(dEl.value + "T23:59:59");
+    const fields = { subStatus: "active", subscribedUntil: until };
+    // إذا كان موقوفًا بسبب انتهاء الاشتراك — يرجع مفعّل
+    const u = adminUsersCache.find(x => x.uid === uid);
+    if (u && u.status === "suspended" && (u.statusReason || "").includes("اشتراك")) { fields.status = "approved"; fields.statusReason = ""; }
+    await updateVerifyFields(uid, fields);
+    showToast("تم تفعيل الاشتراك 💳 حتى " + until.toLocaleDateString("ar-OM"));
+  } catch (e) { console.error(e); showToast("تعذر الحفظ — حاول مرة أخرى", "error"); }
+};
+window.auStopSub = async function(uid) {
+  try {
+    await updateVerifyFields(uid, { subStatus: "none" });
+    showToast("تم إيقاف الاشتراك — الشركة صارت غير مشتركة 💳");
+  } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
 };
 window.adminSubWhats = function(uid) {
   const u = adminUsersCache.find(x => x.uid === uid);
