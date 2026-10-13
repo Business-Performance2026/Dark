@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 87)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 88)</small>
     </div>
   </div>
 </footer>
@@ -1234,6 +1234,7 @@ footer ul a:hover{color:var(--gold-2)}
       <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7">حوّل المبلغ على الحساب أدناه وارفع صورة الإيصال — بنفعّل شارتك بعد تأكيد الدفع ✅</p>
     </div>
     <div id="vpBankBox" style="display:none;background:#f6f1e7;border:1.5px solid var(--gold);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:.8rem;line-height:1.9;color:var(--navy)"></div>
+    <div id="vpPriceLine" style="display:none;text-align:center;font-size:.85rem;font-weight:900;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;margin-bottom:12px"></div>
     <div class="form-group" style="margin-bottom:10px">
       <label>اسم الشركة</label>
       <input type="text" id="vpName" placeholder="اسم شركتك">
@@ -2778,6 +2779,12 @@ window.openVerifyPayModal = async function(mode) {
     box.style.display = "";
     box.innerHTML = `<b>🏦 حوّل المبلغ على:</b><br>المستفيد: <b>${cleanTxt(cfg.bankName) || "—"}</b><br>رقم الحساب: <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
   } else box.style.display = "none";
+  const pl = document.getElementById("vpPriceLine");
+  const bPrice = +(cfg.badgePrice) || 0;
+  if (bPrice > 0) {
+    pl.style.display = "";
+    pl.textContent = "💰 رسوم الشارة: " + bPrice.toLocaleString("ar") + " ر.ع — صالحة لسنة كاملة";
+  } else pl.style.display = "none";
   document.getElementById("renewModal").classList.remove("open");
   document.getElementById("verifyPayModal").classList.add("open");
 };
@@ -3000,7 +3007,7 @@ function isSubExpired(u) { const t = subTs(u); return t > 0 && Date.now() > t; }
 function isSubActive(u) { return !!(u && u.subStatus === "active") && !isSubExpired(u); }
 function subDaysLeft(u) { const t = subTs(u); return t > 0 ? Math.ceil((t - Date.now()) / 86400000) : null; }
 const SUB_EXPIRE_REASON = "انتهى اشتراكك الشهري";
-const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "", enabled: false };
+const DEFAULT_SUB_SETTINGS = { bankName: "", bankAccount: "", price: "", badgePrice: "", enabled: false };
 let _subEnabled = false; // مفتاح تفعيل نظام الاشتراك — يتحكم فيه الأدمن
 // نحمّل الإعدادات بعد جاهزية Firebase فقط — القراءة قبلها ترجع قيمًا فاضية من التخزين المحلي
 async function ensureSubSettings() {
@@ -3106,9 +3113,12 @@ async function loadUsersTable() {
           <input type="text" id="subSetBank" placeholder="اسم البنك / المستفيد" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
           <input type="text" id="subSetAccount" placeholder="رقم الحساب البنكي" dir="ltr" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
         </div>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-          <input type="number" id="subSetPrice" placeholder="سعر الشهر (ر.ع)" min="0" style="flex:1;border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
-          <button type="button" class="action-btn action-approve" onclick="adminSaveSubSettings()">💾 حفظ</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <input type="number" id="subSetPrice" placeholder="سعر اشتراك الشهر (ر.ع)" min="0" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
+          <input type="number" id="subSetBadgePrice" placeholder="سعر الشارة للسنة (ر.ع)" min="0" style="border:1.5px solid #e7dfd0;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.78rem;color:var(--navy)">
+        </div>
+        <div style="margin-top:8px">
+          <button type="button" class="action-btn action-approve" style="width:100%;justify-content:center" onclick="adminSaveSubSettings()">💾 حفظ</button>
         </div>
         <small style="color:var(--muted);font-size:.7rem;display:block;margin-top:6px">بيظهر الحساب وسعر الشهر تلقائيًا لأي شركة تفتح نموذج الاشتراك 💳</small>
       </div>
@@ -3142,6 +3152,8 @@ async function fillSubSettingsForm() {
     if (p) p.value = cfg.price || "";
     const en = document.getElementById("subSetEnabled");
     if (en) en.checked = cfg.enabled === true;
+    const bp = document.getElementById("subSetBadgePrice");
+    if (bp) bp.value = cfg.badgePrice || "";
   } catch (e) { console.warn(e); }
 }
 
@@ -3392,6 +3404,7 @@ window.adminSaveSubSettings = async function() {
     bankName: (document.getElementById("subSetBank").value || "").trim(),
     bankAccount: (document.getElementById("subSetAccount").value || "").trim(),
     price: (document.getElementById("subSetPrice").value || "").trim(),
+    badgePrice: (document.getElementById("subSetBadgePrice").value || "").trim(),
     enabled: !!(enEl && enEl.checked)
   };
   try {
