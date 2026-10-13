@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 83)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 84)</small>
     </div>
   </div>
 </footer>
@@ -2602,8 +2602,10 @@ function buildVerifyCard() {
   if (expired) return `<div style="padding:12px 18px 0"><div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:14px;padding:12px 14px">
     <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:900;color:#b91c1c"><span style="font-size:1.3rem">✖️</span> انتهت صلاحية شارة التوثيق</div>
     <div style="font-size:.74rem;color:#7f1d1d;margin:4px 0 8px;line-height:1.6">الشارة اختفت من التطبيق مؤقتًا — جدّدها وبتظهر فورًا بعد تأكيد الدفع 💳</div>
-    ${(req === "renew" || req === "pending") ? `<div style="font-size:.78rem;font-weight:800;color:var(--navy);background:#fff;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;text-align:center;margin-bottom:8px">⏳ طلب التجديد واصل الإدارة — بنفعّل الشارة بعد تأكيد الحوالة 💳</div>` : (req === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin-bottom:8px">تم رفض الطلب السابق — أعد إرسال الإيصال أو تواصل معنا 💬</div>` : "")}
-    <button type="button" onclick="openVerifyPayModal('renew')" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 جدّد الشارة — ارفع الإيصال</button>
+    ${(req === "renew" || req === "pending")
+      ? `<div style="font-size:.78rem;font-weight:800;color:var(--navy);background:#fff;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;text-align:center">⏳ طلب التجديد واصل الإدارة — بنفعّل الشارة بعد تأكيد الحوالة 💳</div>`
+      : `${req === "rejected" ? `<div style="font-size:.74rem;color:#b91c1c;font-weight:800;background:#fff;border:1.5px dashed #fca5a5;border-radius:10px;padding:8px;text-align:center;margin-bottom:8px">⛔ تم رفض الإيصال — أعد إرسال الإيصال الصحيح</div>` : ""}
+         <button type="button" onclick="openVerifyPayModal('renew')" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 جدّد الشارة — ارفع الإيصال</button>`}
   </div></div>`;
 if (req === "pending" || req === "renew") return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏰ طلب التوثيق قيد المراجعة — بنتواصل معك واتساب قريبًا 💬</div></div>`;
   const rejectNote = req === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin-top:4px">تم رفض الطلب سابقًا — تواصل معنا لمعرفة السبب</div>` : "";
@@ -3040,7 +3042,7 @@ async function loadUsersTable() {
         </div>`).join("")}
       </div>
     </div>` : ""}
-    ${(() => { const vr = users.filter(u => (u.verifyReq === "pending" || u.verifyReq === "renew") && !u.verified);
+    ${(() => { const vr = users.filter(u => (u.verifyReq === "pending" || u.verifyReq === "renew") && (!u.verified || isVerifyExpired(u)));
       return vr.length ? `<div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default;border:2px solid #b98d4e;background:#fffaf0">
         <b style="color:var(--navy)">🏅 طلبات التوثيق (${vr.length})</b>
