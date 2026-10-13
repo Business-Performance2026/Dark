@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 80)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 81)</small>
     </div>
   </div>
 </footer>
@@ -2600,7 +2600,9 @@ function buildSubCard() {
     return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;background:${warn ? "#fffaf0" : "#f0fdf4"};border:1.5px solid ${warn ? "#f59e0b" : "#86efac"};border-radius:14px;padding:12px 14px">
       <span style="font-size:1.6rem">💳</span>
       <div style="flex:1;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">اشتراكك الشهري <span style="color:#16a34a">فعّال ✅</span><br><small style="font-weight:600;color:var(--muted)">ينتهي بتاريخ <b>${until}</b>${dl !== null ? " — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") : ""}</small></div>
-      <button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">تمديد ➕</button>
+      ${currentUser.subRenewPending
+        ? `<span style="flex:0 0 auto;background:#fffaf0;border:1.5px dashed var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.72rem">⏳ تم إرسال طلب التمديد — انتظر الموافقة</span>`
+        : `<button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">تمديد ➕</button>`}
     </div></div>`;
   }
   if (pending) return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏳ طلب الاشتراك قيد المراجعة — بنفعّله بعد تأكيد الحوالة 💳</div></div>`;
@@ -2663,7 +2665,10 @@ window.submitSubRequest = async function() {
   try {
     const receiptUrl = await uploadImage(file, "subscriptions/" + (currentUser.uid || "u"));
     if (!receiptUrl) throw new Error("upload_failed");
-    const fields = { subStatus: "pending", subMonths: months, subName: name, subWhats: whats, subReceipt: receiptUrl, subReqAt: serverTimestampFn ? serverTimestampFn() : new Date().toISOString() };
+    const wasActive = isSubActive(currentUser); // مشترك ساري ويبي يمدد — ما نبدل حالته، نسجل طلب تمديد فقط
+    const fields = { subMonths: months, subName: name, subWhats: whats, subReceipt: receiptUrl, subReqAt: serverTimestampFn ? serverTimestampFn() : new Date().toISOString() };
+    if (wasActive) fields.subRenewPending = true;
+    else fields.subStatus = "pending";
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
       if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), fields);
@@ -2674,7 +2679,7 @@ window.submitSubRequest = async function() {
     }
     Object.assign(currentUser, fields);
     document.getElementById("subModal").classList.remove("open");
-    showToast("وصل طلب اشتراكك للإدارة — بنفعّله بعد تأكيد الحوالة ✅");
+    showToast(wasActive ? "تم إرسال طلب التمديد — انتظر الموافقة من إدارة التطبيق ⏳" : "وصل طلب اشتراكك للإدارة — بنفعّله بعد تأكيد الحوالة ✅");
     openDashboard();
   } catch (e) {
     console.error(e);
@@ -2685,7 +2690,7 @@ window.submitSubRequest = async function() {
 // 🔔 بوب اب تحذير انتهاء الاشتراك — قبل 5 أيام أو بعده (مرة بالجلسة)
 let _subWarned = false;
 function maybeShowSubWarning() {
-  if (_subWarned || !currentUser || !_subEnabled) return;
+  if (_subWarned || !currentUser || !_subEnabled || currentUser.subRenewPending) return;
   const active = isSubActive(currentUser);
   const expired = currentUser.subStatus === "active" && isSubExpired(currentUser);
   if (!active && !expired) return;
@@ -3000,14 +3005,14 @@ async function loadUsersTable() {
         </div>`).join("")}
       </div>
     </div>` : ""; })()}
-    ${(() => { const sr = users.filter(u => u.subStatus === "pending");
+    ${(() => { const sr = users.filter(u => u.subStatus === "pending" || u.subRenewPending);
       return sr.length ? `<div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default;border:2px solid #16a34a;background:#f0fdf4">
         <b style="color:var(--navy)">💳 طلبات الاشتراك (${sr.length})</b>
         ${sr.map(u => `<div style="display:flex;align-items:center;gap:8px;border-top:1.5px dashed #c7e8cf;margin-top:10px;padding-top:10px;flex-wrap:wrap">
           <div style="flex:1;min-width:140px">
             <b>${cleanTxt(u.subName) || u.displayName || "بدون اسم"}</b> <span class="status-badge status-pending">${adminRoleName(u.role)}</span><br>
-            <small style="color:var(--muted)">${+(u.subMonths || 1)} ${+(u.subMonths || 1) === 1 ? "شهر" : "أشهر"}${u.subReqAt ? " • " + new Date(u.subReqAt.seconds ? u.subReqAt.seconds * 1000 : u.subReqAt).toLocaleDateString("ar-OM") : ""} • واتساب: <span dir="ltr">${cleanTxt(u.subWhats) || u.phone || "—"}</span></small><br>
+            <small style="color:var(--muted)">${+(u.subMonths || 1)} ${+(u.subMonths || 1) === 1 ? "شهر" : "أشهر"}${u.subReqAt ? " • " + new Date(u.subReqAt.seconds ? u.subReqAt.seconds * 1000 : u.subReqAt).toLocaleDateString("ar-OM") : ""} • واتساب: <span dir="ltr">${cleanTxt(u.subWhats) || u.phone || "—"}</span>${u.subRenewPending ? ' • <b style="color:#b45309">🔄 طلب <b>تمديد</b> (اشتراكه الحالي شغال)</b>' : ""}</small><br>
             ${u.subReceipt ? `<a href="${u.subReceipt}" target="_blank" rel="noopener" style="display:inline-block;margin-top:5px;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:9px;padding:5px 12px;font-size:.72rem;font-weight:800;text-decoration:none">🧾 عرض الإيصال</a>` : `<small style="color:#b91c1c;font-size:.72rem">بدون إيصال ⛔</small>`}
           </div>
           <button class="action-btn action-approve" style="background:#25d366" onclick="adminSubWhats('${u.uid}')">💬 واتساب</button>
@@ -3158,7 +3163,7 @@ window.adminPickUser = function() {
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:10px;border-top:1.5px dashed #eadfc8;padding-top:10px">
           <span style="font-size:1.1rem">💳</span>
-          <span style="font-size:.78rem;font-weight:800;color:var(--navy);flex:1">الاشتراك: ${u.subStatus === "active" ? (isSubExpired(u) ? '<b style="color:#b91c1c">منتهي ⛔</b>' : '<b style="color:#16a34a">فعّال ✅</b>') : (u.subStatus === "pending" ? "قيد المراجعة ⏳" : "غير مشترك")}${subTs(u) && u.subStatus === "active" && !isSubExpired(u) ? " — ينتهي " + new Date(subTs(u)).toLocaleDateString("ar-OM") : ""}</span>
+          <span style="font-size:.78rem;font-weight:800;color:var(--navy);flex:1">الاشتراك: ${u.subStatus === "active" ? (isSubExpired(u) ? '<b style="color:#b91c1c">منتهي ⛔</b>' : '<b style="color:#16a34a">فعّال ✅</b>' + (u.subRenewPending ? ' <small style="color:#b45309">(طلب تمديد قيد المراجعة ⏳)</small>' : "")) : (u.subStatus === "pending" ? "قيد المراجعة ⏳" : "غير مشترك")}${subTs(u) && u.subStatus === "active" && !isSubExpired(u) ? " — ينتهي " + new Date(subTs(u)).toLocaleDateString("ar-OM") : ""}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
           <label style="font-size:.72rem;color:var(--muted);font-weight:700;white-space:nowrap">تاريخ انتهاء الاشتراك:</label>
@@ -3270,7 +3275,7 @@ window.auSaveSubUntil = async function(uid) {
 };
 window.auStopSub = async function(uid) {
   try {
-    await updateVerifyFields(uid, { subStatus: "none" });
+    await updateVerifyFields(uid, { subStatus: "none", subRenewPending: false });
     showToast("تم إيقاف الاشتراك — الشركة صارت غير مشتركة 💳");
   } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
 };
@@ -3290,7 +3295,7 @@ window.adminSubApprove = async function(uid) {
   const base = cur > Date.now() ? cur : Date.now(); // تمديد فوق المدة السارية إن وجدت
   const until = new Date(base);
   until.setMonth(until.getMonth() + months);
-  const fields = { subStatus: "active", subscribedUntil: until };
+  const fields = { subStatus: "active", subscribedUntil: until, subRenewPending: false };
   // إذا كان الحساب موقوفًا بسبب انتهاء الاشتراك — يرجع مفعّل تلقائيًا
   if (u.status === "suspended" && (u.statusReason || "").includes("اشتراك")) { fields.status = "approved"; fields.statusReason = ""; }
   try {
@@ -3299,9 +3304,12 @@ window.adminSubApprove = async function(uid) {
   } catch (e) { console.error(e); showToast("تعذر التفعيل", "error"); }
 };
 window.adminSubReject = async function(uid) {
+  const u = adminUsersCache.find(x => x.uid === uid);
+  const isRenew = !!(u && u.subRenewPending);
   try {
-    await updateVerifyFields(uid, { subStatus: "rejected" });
-    showToast("تم رفض طلب الاشتراك ⛔");
+    // رفض تمديد: نلغي طلب التمديد فقط — اشتراكه الحالي يستمر | رفض اشتراك جديد: يرفض عادي
+    await updateVerifyFields(uid, isRenew ? { subRenewPending: false } : { subStatus: "rejected" });
+    showToast(isRenew ? "تم رفض طلب التمديد — اشتراكه الحالي مستمر ⛔" : "تم رفض طلب الاشتراك ⛔");
   } catch (e) { console.error(e); showToast("تعذر التحديث", "error"); }
 };
 window.adminSaveSubSettings = async function() {
