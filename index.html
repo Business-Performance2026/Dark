@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 85)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 87)</small>
     </div>
   </div>
 </footer>
@@ -2000,9 +2000,17 @@ document.querySelectorAll(".auth-tabs button").forEach(btn => {
     btn.classList.add("active");
     authMode = btn.dataset.tab;
     document.getElementById("registerFields").style.display = authMode === "register" ? "block" : "none";
+    // ✅ الإجبارية تشتغل فقط بوضع التسجيل — وضع الدخول يخليها بدون required عشان ما تحظر الإرسال
+    document.querySelectorAll('#registerFields input[name="displayName"], #registerFields input[name="phone"]').forEach(inp => {
+      if (authMode === "register") inp.setAttribute("required", ""); else inp.removeAttribute("required");
+    });
     document.getElementById("authSubmit").textContent = authMode === "register" ? t("register_go") : t("login_go");
   });
 });
+// الوضع الافتراضي «دخول» — نشيل الإجبارية من خانات التسجيل المخفية عشان ما توقف الإرسال
+if (authMode !== "register") {
+  document.querySelectorAll('#registerFields input[name="displayName"], #registerFields input[name="phone"]').forEach(inp => inp.removeAttribute("required"));
+}
 
 // اختيار نوع الحساب
 document.querySelectorAll(".role-option").forEach(opt => {
