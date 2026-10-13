@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 81)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 82)</small>
     </div>
   </div>
 </footer>
@@ -1151,7 +1151,7 @@ footer ul a:hover{color:var(--gold-2)}
     <p id="renewMsg" style="color:var(--muted);font-size:.83rem;line-height:1.8;margin:0 0 16px"></p>
     <div id="renewSent" style="display:none;font-size:.8rem;font-weight:800;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:9px;margin-bottom:10px">⏰ وصل طلبك للإدارة — بنتواصل معك واتساب قريبًا 💬</div>
     <div style="display:flex;gap:8px">
-      <button id="renewBtn" onclick="requestRenew()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 تجديد الشارة</button>
+      <button id="renewBtn" onclick="openVerifyPayModal('renew')" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 تجديد الشارة</button>
       <button onclick="document.getElementById('renewModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
     </div>
   </div>
@@ -1221,6 +1221,33 @@ footer ul a:hover{color:var(--gold-2)}
       <button id="susRenewBtn" onclick="document.getElementById('susModal').classList.remove('open');openSubModal()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
       <button onclick="document.getElementById('susModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">✕</button>
     </div>
+  </div>
+</div>
+
+<!-- ================= نافذة دفع الشارة (طلب/تجديد) — نفس حركة الاشتراك ================= -->
+<div class="modal-overlay" id="verifyPayModal">
+  <div class="modal" style="width:min(360px,94%);padding:24px 20px 20px">
+    <button class="modal-close" onclick="document.getElementById('verifyPayModal').classList.remove('open')" aria-label="إغلاق">✕</button>
+    <div style="text-align:center">
+      <img id="vpBadgeImg" style="width:56px;height:56px;object-fit:contain">
+      <h3 id="vpTitle" style="margin:6px 0 4px;color:var(--navy);font-size:1rem">طلب شارة التوثيق</h3>
+      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7">حوّل المبلغ على الحساب أدناه وارفع صورة الإيصال — بنفعّل شارتك بعد تأكيد الدفع ✅</p>
+    </div>
+    <div id="vpBankBox" style="display:none;background:#f6f1e7;border:1.5px solid var(--gold);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:.8rem;line-height:1.9;color:var(--navy)"></div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>اسم الشركة</label>
+      <input type="text" id="vpName" placeholder="اسم شركتك">
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>رقم الواتساب</label>
+      <input type="tel" id="vpWhats" placeholder="9XXXXXXX" dir="ltr" style="text-align:left">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>صورة الإيصال (سكرين شوت الحوالة)</label>
+      <input type="file" id="vpReceipt" accept="image/*" style="padding:9px 12px;border:2px dashed #d8cdb8;border-radius:12px;font-family:inherit;font-size:.8rem;width:100%;box-sizing:border-box;background:#fff">
+      <small style="color:var(--muted);font-size:.7rem">صورة فقط — أقل من 5 ميجا 📎</small>
+    </div>
+    <button type="button" onclick="submitVerifyPay()" id="vpSubmitBtn" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال الطلب 🚀</button>
   </div>
 </div>
 
@@ -2597,11 +2624,11 @@ function buildSubCard() {
     const dl = subDaysLeft(currentUser);
     const warn = dl !== null && dl <= 5;
     const until = new Date(subTs(currentUser)).toLocaleDateString("ar-OM");
-    return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;background:${warn ? "#fffaf0" : "#f0fdf4"};border:1.5px solid ${warn ? "#f59e0b" : "#86efac"};border-radius:14px;padding:12px 14px">
+    return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:${warn ? "#fffaf0" : "#f0fdf4"};border:1.5px solid ${warn ? "#f59e0b" : "#86efac"};border-radius:14px;padding:12px 14px">
       <span style="font-size:1.6rem">💳</span>
-      <div style="flex:1;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">اشتراكك الشهري <span style="color:#16a34a">فعّال ✅</span><br><small style="font-weight:600;color:var(--muted)">ينتهي بتاريخ <b>${until}</b>${dl !== null ? " — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") : ""}</small></div>
+      <div style="flex:1;min-width:0;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">اشتراكك الشهري <span style="color:#16a34a">فعّال ✅</span><br><small style="font-weight:600;color:var(--muted)">ينتهي بتاريخ <b>${until}</b>${dl !== null ? " — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") : ""}</small></div>
       ${currentUser.subRenewPending
-        ? `<span style="flex:0 0 auto;background:#fffaf0;border:1.5px dashed var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.72rem">⏳ تم إرسال طلب التمديد — انتظر الموافقة</span>`
+        ? `<span style="flex:1 1 100%;box-sizing:border-box;text-align:center;background:#fffaf0;border:1.5px dashed var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.72rem">⏳ تم إرسال طلب التمديد — انتظر الموافقة</span>`
         : `<button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">تمديد ➕</button>`}
     </div></div>`;
   }
@@ -2713,45 +2740,69 @@ function showSuspendedPopup(reason) {
   document.getElementById("susRenewBtn").style.display = isSubReason ? "" : "none";
   m.classList.add("open");
 }
-window.requestVerify = async function() {
+// 🏅 نافذة دفع الشارة — طلب جديد أو تجديد، نفس حركة الاشتراك: اسم + واتساب + إيصال
+let _vpMode = "pending";
+window.openVerifyPayModal = async function(mode) {
+  if (!currentUser) return;
+  _vpMode = mode === "renew" ? "renew" : "pending";
+  document.getElementById("vpBadgeImg").src = VERIFIED_BADGE;
+  document.getElementById("vpTitle").textContent = _vpMode === "renew" ? "تجديد شارة التوثيق" : "طلب شارة التوثيق";
+  document.getElementById("vpName").value = currentUser.companyName || currentUser.displayName || "";
+  document.getElementById("vpWhats").value = currentUser.verifyWhats || currentUser.phone || "";
+  document.getElementById("vpReceipt").value = "";
+  const cfg = await ensureSubSettings(); // نفس الحساب البنكي المستخدم للاشتراك
+  const box = document.getElementById("vpBankBox");
+  if (cfg.bankName || cfg.bankAccount) {
+    box.style.display = "";
+    box.innerHTML = `<b>🏦 حوّل المبلغ على:</b><br>المستفيد: <b>${cleanTxt(cfg.bankName) || "—"}</b><br>رقم الحساب: <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
+  } else box.style.display = "none";
+  document.getElementById("renewModal").classList.remove("open");
+  document.getElementById("verifyPayModal").classList.add("open");
+};
+window.requestVerify = function() { openVerifyPayModal("pending"); };
+window.requestRenew = function() { openVerifyPayModal("renew"); };
+window.submitVerifyPay = async function() {
+  const btn = document.getElementById("vpSubmitBtn");
+  const name = document.getElementById("vpName").value.trim();
+  const whats = document.getElementById("vpWhats").value.trim();
+  const file = document.getElementById("vpReceipt").files[0];
+  if (!name) { showToast("اكتب اسم شركتك 🏢", "error"); return; }
+  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast("اكتب رقم الواتساب صحيحًا 📱", "error"); return; }
+  if (!file) { showToast("ارفع صورة الإيصال أولًا 📎", "error"); return; }
+  if (!file.type.startsWith("image/")) { showToast("الإيصال لازم يكون صورة 📷", "error"); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast("الصورة أكبر من 5 ميجا — صغّرها 🗜️", "error"); return; }
+  btn.disabled = true; btn.textContent = "جارٍ الإرسال… ⏳";
   try {
+    const receiptUrl = await uploadImage(file, "subscriptions/" + (currentUser.uid || "u"));
+    if (!receiptUrl) throw new Error("upload_failed");
+    const fields = { verifyReq: _vpMode, verifyReqAt: serverTimestampFn ? serverTimestampFn() : new Date().toISOString(), verifyWhats: whats, verifyReceipt: receiptUrl };
     if (db && getDocsFn) {
       const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
-      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), { verifyReq: "pending", verifyReqAt: serverTimestampFn() });
+      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), fields);
     } else {
       const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
       const lu = users.find(x => x.uid === currentUser.uid);
-      if (lu) { lu.verifyReq = "pending"; lu.verifyReqAt = new Date().toISOString(); localStorage.setItem("darak_users", JSON.stringify(users)); }
+      if (lu) { Object.assign(lu, fields); localStorage.setItem("darak_users", JSON.stringify(users)); }
     }
-    currentUser.verifyReq = "pending";
-    showToast("تم إرسال طلب التوثيق — بنتواصل معك واتساب قريبًا 🏅");
+    Object.assign(currentUser, fields);
+    document.getElementById("verifyPayModal").classList.remove("open");
+    showToast(_vpMode === "renew" ? "تم إرسال طلب تجديد الشارة — انتظر الموافقة ⏳" : "وصل طلب التوثيق للإدارة — بنفعّل الشارة بعد تأكيد الدفع 🏅");
     openDashboard();
-  } catch (e) { console.error(e); showToast("تعذر إرسال الطلب — حاول مرة أخرى", "error"); }
+  } catch (e) {
+    console.error(e);
+    showToast("تعذر إرسال الطلب — تأكد من النت وحاول مرة أخرى", "error");
+  }
+  btn.disabled = false; btn.textContent = "إرسال الطلب 🚀";
 };
-window.requestRenew = async function() {
-  try {
-    if (db && getDocsFn) {
-      const snap = await getDocsFn(queryFn(collectionFn(db, "users"), whereFn("uid", "==", currentUser.uid)));
-      if (snap.docs.length) await updateDocFn(docFn(db, "users", snap.docs[0].id), { verifyReq: "renew", verifyReqAt: serverTimestampFn() });
-    } else {
-      const users = JSON.parse(localStorage.getItem("darak_users") || "[]");
-      const lu = users.find(x => x.uid === currentUser.uid);
-      if (lu) { lu.verifyReq = "renew"; lu.verifyReqAt = new Date().toISOString(); localStorage.setItem("darak_users", JSON.stringify(users)); }
-    }
-    currentUser.verifyReq = "renew";
-    document.getElementById("renewModal").classList.remove("open");
-    showToast("وصل طلب التجديد للإدارة — بنتواصل معك واتساب 💬");
-    openDashboard();
-  } catch (e) { console.error(e); showToast("تعذر إرسال الطلب — حاول مرة أخرى", "error"); }
-};
-// 🔔 بوب اب تحذير انتهاء الشارة — يظهر تلقائيًا قبل 5 أيام أو بعد الانتهاء (مرة بالجلسة)
-let _renewWarned = false;
+// 🔔 بوب اب تحذير انتهاء الشارة — يظهر قبل 5 أيام أو بعد الانتهاء (مرة كل 3 أيام فقط — مو مزعج)
 function maybeShowRenewWarning() {
-  if (_renewWarned || !currentUser || !currentUser.verified) return;
+  if (!currentUser || !currentUser.verified) return;
+  const last = +(localStorage.getItem("darak_renew_warn") || 0);
+  if (Date.now() - last < 3 * 86400000) return;
+  localStorage.setItem("darak_renew_warn", Date.now());
   const dl = verifyDaysLeft(currentUser);
   const expired = isVerifyExpired(currentUser);
   if (!expired && (dl === null || dl > 5)) return;
-  _renewWarned = true;
   document.getElementById("renewIcon").textContent = expired ? "✖️" : "⚠️";
   document.getElementById("renewTitle").textContent = expired ? "انتهت شارة التوثيق" : "شارة التوثيق بتنتهي قريبًا";
   document.getElementById("renewMsg").innerHTML = expired
@@ -2996,7 +3047,8 @@ async function loadUsersTable() {
           <div style="flex:1;min-width:140px">
             <b>${u.displayName || "بدون اسم"}</b> <span class="status-badge status-pending">${adminRoleName(u.role)}</span><br>
             <small style="color:var(--muted)" dir="ltr">${u.email || ""}</small><br>
-            <small style="color:var(--muted)">${u.phone || "—"} • 📍 ${u.location || "—"}${u.verifyReq === "renew" ? " • 🔄 طلب <b>تجديد</b>" : ""}</small>
+            <small style="color:var(--muted)">${u.phone || "—"} • 📍 ${u.location || "—"}${u.verifyReq === "renew" ? " • 🔄 طلب <b>تجديد</b>" : ""} • واتساب: <span dir="ltr">${cleanTxt(u.verifyWhats) || u.phone || "—"}</span></small><br>
+            ${u.verifyReceipt ? `<a href="${u.verifyReceipt}" target="_blank" rel="noopener" style="display:inline-block;margin-top:5px;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:9px;padding:5px 12px;font-size:.72rem;font-weight:800;text-decoration:none">🧾 عرض الإيصال</a>` : `<small style="color:#b91c1c;font-size:.72rem">بدون إيصال ⛔</small>`}
           </div>
           <input type="date" id="vu_${u.uid}" value="${new Date(Date.now() + 365*86400000).toISOString().slice(0,10)}" title="تاريخ انتهاء التوثيق" style="border:1.5px solid #e7dfd0;border-radius:8px;padding:7px 6px;font-family:inherit;font-size:.75rem;color:var(--navy)">
           <button class="action-btn action-approve" style="background:#25d366" onclick="adminWhatsApp('${u.uid}')">💬 واتساب</button>
@@ -3088,7 +3140,7 @@ function waNormalize(p) {
 window.adminWhatsApp = function(uid) {
   const u = adminUsersCache.find(x => x.uid === uid);
   if (!u) return;
-  const num = waNormalize(u.phone);
+  const num = waNormalize(u.verifyWhats || u.phone);
   if (!num || num.length < 10) { showToast("رقم الجوال غير مكتمل — أضف الرقم ثم جرّب 💬", "error"); return; }
   const msg = encodeURIComponent("مرحبًا " + (u.displayName || "") + "، معك إدارة تطبيق دارك 👋");
   window.open("https://wa.me/" + num.replace("+", "") + "?text=" + msg, "_blank");
