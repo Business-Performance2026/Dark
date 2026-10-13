@@ -671,7 +671,7 @@ footer ul a:hover{color:var(--gold-2)}
   <div class="container">
     <div class="row-head">
       <h2 class="row-title" data-i18n="secs_tech">اطلب فني 🔧</h2>
-      <button class="btn btn-gold btn-sm" onclick="openTechDir()" style="font-size:.85rem;padding:8px 16px;font-weight:800">👷 تصفح الفنيين ←</button>
+      <button class="btn btn-gold btn-sm" onclick="openTechDir()" style="font-size:.85rem;padding:8px 16px;font-weight:800" data-i18n="browse_techs">👷 تصفح الفنيين ←</button>
     </div>
     <div class="h-scroll cards-row" id="techCatRow"></div>
   </div>
@@ -708,24 +708,24 @@ footer ul a:hover{color:var(--gold-2)}
       <h3 style="padding:18px 18px 6px;color:var(--navy);font-size:1.15rem" data-i18n="cp_title">📇 ملف الشركة (يظهر للعملاء في صفحتك)</h3>
       <form id="cpForm" style="padding:6px 14px 14px">
         <div class="form-group"><label data-i18n="cp_logo">شعار الشركة (صورة)</label><input type="file" id="cpLogo" accept="image/*"></div>
-        <div class="form-group"><label>🏗️ سنوات الخبرة</label><input type="number" id="cpExpYears" min="0" max="60" placeholder="مثال: 5"></div>
-        <div class="form-group"><label>🖼️ معرض أعمال الشركة (صور من مشاريعك)</label>
+        <div class="form-group"><label data-i18n="cpf_exp">🏗️ سنوات الخبرة</label><input type="number" id="cpExpYears" min="0" max="60" placeholder="مثال: 5" data-i18n-ph="cpf_exp_ph"></div>
+        <div class="form-group"><label data-i18n="cpf_gallery">🖼️ معرض أعمال الشركة (صور من مشاريعك)</label>
           <input type="file" id="cpGallery" accept="image/*" multiple>
-          <small style="color:var(--muted);font-size:.72rem">لحد 8 صور — كل صورة أقل من 5 ميجا — اضغط حفظ عشان ترفع</small>
+          <small style="color:var(--muted);font-size:.72rem" data-i18n="cpf_gallery_hint">لحد 8 صور — كل صورة أقل من 5 ميجا — اضغط حفظ عشان ترفع</small>
           <div id="cpGalleryPrev" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
         </div>
         <div class="form-group"><label data-i18n="cp_name_ar">اسم الشركة (عربي)</label><input type="text" id="cpNameAr"></div>
         <div class="form-group"><label data-i18n="cp_name_en">اسم الشركة (إنجليزي)</label><input type="text" id="cpNameEn" dir="ltr"></div>
-        <div class="form-group"><label>تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
-        <div class="form-group"><label>⭐ التخصص الظاهر في بطاقتك</label><select id="cpPrimary"></select>
-          <small style="color:var(--muted);font-size:.74rem">هذا اللي يشوفه المستخدمون تحت شعارك عند تصفح الشركات والفنيين</small></div>
+        <div class="form-group"><label data-i18n="cpf_cats">تخصصاتك (اختر واحدًا أو أكثر)</label><div id="cpCatList" class="cat-picks"></div></div>
+        <div class="form-group"><label data-i18n="cpf_primary">⭐ التخصص الظاهر في بطاقتك</label><select id="cpPrimary"></select>
+          <small style="color:var(--muted);font-size:.74rem" data-i18n="cpf_primary_hint">هذا اللي يشوفه المستخدمون تحت شعارك عند تصفح الشركات والفنيين</small></div>
         <div class="form-group"><label data-i18n="cp_bio">نبذة عن الشركة</label><textarea id="cpBio" rows="2" placeholder="من نحن، خبرتنا، مناطق العمل…"></textarea></div>
         <div class="form-group"><label data-i18n="cp_services">خدماتك (افصل بينها بفاصلة ، أو اختر من الاقتراحات)</label><input type="text" id="cpServices" placeholder="تصميم، تنفيذ، صيانة"><div id="cpSvcSugs" style="margin-top:6px"></div></div>
         <div class="form-group"><label data-i18n="cp_wa">رقم الواتساب</label><input type="tel" id="cpWhatsApp" dir="ltr" placeholder="9XXXXXXX"></div>
-        <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="cpPhone" dir="ltr" placeholder="9XXXXXXX"></div>
-        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="cpEmail" dir="ltr"></div>
-        <div class="form-group"><label>📍 المحافظة</label><select id="cpGov"></select></div>
-        <div class="form-group"><label>الولاية</label><select id="cpWilaya"></select></div>
+        <div class="form-group"><label data-i18n="cpf_phone">رقم الهاتف</label><input type="tel" id="cpPhone" dir="ltr" placeholder="9XXXXXXX"></div>
+        <div class="form-group"><label data-i18n="cpf_email">البريد الإلكتروني</label><input type="email" id="cpEmail" dir="ltr"></div>
+        <div class="form-group"><label data-i18n="cpf_gov">📍 المحافظة</label><select id="cpGov"></select></div>
+        <div class="form-group"><label data-i18n="cpf_wilaya">الولاية</label><select id="cpWilaya"></select></div>
         <input type="hidden" id="cpLoc">
         <div class="form-group"><label data-i18n="cp_insta">رابط إنستجرام</label><input type="url" id="cpInsta" dir="ltr" placeholder="https://instagram.com/..."></div>
         <div class="form-group"><label data-i18n="cp_map">رابط خريطة جوجل</label><input type="url" id="cpMap" dir="ltr" placeholder="https://maps.google.com/..."></div>
@@ -897,10 +897,10 @@ footer ul a:hover{color:var(--gold-2)}
       <div>
         <h5 data-i18n="f_cats">التخصصات</h5>
         <ul>
-          <li><a href="#categories">المقاولون</a></li>
-          <li><a href="#categories">مواد البناء</a></li>
-          <li><a href="#categories">الكهرباء والسباكة</a></li>
-          <li><a href="#categories">الديكور والأثاث</a></li>
+          <li><a href="#categories" data-i18n="f_contractors">المقاولون</a></li>
+          <li><a href="#categories" data-i18n="f_materials">مواد البناء</a></li>
+          <li><a href="#categories" data-i18n="f_elec">الكهرباء والسباكة</a></li>
+          <li><a href="#categories" data-i18n="f_deco">الديكور والأثاث</a></li>
         </ul>
       </div>
       <div>
@@ -908,8 +908,8 @@ footer ul a:hover{color:var(--gold-2)}
         <ul>
           <li><a href="#how" data-i18n="nav_how">كيف نعمل</a></li>
           <li><a href="#providers" data-i18n="nav_providers">مقدمو الخدمة</a></li>
-          <li><a href="#" class="footer-request">اطلب خدمة</a></li>
-          <li><a href="#" class="footer-join">انضم كشركة</a></li>
+          <li><a href="#" class="footer-request" data-i18n="f_request">اطلب خدمة</a></li>
+          <li><a href="#" class="footer-join" data-i18n="f_join">انضم كشركة</a></li>
         </ul>
       </div>
       <div>
@@ -922,7 +922,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 88)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 89)</small>
     </div>
   </div>
 </footer>
@@ -949,13 +949,13 @@ footer ul a:hover{color:var(--gold-2)}
       <div id="registerFields" style="display:none">
         <div class="form-group">
           <label data-i18n="name_lbl">الاسم الكامل / اسم المنشأة</label>
-          <input type="text" name="displayName" required placeholder="مثال: محمد العتيبي">
+          <input type="text" name="displayName" required placeholder="مثال: محمد العتيبي" data-i18n-ph="reg_name_ph">
         </div>
         <div class="form-group">
           <label data-i18n="reg_phone">رقم الجوال</label>
           <input type="tel" name="phone" required placeholder="9xxxxxxx" pattern="[0-9+]{8,15}">
         </div>
-        <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px">نوع الحساب</label>
+        <label style="font-weight:700;color:var(--navy);font-size:.9rem;display:block;margin-bottom:8px" data-i18n="reg_role_lbl">نوع الحساب</label>
         <div class="role-picker">
           <div class="role-option active" data-role="client">
             <div class="r-icon">🏠</div>
@@ -973,12 +973,12 @@ footer ul a:hover{color:var(--gold-2)}
         <div class="form-group" id="regCategoryWrap" style="display:none">
           <label data-i18n="cat_lbl">تخصصك</label>
           <div id="regCatList" class="cat-picks"></div>
-          <small style="color:var(--muted);font-size:.74rem">✅ تقدر تختار أكثر من تخصص</small>
+          <small style="color:var(--muted);font-size:.74rem" data-i18n="reg_multi_hint">✅ تقدر تختار أكثر من تخصص</small>
         </div>
         <div class="form-group" id="regLocWrap" style="display:none">
-          <label>📍 منطقتك (المحافظة / الولاية / المنطقة)</label>
-          <input type="text" id="regLoc" placeholder="مثال: مسقط / السيب / المعبيلة">
-          <small style="color:var(--muted);font-size:.74rem">تظهر للعملاء عند تصفح منطقتك</small>
+          <label data-i18n="reg_loc_lbl">📍 منطقتك (المحافظة / الولاية / المنطقة)</label>
+      <input type="text" id="regLoc" placeholder="مثال: مسقط / السيب / المعبيلة" data-i18n-ph="reg_loc_ph">
+          <small style="color:var(--muted);font-size:.74rem" data-i18n="reg_loc_hint">تظهر للعملاء عند تصفح منطقتك</small>
         </div>
       </div>
       <div class="form-group">
@@ -987,7 +987,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <div class="form-group">
         <label data-i18n="pass_lbl">كلمة المرور</label>
-        <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right">
+        <input type="password" name="password" required minlength="6" placeholder="6 أحرف على الأقل" dir="ltr" style="text-align:right" data-i18n-ph="reg_pass_ph">
       </div>
       <div style="text-align:left;margin:-6px 0 14px">
         <a href="#" id="forgotPass" style="color:var(--gold);font-size:.85rem;font-weight:700" data-i18n="forgot">نسيت كلمة المرور؟</a>
@@ -1007,7 +1007,7 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="req_name">الاسم الكامل *</label>
-          <input type="text" name="name" id="reqName" required placeholder="مثال: محمد البلوشي">
+          <input type="text" name="name" id="reqName" required placeholder="مثال: محمد البلوشي" data-i18n-ph="req_name_ph">
         </div>
         <div class="form-group">
           <label data-i18n="phone_lbl">رقم الجوال *</label>
@@ -1017,12 +1017,12 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="city_lbl">المدينة *</label>
-          <input type="text" name="city" required placeholder="مثال: مسقط">
+          <input type="text" name="city" required placeholder="مثال: مسقط" data-i18n-ph="req_city_ph">
         </div>
         <div class="form-group">
           <label data-i18n="req_cat">التخصص المطلوب *</label>
           <select name="category" required id="reqCategory">
-            <option value="">اختر التخصص…</option>
+            <option value="" data-i18n="req_cat_ph">اختر التخصص…</option>
           </select>
         </div>
       </div>
@@ -1032,7 +1032,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <div class="form-group">
         <label data-i18n="details_lbl">تفاصيل المشروع *</label>
-        <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…"></textarea>
+        <textarea name="details" rows="3" required placeholder="صف مشروعك: المساحة، المرحلة الحالية، المطلوب…" data-i18n-ph="req_details_ph"></textarea>
       </div>
       <div class="form-group">
         <label data-i18n="attach_lbl">📎 إرفاق مخطط أو مستند (PDF) — اختياري</label>
@@ -1054,7 +1054,7 @@ footer ul a:hover{color:var(--gold-2)}
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="req_name">الاسم الكامل *</label>
-          <input type="text" name="name" id="techReqName" required placeholder="مثال: محمد البلوشي">
+          <input type="text" name="name" id="techReqName" required placeholder="مثال: محمد البلوشي" data-i18n-ph="req_name_ph">
         </div>
         <div class="form-group">
           <label data-i18n="phone_lbl">رقم الجوال *</label>
@@ -1063,11 +1063,11 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <div class="form-group">
         <label data-i18n="city_lbl">المدينة *</label>
-        <input type="text" name="city" required placeholder="مثال: مسقط — الخوض">
+        <input type="text" name="city" required placeholder="مثال: مسقط — الخوض" data-i18n-ph="tech_city_ph">
       </div>
       <div class="form-group">
         <label data-i18n="tech_details">وصف المشكلة أو العمل المطلوب *</label>
-        <textarea name="details" rows="3" required placeholder="مثال: فيش المطبخ ما يشتغل، وأبي أركب إنارة جديدة…"></textarea>
+        <textarea name="details" rows="3" required placeholder="مثال: فيش المطبخ ما يشتغل، وأبي أركب إنارة جديدة…" data-i18n-ph="tech_details_ph"></textarea>
       </div>
       <input type="hidden" name="category" id="techCategory">
       <button type="submit" class="submit-btn" id="techSubmit" data-i18n="send_req">إرسال الطلب 🚀</button>
@@ -1092,7 +1092,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
       <div class="form-group">
         <label data-i18n="quote_note">ملاحظة للعميل</label>
-        <textarea id="quoteNote" rows="2" placeholder="شروط، مدة التنفيذ، الضمان…"></textarea>
+        <textarea id="quoteNote" rows="2" placeholder="شروط، مدة التنفيذ، الضمان…" data-i18n-ph="quote_note_ph"></textarea>
       </div>
       <button type="submit" class="submit-btn" id="quoteSubmit" data-i18n="quote_send">إرسال العرض 🚀</button>
     </form>
@@ -1110,9 +1110,9 @@ footer ul a:hover{color:var(--gold-2)}
     </div>
     <div id="rateHint" style="color:var(--gold);font-weight:700;min-height:22px;margin-bottom:10px"></div>
     <div class="form-group" style="text-align:right">
-      <textarea id="rateComment" rows="2" placeholder="تعليق اختياري — كيف كانت تجربتك؟"></textarea>
+      <textarea id="rateComment" rows="2" placeholder="تعليق اختياري — كيف كانت تجربتك؟" data-i18n-ph="rate_ph"></textarea>
     </div>
-    <button class="submit-btn" id="rateSubmit">إرسال التقييم ⭐</button>
+    <button class="submit-btn" id="rateSubmit" data-i18n="rate_submit">إرسال التقييم ⭐</button>
   </div>
 </div>
 
@@ -1137,7 +1137,7 @@ footer ul a:hover{color:var(--gold-2)}
     <p id="confirmSub" style="color:var(--muted);font-size:.88rem;line-height:1.7"></p>
     <div style="display:flex;gap:10px;margin-top:18px">
       <button class="submit-btn" id="confirmOk" type="button" style="background:#b91c1c;flex:1">تأكيد</button>
-      <button class="submit-btn" id="confirmCancel" type="button" style="background:#8a8a8a;flex:1">إلغاء</button>
+      <button class="submit-btn" id="confirmCancel" type="button" style="background:#8a8a8a;flex:1" data-i18n="confirm_cancel">إلغاء</button>
     </div>
   </div>
 </div>
@@ -1149,10 +1149,10 @@ footer ul a:hover{color:var(--gold-2)}
     <div id="renewIcon" style="width:64px;height:64px;border-radius:50%;background:#fee2e2;color:#b91c1c;font-size:1.9rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">⚠️</div>
     <h3 id="renewTitle" style="color:var(--navy);margin:0 0 8px;font-size:1rem"></h3>
     <p id="renewMsg" style="color:var(--muted);font-size:.83rem;line-height:1.8;margin:0 0 16px"></p>
-    <div id="renewSent" style="display:none;font-size:.8rem;font-weight:800;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:9px;margin-bottom:10px">⏰ وصل طلبك للإدارة — بنتواصل معك واتساب قريبًا 💬</div>
+    <div id="renewSent" style="display:none;font-size:.8rem;font-weight:800;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:9px;margin-bottom:10px" data-i18n="renew_sent_note">⏰ وصل طلبك للإدارة — بنتواصل معك واتساب قريبًا 💬</div>
     <div style="display:flex;gap:8px">
-      <button id="renewBtn" onclick="openVerifyPayModal('renew')" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 تجديد الشارة</button>
-      <button onclick="document.getElementById('renewModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
+      <button id="renewBtn" onclick="openVerifyPayModal('renew')" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)" data-i18n="renew_btn">🏅 تجديد الشارة</button>
+      <button onclick="document.getElementById('renewModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit" data-i18n="close_btn">إغلاق ✕</button>
     </div>
   </div>
 </div>
@@ -1163,34 +1163,34 @@ footer ul a:hover{color:var(--gold-2)}
     <button class="modal-close" onclick="document.getElementById('subModal').classList.remove('open')" aria-label="إغلاق">✕</button>
     <div style="text-align:center">
       <div style="font-size:2rem">💳</div>
-      <h3 style="margin:6px 0 4px;color:var(--navy);font-size:1rem">الاشتراك الشهري</h3>
-      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7">اختر عدد الشهور، حوّل المبلغ على الحساب أدناه، وارفع صورة الإيصال — بنفعّل اشتراكك بعد تأكيد الدفع ✅</p>
+      <h3 style="margin:6px 0 4px;color:var(--navy);font-size:1rem" data-i18n="sub_monthly">الاشتراك الشهري</h3>
+      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7" data-i18n="sub_desc">اختر عدد الشهور، حوّل المبلغ على الحساب أدناه، وارفع صورة الإيصال — بنفعّل اشتراكك بعد تأكيد الدفع ✅</p>
     </div>
     <div class="form-group" style="margin-bottom:10px">
-      <label>عدد الشهور</label>
+      <label data-i18n="sub_months_lbl">عدد الشهور</label>
       <select id="subMonths" onchange="updateSubTotal()" style="width:100%;padding:10px 12px;border:2px solid #e8e2d5;border-radius:12px;font-family:inherit;font-size:.9rem;color:var(--navy)">
-        <option value="1">شهر واحد</option>
-        <option value="3">3 أشهر</option>
-        <option value="6">6 أشهر</option>
-        <option value="12">سنة كاملة</option>
+        <option value="1" data-i18n="sub_m1">شهر واحد</option>
+        <option value="3" data-i18n="sub_m3">3 أشهر</option>
+        <option value="6" data-i18n="sub_m6">6 أشهر</option>
+        <option value="12" data-i18n="sub_m12">سنة كاملة</option>
       </select>
     </div>
     <div id="subBankBox" style="display:none;background:#f6f1e7;border:1.5px solid var(--gold);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:.8rem;line-height:1.9;color:var(--navy)"></div>
     <div id="subTotalLine" style="display:none;text-align:center;font-size:.85rem;font-weight:900;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;margin-bottom:12px"></div>
     <div class="form-group" style="margin-bottom:10px">
-      <label>اسم الشركة</label>
-      <input type="text" id="subName" placeholder="اسم شركتك">
+      <label data-i18n="sub_co_name">اسم الشركة</label>
+      <input type="text" id="subName" placeholder="اسم شركتك" data-i18n-ph="sub_co_name_ph">
     </div>
     <div class="form-group" style="margin-bottom:10px">
-      <label>رقم الواتساب</label>
+      <label data-i18n="sub_whats">رقم الواتساب</label>
       <input type="tel" id="subWhats" placeholder="9XXXXXXX" dir="ltr" style="text-align:left">
     </div>
     <div class="form-group" style="margin-bottom:14px">
-      <label>صورة الإيصال (سكرين شوت الحوالة)</label>
+      <label data-i18n="sub_receipt_lbl">صورة الإيصال (سكرين شوت الحوالة)</label>
       <input type="file" id="subReceipt" accept="image/*" style="padding:9px 12px;border:2px dashed #d8cdb8;border-radius:12px;font-family:inherit;font-size:.8rem;width:100%;box-sizing:border-box;background:#fff">
-      <small style="color:var(--muted);font-size:.7rem">صورة فقط — أقل من 5 ميجا 📎</small>
+      <small style="color:var(--muted);font-size:.7rem" data-i18n="sub_receipt_hint">صورة فقط — أقل من 5 ميجا 📎</small>
     </div>
-    <button type="button" onclick="submitSubRequest()" id="subSubmitBtn" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال طلب الاشتراك 🚀</button>
+    <button type="button" onclick="submitSubRequest()" id="subSubmitBtn" data-i18n="sub_send" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال طلب الاشتراك 🚀</button>
   </div>
 </div>
 
@@ -1201,8 +1201,8 @@ footer ul a:hover{color:var(--gold-2)}
     <h3 id="subWarnTitle" style="color:var(--navy);margin:0 0 8px;font-size:1rem"></h3>
     <p id="subWarnMsg" style="color:var(--muted);font-size:.83rem;line-height:1.8;margin:0 0 16px"></p>
     <div style="display:flex;gap:8px">
-      <button onclick="closeSubWarnAndOpenSub()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
-      <button onclick="document.getElementById('subWarnModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">إغلاق ✕</button>
+      <button onclick="closeSubWarnAndOpenSub()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)" data-i18n="sub_renew_btn">💳 تجديد الاشتراك</button>
+      <button onclick="document.getElementById('subWarnModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit" data-i18n="close_btn">إغلاق ✕</button>
     </div>
   </div>
 </div>
@@ -1211,14 +1211,14 @@ footer ul a:hover{color:var(--gold-2)}
 <div class="modal-overlay" id="susModal">
   <div class="modal" style="width:min(340px,92%);text-align:center;padding:26px 20px 20px">
     <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;font-size:1.9rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">🚫</div>
-    <h3 style="color:var(--navy);margin:0 0 8px;font-size:1rem">حسابك موقوف</h3>
+    <h3 style="color:var(--navy);margin:0 0 8px;font-size:1rem" data-i18n="sus_title">حسابك موقوف</h3>
     <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:11px 13px;margin-bottom:8px">
-      <small style="color:#b91c1c;font-weight:800;font-size:.72rem">سبب الإيقاف</small>
+      <small style="color:#b91c1c;font-weight:800;font-size:.72rem" data-i18n="sus_reason_lbl">سبب الإيقاف</small>
       <div id="susReason" style="color:#7f1d1d;font-size:.85rem;font-weight:800;margin-top:3px;line-height:1.6"></div>
     </div>
-    <p style="color:var(--muted);font-size:.76rem;line-height:1.7;margin:0 0 14px">بعد حل السبب راح يرجع حسابك يشتغل بشكل طبيعي ✅</p>
+    <p style="color:var(--muted);font-size:.76rem;line-height:1.7;margin:0 0 14px" data-i18n="sus_note">بعد حل السبب راح يرجع حسابك يشتغل بشكل طبيعي ✅</p>
     <div style="display:flex;gap:8px">
-      <button id="susRenewBtn" onclick="document.getElementById('susModal').classList.remove('open');openSubModal()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 تجديد الاشتراك</button>
+      <button id="susRenewBtn" onclick="document.getElementById('susModal').classList.remove('open');openSubModal()" style="flex:2;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(185,141,78,.35)" data-i18n="sub_renew_btn">💳 تجديد الاشتراك</button>
       <button onclick="document.getElementById('susModal').classList.remove('open')" style="flex:1;background:#fff;border:1.5px solid #e7dfd0;color:var(--navy);border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit">✕</button>
     </div>
   </div>
@@ -1231,24 +1231,24 @@ footer ul a:hover{color:var(--gold-2)}
     <div style="text-align:center">
       <img id="vpBadgeImg" style="width:56px;height:56px;object-fit:contain">
       <h3 id="vpTitle" style="margin:6px 0 4px;color:var(--navy);font-size:1rem">طلب شارة التوثيق</h3>
-      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7">حوّل المبلغ على الحساب أدناه وارفع صورة الإيصال — بنفعّل شارتك بعد تأكيد الدفع ✅</p>
+      <p style="color:var(--muted);font-size:.76rem;margin:0 0 14px;line-height:1.7" data-i18n="vb_desc">حوّل المبلغ على الحساب أدناه وارفع صورة الإيصال — بنفعّل شارتك بعد تأكيد الدفع ✅</p>
     </div>
     <div id="vpBankBox" style="display:none;background:#f6f1e7;border:1.5px solid var(--gold);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:.8rem;line-height:1.9;color:var(--navy)"></div>
     <div id="vpPriceLine" style="display:none;text-align:center;font-size:.85rem;font-weight:900;color:var(--navy);background:#fffaf0;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;margin-bottom:12px"></div>
     <div class="form-group" style="margin-bottom:10px">
-      <label>اسم الشركة</label>
-      <input type="text" id="vpName" placeholder="اسم شركتك">
+      <label data-i18n="sub_co_name">اسم الشركة</label>
+      <input type="text" id="vpName" placeholder="اسم شركتك" data-i18n-ph="sub_co_name_ph">
     </div>
     <div class="form-group" style="margin-bottom:10px">
-      <label>رقم الواتساب</label>
+      <label data-i18n="sub_whats">رقم الواتساب</label>
       <input type="tel" id="vpWhats" placeholder="9XXXXXXX" dir="ltr" style="text-align:left">
     </div>
     <div class="form-group" style="margin-bottom:14px">
-      <label>صورة الإيصال (سكرين شوت الحوالة)</label>
+      <label data-i18n="sub_receipt_lbl">صورة الإيصال (سكرين شوت الحوالة)</label>
       <input type="file" id="vpReceipt" accept="image/*" style="padding:9px 12px;border:2px dashed #d8cdb8;border-radius:12px;font-family:inherit;font-size:.8rem;width:100%;box-sizing:border-box;background:#fff">
-      <small style="color:var(--muted);font-size:.7rem">صورة فقط — أقل من 5 ميجا 📎</small>
+      <small style="color:var(--muted);font-size:.7rem" data-i18n="sub_receipt_hint">صورة فقط — أقل من 5 ميجا 📎</small>
     </div>
-    <button type="button" onclick="submitVerifyPay()" id="vpSubmitBtn" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال الطلب 🚀</button>
+    <button type="button" onclick="submitVerifyPay()" id="vpSubmitBtn" data-i18n="vp_send" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">إرسال الطلب 🚀</button>
   </div>
 </div>
 
@@ -1257,16 +1257,16 @@ footer ul a:hover{color:var(--gold-2)}
   <div class="modal" style="text-align:center;padding:26px 22px">
     <button class="modal-close" id="shareClose" aria-label="إغلاق">✕</button>
     <div style="font-size:2.2rem">🔗</div>
-    <h3 style="margin:8px 0 4px;color:var(--navy)">رابطك الخاص وباركود QR</h3>
-    <p style="color:var(--muted);font-size:.84rem;line-height:1.7">شاركه مع عملائك — اللي يفتحه يوصل لصفحتك في دارك ويطلب منك مباشرة 🎯</p>
+    <h3 style="margin:8px 0 4px;color:var(--navy)" data-i18n="share_title">رابطك الخاص وباركود QR</h3>
+    <p style="color:var(--muted);font-size:.84rem;line-height:1.7" data-i18n="share_desc">شاركه مع عملائك — اللي يفتحه يوصل لصفحتك في دارك ويطلب منك مباشرة 🎯</p>
     <div style="display:flex;gap:8px;margin-top:14px;direction:ltr">
       <input type="text" id="shareLinkText" readonly style="flex:1;padding:10px;border:1.5px solid #e5dfd2;border-radius:10px;font-size:.78rem;background:#faf8f3;text-align:left;color:var(--navy)">
-      <button class="submit-btn" id="shareCopy" type="button" style="width:auto;padding:10px 16px;font-size:.8rem;margin:0">نسخ 📋</button>
+      <button class="submit-btn" id="shareCopy" type="button" style="width:auto;padding:10px 16px;font-size:.8rem;margin:0" data-i18n="share_copy">نسخ 📋</button>
     </div>
     <div style="margin-top:16px;display:grid;place-items:center">
       <img id="shareQrImg" alt="QR" style="width:210px;height:210px;border-radius:14px;border:1.5px solid #f0ece4;background:#fff">
     </div>
-    <a id="shareQrDown" class="submit-btn" style="background:var(--navy);margin-top:14px;display:block;text-decoration:none" download="darak-qr.png">تحميل الباركود ⬇️</a>
+    <a id="shareQrDown" class="submit-btn" style="background:var(--navy);margin-top:14px;display:block;text-decoration:none" download="darak-qr.png" data-i18n="share_dl">تحميل الباركود ⬇️</a>
   </div>
 </div>
 
@@ -1283,14 +1283,14 @@ footer ul a:hover{color:var(--gold-2)}
 <div class="modal-overlay" id="myEditModal">
   <div class="modal">
     <button class="modal-close" id="myEditClose" aria-label="إغلاق">✕</button>
-    <h3>✏️ تعديل ملفي</h3>
-    <p>عدّل بياناتك ثم احفظ</p>
-    <div class="form-group"><label>الاسم</label><input type="text" id="meName"></div>
-    <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="mePhone" dir="ltr" placeholder="9XXXXXXX"></div>
-    <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="meEmail" dir="ltr"></div>
-    <div class="form-group"><label>📍 المحافظة</label><select id="meGov"></select></div>
-    <div class="form-group"><label>الولاية</label><select id="meWilaya"></select></div>
-    <button class="submit-btn" id="meSave" type="button">حفظ 💾</button>
+    <h3 data-i18n="me_title">✏️ تعديل ملفي</h3>
+    <p data-i18n="me_sub">عدّل بياناتك ثم احفظ</p>
+    <div class="form-group"><label data-i18n="me_name">الاسم</label><input type="text" id="meName"></div>
+    <div class="form-group"><label data-i18n="cpf_phone">رقم الهاتف</label><input type="tel" id="mePhone" dir="ltr" placeholder="9XXXXXXX"></div>
+    <div class="form-group"><label data-i18n="cpf_email">البريد الإلكتروني</label><input type="email" id="meEmail" dir="ltr"></div>
+    <div class="form-group"><label data-i18n="cpf_gov">📍 المحافظة</label><select id="meGov"></select></div>
+    <div class="form-group"><label data-i18n="cpf_wilaya">الولاية</label><select id="meWilaya"></select></div>
+    <button class="submit-btn" id="meSave" type="button" data-i18n="cp_save">حفظ 💾</button>
   </div>
 </div>
 
@@ -1575,7 +1575,98 @@ const I18N = {
     tech_req_title: "🔧 اطلب فني", tech_req_for: "التخصص:", tech_details: "وصف المشكلة أو العمل المطلوب *",
     tech_login_first: "سجّل دخولك أولًا عشان ترسل طلبك", tech_sent: "تم استلام طلبك! بيشوفه الفنيون في التخصص المطلوب",
     dash_tech: "لوحة الفني 🔧", sub_tech: "طلبات العملاء الواردة في تخصصك",
-    quote_file_opt: "ملف العرض (PDF) — اختياري", pdf_required: "الرجاء إرفاق ملف عرض السعر (PDF) 📎", req_err: "تعذر إرسال الطلب، حاول مرة أخرى", sending: "جارٍ الإرسال…"
+    ph_optional: "اختياري", quote_file_opt: "ملف العرض (PDF) — اختياري", pdf_required: "الرجاء إرفاق ملف عرض السعر (PDF) 📎", req_err: "تعذر إرسال الطلب، حاول مرة أخرى", sending: "جارٍ الإرسال…",
+    // 💳 الاشتراك الشهري
+    sub_monthly: "الاشتراك الشهري", sub_desc: "اختر عدد الشهور، حوّل المبلغ على الحساب أدناه، وارفع صورة الإيصال — بنفعّل اشتراكك بعد تأكيد الدفع ✅",
+    sub_months_lbl: "عدد الشهور", sub_m1: "شهر واحد", sub_m3: "3 أشهر", sub_m6: "6 أشهر", sub_m12: "سنة كاملة",
+    sub_total_pre: "💰 المبلغ الإجمالي: ", sub_month_word: "شهر", sub_months_word: "أشهر", currency: "ر.ع",
+    sub_bank_to: "🏦 حوّل المبلغ على:", sub_beneficiary: "المستفيد:", sub_acc_no: "رقم الحساب:",
+    sub_co_name: "اسم الشركة", sub_co_name_ph: "اسم شركتك", sub_whats: "رقم الواتساب",
+    sub_receipt_lbl: "صورة الإيصال (سكرين شوت الحوالة)", sub_receipt_hint: "صورة فقط — أقل من 5 ميجا 📎",
+    sub_send: "إرسال طلب الاشتراك 🚀", sub_sending: "جارٍ الإرسال… ⏳", vp_send: "إرسال الطلب 🚀",
+    sub_active: "فعّال ✅", sub_until: "ينتهي بتاريخ ", sub_left_pre: " — باقي ",
+    sub_day: "يوم", sub_day2: "يومين", sub_days: "أيام",
+    sub_renew_pending: "⏳ تم إرسال طلب التمديد — انتظر الموافقة", sub_extend: "تمديد ➕",
+    sub_pending_note: "⏳ طلب الاشتراك قيد المراجعة — بنفعّله بعد تأكيد الحوالة 💳",
+    sub_rej_note: "تم رفض الإيصال السابق — تواصل معنا واتساب أو أعد الإرسال",
+    sub_title_exp: "انتهى اشتراكك الشهري", sub_title_norm: "الاشتراك الشهري للشركات",
+    sub_desc_exp: "اشتراكك انتهى — جدّده الآن حتى تستمر بلا انقطاع 💳",
+    sub_desc_norm: "اشتراك شهري يدعم استمرار منصة دارك ويمنح شركتك أولوية الظهور ✨ الدفع يدوي بالتحويل البنكي.",
+    sub_btn_exp: "جدّد الاشتراك", sub_btn_norm: "اشترك الآن",
+    sub_warn_exp_t: "انتهى اشتراكك الشهري", sub_warn_soon_t: "اشتراكك بيخلص قريبًا",
+    sub_warn_exp_m1: "انتهى اشتراكك الشهري يوم ", sub_warn_exp_m2: ".<br>جدّده الآن واستمر بلا انقطاع 💳",
+    sub_warn_soon_m1: "باقي ", sub_warn_soon_m2: " وينتهي اشتراكك يوم ", sub_warn_soon_m3: ".<br>جدّده قبل لا ينتهي ✨",
+    sub_renew_btn: "💳 تجديد الاشتراك", close_btn: "إغلاق ✕",
+    sub_sys_off: "نظام الاشتراك غير مفعّل حاليًا — التسجيل مجاني 🎉",
+    sub_err_name: "اكتب اسم شركتك 🏢", sub_err_whats: "اكتب رقم الواتساب صحيحًا 📱",
+    sub_err_receipt: "ارفع صورة الإيصال أولًا 📎", sub_err_img: "الإيصال لازم يكون صورة 📷",
+    sub_err_size: "الصورة أكبر من 5 ميجا — صغّرها 🗜️",
+    sub_sent_renew: "تم إرسال طلب التمديد — انتظر الموافقة من إدارة التطبيق ⏳",
+    sub_sent_new: "وصل طلب اشتراكك للإدارة — بنفعّله بعد تأكيد الحوالة ✅",
+    sub_err_send: "تعذر إرسال الطلب — تأكد من النت وحاول مرة أخرى",
+    sus_title: "حسابك موقوف", sus_reason_lbl: "سبب الإيقاف",
+    sus_note: "بعد حل السبب راح يرجع حسابك يشتغل بشكل طبيعي ✅",
+    sus_fallback: "تواصل مع الإدارة لمعرفة السبب",
+    vb_you: "أنت ", vb_verified_co: "شركة موثّقة من دارك",
+    vb_forever: "شارتك الذهبية ظاهرة للعملاء في كل التطبيق ✓",
+    vb_left_pre: "الشارة سارية — باقي ",
+    vb_exp_title: "انتهت صلاحية شارة التوثيق",
+    vb_exp_desc: "الشارة اختفت من التطبيق مؤقتًا — جدّدها وبتظهر فورًا بعد تأكيد الدفع 💳",
+    vb_sent_note: "⏳ طلب التجديد واصل الإدارة — بنفعّل الشارة بعد تأكيد الحوالة 💳",
+    vb_rej_note: "⛔ تم رفض الإيصال — أعد إرسال الإيصال الصحيح",
+    vb_renew_btn: "🏅 جدّد الشارة — ارفع الإيصال",
+    vb_pending_note: "⏰ طلب التوثيق قيد المراجعة — بنتواصل معك واتساب قريبًا 💬",
+    vb_old_rej: "تم رفض الطلب سابقًا — تواصل معنا لمعرفة السبب",
+    vb_promo_title: "🏅 وثّق شركتك وتميّز عن البقية",
+    vb_promo_desc: "شارة ذهبية باسم شركتك تظهر للعملاء في كل التطبيق وتزيد ثقتهم فيك ✨ الدفع يدوي — نتواصل معك واتساب.",
+    vb_req_btn: "🏅 اطلب شارة التوثيق الآن",
+    vb_title_new: "طلب شارة التوثيق", vb_title_renew: "تجديد شارة التوثيق",
+    vb_desc: "حوّل المبلغ على الحساب أدناه وارفع صورة الإيصال — بنفعّل شارتك بعد تأكيد الدفع ✅",
+    vb_fee_pre: "💰 رسوم الشارة: ", vb_fee_post: " — صالحة لسنة كاملة",
+    vb_sent_renew: "تم إرسال طلب تجديد الشارة — انتظر الموافقة ⏳",
+    vb_sent_new: "وصل طلب التوثيق للإدارة — بنفعّل الشارة بعد تأكيد الدفع 🏅",
+    renew_sent_note: "⏰ وصل طلبك للإدارة — بنتواصل معك واتساب قريبًا 💬",
+    renew_btn: "🏅 تجديد الشارة",
+    renew_exp_t: "انتهت شارة التوثيق", renew_soon_t: "شارة التوثيق بتنتهي قريبًا",
+    renew_exp_m1: "انتهت صلاحية الشارة الذهبية يوم ", renew_exp_m2: " واختفت من التطبيق.<br>جدّدها الآن وبتظهر فورًا بعد تأكيد الدفع 💳",
+    renew_soon_m1: "باقي ", renew_soon_m2: " وتنتهي شارة التوثيق يوم ", renew_soon_m3: ".<br>جدّدها قبل لا تختفي من التطبيق ✨",
+    share_title: "رابطك الخاص وباركود QR", share_desc: "شاركه مع عملائك — اللي يفتحه يوصل لصفحتك في دارك ويطلب منك مباشرة 🎯",
+    share_copy: "نسخ 📋", share_dl: "تحميل الباركود ⬇️", share_link_item: "🔗 رابطك الخاص + باركود QR",
+    share_landing: "وصلت من رابطهم الخاص — طلبك بيوصل لهم مباشرة 🎯",
+    share_landing_btn: "📨 اطلب منهم خدمة", share_arrived: "👋 وصلت من رابط ",
+    share_arrived_end: " — اضغط «اطلب عرض سعر» وطلبك بيوصلهم مباشرة",
+    rate_title: "⭐ قيّم الخدمة", rate_ph: "تعليق اختياري — كيف كانت تجربتك؟", rate_submit: "إرسال التقييم ⭐",
+    gal_empty: "لا توجد صور بعد — أضف صور مشاريعك وتبهر العملاء ✨",
+    gal_max: "لحد 8 صور بس بالمعرض 📸", gal_big: "أكبر من 5 ميجا — صغّرها وحاول 💡",
+    gal_added_end: " — اضغط حفظ عشان ترفع 🖼️",
+    gal_uploading: "جارٍ رفع صور المعرض… 🖼️",
+    gal_fail_pre: "تعذر رفع ", gal_fail_post1: " صورة", gal_fail_post2: " صور", gal_fail_end: " — تأكد إنك نشرت قواعد التخزين الجديدة ⚠️",
+    co_gallery_title: "🖼️ معرض الأعمال ", co_reviews: "💬 آراء العملاء ",
+    co_no_reviews: "لا توجد آراء بعد — التقييمات تظهر هنا بعد كل خدمة مكتملة ⭐",
+    co_client_default: "عميل دارك", co_share_page: "🔗 مشاركة الصفحة",
+    cpf_exp: "🏗️ سنوات الخبرة", cpf_exp_ph: "مثال: 5",
+    cpf_gallery: "🖼️ معرض أعمال الشركة (صور من مشاريعك)",
+    cpf_gallery_hint: "لحد 8 صور — كل صورة أقل من 5 ميجا — اضغط حفظ عشان ترفع",
+    cpf_cats: "تخصصاتك (اختر واحدًا أو أكثر)", cpf_primary: "⭐ التخصص الظاهر في بطاقتك",
+    cpf_primary_hint: "هذا اللي يشوفه المستخدمون تحت شعارك عند تصفح الشركات والفنيين",
+    cpf_phone: "رقم الهاتف", cpf_email: "البريد الإلكتروني", cpf_gov: "📍 المحافظة", cpf_wilaya: "الولاية",
+    cpf_pick_first: "— اختر تخصصاتك أولًا من الأعلى —",
+    cpf_need_cat: "اختر تخصصًا واحدًا على الأقل ✅",
+    cpf_email_changed: "✅ تم الحفظ وتغيير إيميل الدخول — ادخل بالإيميل الجديد من المرة الجاية",
+    ios_title: "📱 عندك آيفون؟ ثبّت دارك على شاشتك الرئيسية",
+    ios_s1: "١. افتح رابط دارك في متصفح Safari", ios_s2: "٢. اضغط زر المشاركة ⎋ (السهم اللي فوق)",
+    ios_s3: "٣. اختر \"إضافة إلى الشاشة الرئيسية\"", ios_s4: "٤. اضغط \"إضافة\" في أعلى الشاشة",
+    ios_foot: "بتجد أيقونة دارك بين تطبيقاتك، وافتحها مثل أي تطبيق ✨",
+    reg_name_ph: "مثال: محمد العتيبي", reg_role_lbl: "نوع الحساب", reg_multi_hint: "✅ تقدر تختار أكثر من تخصص",
+    reg_loc_lbl: "📍 منطقتك (المحافظة / الولاية / المنطقة)", reg_loc_ph: "مثال: مسقط / السيب / المعبيلة",
+    reg_loc_hint: "تظهر للعملاء عند تصفح منطقتك", reg_pass_ph: "6 أحرف على الأقل",
+    req_name_ph: "مثال: محمد البلوشي", req_city_ph: "مثال: مسقط", req_cat_ph: "اختر التخصص…",
+    req_details_ph: "صف مشروعك: المساحة، المرحلة الحالية، المطلوب…",
+    tech_city_ph: "مثال: مسقط — الخوض", tech_details_ph: "مثال: فيش المطبخ ما يشتغل، وأبي أركب إنارة جديدة…",
+    quote_note_ph: "شروط، مدة التنفيذ، الضمان…", browse_techs: "👷 تصفح الفنيين",
+    me_title: "✏️ تعديل ملفي", me_sub: "عدّل بياناتك ثم احفظ", me_name: "الاسم",
+    f_contractors: "المقاولون", f_materials: "مواد البناء", f_elec: "الكهرباء والسباكة", f_deco: "الديكور والأثاث",
+    f_request: "اطلب خدمة", f_join: "انضم كشركة", confirm_cancel: "إلغاء"
   },
   en: {
     login: "Sign in", logout: "Log out", tab_home: "Home", tab_cats: "Services", tab_dash: "My Requests", tab_account: "Account",
@@ -1650,11 +1741,105 @@ const I18N = {
     tech_req_title: "🔧 Request a technician", tech_req_for: "Specialty:", tech_details: "Describe the problem or work needed *",
     tech_login_first: "Sign up or log in first to send your request", tech_sent: "Request received! Technicians in this specialty will see it",
     dash_tech: "🔧 Technician dashboard", sub_tech: "Client requests in your specialty",
-    quote_file_opt: "Quote file (PDF) — optional", pdf_required: "Please attach the quotation file (PDF) 📎", req_err: "Could not send the request — try again", sending: "Sending…",
-    btn_join_tech: "🔧 Join as technician"
+    ph_optional: "Optional", quote_file_opt: "Quote file (PDF) — optional", pdf_required: "Please attach the quotation file (PDF) 📎", req_err: "Could not send the request — try again", sending: "Sending…",
+    btn_join_tech: "🔧 Join as technician",
+    // 💳 Monthly subscription
+    sub_monthly: "Monthly Subscription", sub_desc: "Pick the number of months, transfer the amount to the account below, and upload a receipt photo — we'll activate your subscription after confirming payment ✅",
+    sub_months_lbl: "Number of months", sub_m1: "1 month", sub_m3: "3 months", sub_m6: "6 months", sub_m12: "Full year",
+    sub_total_pre: "💰 Total amount: ", sub_month_word: "month", sub_months_word: "months", currency: "OMR",
+    sub_bank_to: "🏦 Transfer the amount to:", sub_beneficiary: "Beneficiary:", sub_acc_no: "Account no.:",
+    sub_co_name: "Company name", sub_co_name_ph: "Your company name", sub_whats: "WhatsApp number",
+    sub_receipt_lbl: "Receipt photo (transfer screenshot)", sub_receipt_hint: "Image only — under 5MB 📎",
+    sub_send: "Send subscription request 🚀", sub_sending: "Sending… ⏳", vp_send: "Send request 🚀",
+    sub_active: "Active ✅", sub_until: "Expires on ", sub_left_pre: " — ",
+    sub_day: "day left", sub_day2: "days left", sub_days: "days left",
+    sub_renew_pending: "⏳ Renewal request sent — awaiting approval", sub_extend: "Extend ➕",
+    sub_pending_note: "⏳ Subscription request under review — we'll activate it after confirming the transfer 💳",
+    sub_rej_note: "Previous receipt was rejected — contact us on WhatsApp or resubmit",
+    sub_title_exp: "Your monthly subscription expired", sub_title_norm: "Monthly Subscription for Companies",
+    sub_desc_exp: "Your subscription has ended — renew now to keep going without interruption 💳",
+    sub_desc_norm: "A monthly subscription that supports Darak and gives your company priority visibility ✨ Payment is manual via bank transfer.",
+    sub_btn_exp: "Renew subscription", sub_btn_norm: "Subscribe now",
+    sub_warn_exp_t: "Your monthly subscription expired", sub_warn_soon_t: "Your subscription is ending soon",
+    sub_warn_exp_m1: "Your monthly subscription ended on ", sub_warn_exp_m2: ".<br>Renew now and keep going without interruption 💳",
+    sub_warn_soon_m1: "", sub_warn_soon_m2: " left — your subscription ends on ", sub_warn_soon_m3: ".<br>Renew before it expires ✨",
+    sub_renew_btn: "💳 Renew subscription", close_btn: "Close ✕",
+    sub_sys_off: "The subscription system is currently disabled — registration is free 🎉",
+    sub_err_name: "Enter your company name 🏢", sub_err_whats: "Enter a valid WhatsApp number 📱",
+    sub_err_receipt: "Upload the receipt photo first 📎", sub_err_img: "The receipt must be an image 📷",
+    sub_err_size: "Image is over 5MB — compress it 🗜️",
+    sub_sent_renew: "Renewal request sent — wait for approval ⏳",
+    sub_sent_new: "Your subscription request reached the admin — we'll activate it after confirming the transfer ✅",
+    sub_err_send: "Could not send the request — check your connection and try again",
+    sus_title: "Your account is suspended", sus_reason_lbl: "Suspension reason",
+    sus_note: "Once the reason is resolved, your account will work normally again ✅",
+    sus_fallback: "Contact the admin to know the reason",
+    vb_you: "You are a ", vb_verified_co: "Darak-verified company",
+    vb_forever: "Your golden badge is visible to clients across the app ✓",
+    vb_left_pre: "Badge active — ",
+    vb_exp_title: "Verification badge expired",
+    vb_exp_desc: "The badge is temporarily hidden from the app — renew it and it will reappear right after payment confirmation 💳",
+    vb_sent_note: "⏳ Renewal request received — we'll activate the badge after confirming the transfer 💳",
+    vb_rej_note: "⛔ Receipt rejected — please resend the correct receipt",
+    vb_renew_btn: "🏅 Renew badge — upload receipt",
+    vb_pending_note: "⏰ Verification request under review — we'll contact you on WhatsApp soon 💬",
+    vb_old_rej: "Request was previously rejected — contact us to know why",
+    vb_promo_title: "🏅 Get verified and stand out",
+    vb_promo_desc: "A golden badge with your company name shown to clients across the app, boosting their trust ✨ Manual payment — we'll contact you on WhatsApp.",
+    vb_req_btn: "🏅 Request verification badge now",
+    vb_title_new: "Request Verification Badge", vb_title_renew: "Renew Verification Badge",
+    vb_desc: "Transfer the amount to the account below and upload the receipt photo — we'll activate your badge after confirming payment ✅",
+    vb_fee_pre: "💰 Badge fee: ", vb_fee_post: " — valid for a full year",
+    vb_sent_renew: "Badge renewal request sent — awaiting approval ⏳",
+    vb_sent_new: "Verification request reached the admin — we'll activate the badge after confirming payment 🏅",
+    renew_sent_note: "⏰ Your request reached the admin — we'll contact you on WhatsApp soon 💬",
+    renew_btn: "🏅 Renew badge",
+    renew_exp_t: "Verification badge expired", renew_soon_t: "Verification badge expiring soon",
+    renew_exp_m1: "Your golden badge expired on ", renew_exp_m2: " and was hidden from the app.<br>Renew it now and it will reappear right after payment confirmation 💳",
+    renew_soon_m1: "", renew_soon_m2: " left — your verification badge ends on ", renew_soon_m3: ".<br>Renew before it disappears from the app ✨",
+    share_title: "Your private link & QR code", share_desc: "Share it with your clients — anyone who opens it lands on your Darak page and can request you directly 🎯",
+    share_copy: "Copy 📋", share_dl: "Download QR ⬇️", share_link_item: "🔗 Your private link + QR code",
+    share_landing: "You arrived from their private link — your request goes straight to them 🎯",
+    share_landing_btn: "📨 Request a service from them", share_arrived: "👋 You arrived via ",
+    share_arrived_end: " — tap \"Request a quote\" and your request goes straight to them",
+    rate_title: "⭐ Rate the service", rate_ph: "Optional comment — how was your experience?", rate_submit: "Send rating ⭐",
+    gal_empty: "No photos yet — add photos of your projects and impress clients ✨",
+    gal_max: "Gallery is limited to 8 photos 📸", gal_big: " is over 5MB — compress it and try 💡",
+    gal_added_end: " — press Save to upload 🖼️",
+    gal_uploading: "Uploading gallery photos… 🖼️",
+    gal_fail_pre: "Could not upload ", gal_fail_post1: " photo", gal_fail_post2: " photos", gal_fail_end: " — make sure you published the new storage rules ⚠️",
+    co_gallery_title: "🖼️ Work gallery ", co_reviews: "💬 Client reviews ",
+    co_no_reviews: "No reviews yet — ratings appear here after each completed service ⭐",
+    co_client_default: "Darak client", co_share_page: "🔗 Share page",
+    cpf_exp: "🏗️ Years of experience", cpf_exp_ph: "e.g. 5",
+    cpf_gallery: "🖼️ Company work gallery (photos of your projects)",
+    cpf_gallery_hint: "Up to 8 photos — each under 5MB — press Save to upload",
+    cpf_cats: "Your trades (pick one or more)", cpf_primary: "⭐ Trade shown on your card",
+    cpf_primary_hint: "This is what users see under your logo when browsing companies and technicians",
+    cpf_phone: "Phone number", cpf_email: "Email", cpf_gov: "📍 Governorate", cpf_wilaya: "Wilaya",
+    cpf_pick_first: "— Pick your trades above first —",
+    cpf_need_cat: "Pick at least one trade ✅",
+    cpf_email_changed: "✅ Saved and login email changed — use the new email to sign in from next time",
+    ios_title: "📱 On iPhone? Install Darak on your home screen",
+    ios_s1: "1. Open Darak's link in Safari", ios_s2: "2. Tap the Share button ⎋ (the arrow at the top)",
+    ios_s3: "3. Choose \"Add to Home Screen\"", ios_s4: "4. Tap \"Add\" at the top",
+    ios_foot: "You'll find the Darak icon among your apps — open it like any app ✨",
+    reg_name_ph: "e.g. Mohammed Al-otaibi", reg_role_lbl: "Account type", reg_multi_hint: "✅ You can pick more than one trade",
+    reg_loc_lbl: "📍 Your area (governorate / wilaya / district)", reg_loc_ph: "e.g. Muscat / Seeb / Mabela",
+    reg_loc_hint: "Shown to clients browsing your area", reg_pass_ph: "At least 6 characters",
+    req_name_ph: "e.g. Mohammed Al-baloushi", req_city_ph: "e.g. Muscat", req_cat_ph: "Choose a trade…",
+    req_details_ph: "Describe your project: area, current stage, what's needed…",
+    tech_city_ph: "e.g. Muscat — Al-khoud", tech_details_ph: "e.g. Kitchen socket not working, need new lighting installed…",
+    quote_note_ph: "Terms, timeline, warranty…", browse_techs: "👷 Browse technicians",
+    me_title: "✏️ Edit my profile", me_sub: "Edit your info then save", me_name: "Name",
+    f_contractors: "Contractors", f_materials: "Building materials", f_elec: "Electrical & plumbing", f_deco: "Décor & furniture",
+    f_request: "Request a service", f_join: "Join as a company", confirm_cancel: "Cancel"
   }
 };
 function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.ar[k] || k; }
+function dayWord(n) { return n === 1 ? t("sub_day") : n === 2 ? t("sub_day2") : t("sub_days"); }
+function locDate(ts) { return new Date(ts).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB"); }
+function fmtNum(n) { return n.toLocaleString(LANG === "ar" ? "ar" : "en"); }
 
 function renderCats() {
   document.getElementById("catChips").innerHTML = CATEGORIES.map(c => `
@@ -2616,24 +2801,24 @@ function buildVerifyCard() {
     const warn = dl !== null && dl <= 5;
     return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#16283a,#2a4159);border:1.5px solid ${warn ? "#f59e0b" : "var(--gold)"};border-radius:14px;padding:12px 14px">
     <img src="${VERIFIED_BADGE}" style="width:44px;height:44px;object-fit:contain;flex:0 0 auto">
-    <div style="flex:1;color:#fff;font-size:.82rem;font-weight:800;line-height:1.6">أنت <span style="color:#e3c67f">شركة موثّقة من دارك</span><br><small style="font-weight:600;color:#c9d4e0">${dl === null ? "شارتك الذهبية ظاهرة للعملاء في كل التطبيق ✓" : "الشارة سارية — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") + " ⏳"}</small></div>
+    <div style="flex:1;color:#fff;font-size:.82rem;font-weight:800;line-height:1.6">${t("vb_you")}<span style="color:#e3c67f">${t("vb_verified_co")}</span><br><small style="font-weight:600;color:#c9d4e0">${dl === null ? t("vb_forever") : t("vb_left_pre") + dl + " " + dayWord(dl) + " ⏳"}</small></div>
   </div></div>`;
   }
   if (expired) return `<div style="padding:12px 18px 0"><div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:14px;padding:12px 14px">
-    <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:900;color:#b91c1c"><span style="font-size:1.3rem">✖️</span> انتهت صلاحية شارة التوثيق</div>
-    <div style="font-size:.74rem;color:#7f1d1d;margin:4px 0 8px;line-height:1.6">الشارة اختفت من التطبيق مؤقتًا — جدّدها وبتظهر فورًا بعد تأكيد الدفع 💳</div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:900;color:#b91c1c"><span style="font-size:1.3rem">✖️</span> ${t("vb_exp_title")}</div>
+    <div style="font-size:.74rem;color:#7f1d1d;margin:4px 0 8px;line-height:1.6">${t("vb_exp_desc")}</div>
     ${(req === "renew" || req === "pending")
-      ? `<div style="font-size:.78rem;font-weight:800;color:var(--navy);background:#fff;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;text-align:center">⏳ طلب التجديد واصل الإدارة — بنفعّل الشارة بعد تأكيد الحوالة 💳</div>`
-      : `${req === "rejected" ? `<div style="font-size:.74rem;color:#b91c1c;font-weight:800;background:#fff;border:1.5px dashed #fca5a5;border-radius:10px;padding:8px;text-align:center;margin-bottom:8px">⛔ تم رفض الإيصال — أعد إرسال الإيصال الصحيح</div>` : ""}
-         <button type="button" onclick="openVerifyPayModal('renew')" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 جدّد الشارة — ارفع الإيصال</button>`}
+      ? `<div style="font-size:.78rem;font-weight:800;color:var(--navy);background:#fff;border:1.5px dashed var(--gold);border-radius:10px;padding:8px;text-align:center">${t("vb_sent_note")}</div>`
+      : `${req === "rejected" ? `<div style="font-size:.74rem;color:#b91c1c;font-weight:800;background:#fff;border:1.5px dashed #fca5a5;border-radius:10px;padding:8px;text-align:center;margin-bottom:8px">${t("vb_rej_note")}</div>` : ""}
+         <button type="button" onclick="openVerifyPayModal('renew')" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">${t("vb_renew_btn")}</button>`}
   </div></div>`;
-if (req === "pending" || req === "renew") return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏰ طلب التوثيق قيد المراجعة — بنتواصل معك واتساب قريبًا 💬</div></div>`;
-  const rejectNote = req === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin-top:4px">تم رفض الطلب سابقًا — تواصل معنا لمعرفة السبب</div>` : "";
+if (req === "pending" || req === "renew") return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">${t("vb_pending_note")}</div></div>`;
+  const rejectNote = req === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin-top:4px">${t("vb_old_rej")}</div>` : "";
   return `<div style="padding:12px 18px 0"><div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 14px">
-    <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px">🏅 وثّق شركتك وتميّز عن البقية</div>
-    <div style="font-size:.74rem;color:var(--muted);margin-bottom:8px;line-height:1.6">شارة ذهبية باسم شركتك تظهر للعملاء في كل التطبيق وتزيد ثقتهم فيك ✨ الدفع يدوي — نتواصل معك واتساب.</div>
+    <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px">${t("vb_promo_title")}</div>
+    <div style="font-size:.74rem;color:var(--muted);margin-bottom:8px;line-height:1.6">${t("vb_promo_desc")}</div>
     ${rejectNote}
-    <button type="button" onclick="requestVerify()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">🏅 اطلب شارة التوثيق الآن</button>
+    <button type="button" onclick="requestVerify()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">${t("vb_req_btn")}</button>
   </div></div>`;
 }
 
@@ -2646,33 +2831,31 @@ function buildSubCard() {
   if (active) {
     const dl = subDaysLeft(currentUser);
     const warn = dl !== null && dl <= 5;
-    const until = new Date(subTs(currentUser)).toLocaleDateString("ar-OM");
+    const until = locDate(subTs(currentUser));
     return `<div style="padding:12px 18px 0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:${warn ? "#fffaf0" : "#f0fdf4"};border:1.5px solid ${warn ? "#f59e0b" : "#86efac"};border-radius:14px;padding:12px 14px">
       <span style="font-size:1.6rem">💳</span>
-      <div style="flex:1;min-width:0;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">اشتراكك الشهري <span style="color:#16a34a">فعّال ✅</span><br><small style="font-weight:600;color:var(--muted)">ينتهي بتاريخ <b>${until}</b>${dl !== null ? " — باقي " + dl + (dl <= 10 ? " أيام" : " يوم") : ""}</small></div>
+      <div style="flex:1;min-width:0;font-size:.82rem;font-weight:800;color:var(--navy);line-height:1.6">${t("sub_monthly")} <span style="color:#16a34a">${t("sub_active")}</span><br><small style="font-weight:600;color:var(--muted)">${t("sub_until")}<b>${until}</b>${dl !== null ? t("sub_left_pre") + dl + " " + dayWord(dl) : ""}</small></div>
       ${currentUser.subRenewPending
-        ? `<span style="flex:1 1 100%;box-sizing:border-box;text-align:center;background:#fffaf0;border:1.5px dashed var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.72rem">⏳ تم إرسال طلب التمديد — انتظر الموافقة</span>`
-        : `<button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">تمديد ➕</button>`}
+        ? `<span style="flex:1 1 100%;box-sizing:border-box;text-align:center;background:#fffaf0;border:1.5px dashed var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.72rem">${t("sub_renew_pending")}</span>`
+        : `<button type="button" onclick="openSubModal()" style="flex:0 0 auto;background:#fff;border:1.5px solid var(--gold);color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:800;font-size:.75rem;font-family:inherit;cursor:pointer">${t("sub_extend")}</button>`}
     </div></div>`;
   }
-  if (pending) return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">⏳ طلب الاشتراك قيد المراجعة — بنفعّله بعد تأكيد الحوالة 💳</div></div>`;
-  const rejectNote = currentUser.subStatus === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin:4px 0 6px">تم رفض الإيصال السابق — تواصل معنا واتساب أو أعد الإرسال</div>` : "";
-  const title = expired ? "انتهى اشتراكك الشهري" : "الاشتراك الشهري للشركات";
-  const desc = expired
-    ? "اشتراكك انتهى — جدّده الآن حتى تستمر بلا انقطاع 💳"
-    : "اشتراك شهري يدعم استمرار منصة دارك ويمنح شركتك أولوية الظهور ✨ الدفع يدوي بالتحويل البنكي.";
+  if (pending) return `<div style="padding:12px 18px 0"><div style="background:#fffaf0;border:1.5px solid var(--gold);border-radius:14px;padding:12px 14px;font-size:.8rem;font-weight:800;color:var(--navy)">${t("sub_pending_note")}</div></div>`;
+  const rejectNote = currentUser.subStatus === "rejected" ? `<div style="font-size:.72rem;color:#b91c1c;font-weight:700;margin:4px 0 6px">${t("sub_rej_note")}</div>` : "";
+  const title = expired ? t("sub_title_exp") : t("sub_title_norm");
+  const desc = expired ? t("sub_desc_exp") : t("sub_desc_norm");
   return `<div style="padding:12px 18px 0"><div style="background:#fbf9f4;border:1.5px solid #efe9dc;border-radius:14px;padding:12px 14px">
     <div style="font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:4px">💳 ${title}</div>
     <div style="font-size:.74rem;color:var(--muted);margin-bottom:8px;line-height:1.6">${desc}</div>
     ${rejectNote}
-    <button type="button" onclick="openSubModal()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 ${expired ? "جدّد الاشتراك" : "اشترك الآن"}</button>
+    <button type="button" onclick="openSubModal()" style="width:100%;background:linear-gradient(135deg,#b98d4e,#d4af6a);color:#fff;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:.82rem;font-family:inherit;cursor:pointer;box-shadow:0 3px 10px rgba(185,141,78,.35)">💳 ${expired ? t("sub_btn_exp") : t("sub_btn_norm")}</button>
   </div></div>`;
 }
 let _subSettingsCache = null;
 window.openSubModal = async function() {
   const m = document.getElementById("subModal");
   if (!m) return;
-  if (!_subEnabled) { showToast("نظام الاشتراك غير مفعّل حاليًا — التسجيل مجاني 🎉"); return; }
+  if (!_subEnabled) { showToast(t("sub_sys_off")); return; }
   document.getElementById("subName").value = currentUser.companyName || currentUser.displayName || "";
   document.getElementById("subWhats").value = currentUser.subWhats || currentUser.phone || "";
   document.getElementById("subReceipt").value = "";
@@ -2681,7 +2864,7 @@ window.openSubModal = async function() {
   const box = document.getElementById("subBankBox");
   if (cfg.bankName || cfg.bankAccount) {
     box.style.display = "";
-    box.innerHTML = `<b>🏦 حوّل المبلغ على:</b><br>المستفيد: <b>${cleanTxt(cfg.bankName) || "—"}</b><br>رقم الحساب: <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
+    box.innerHTML = `<b>${t("sub_bank_to")}</b><br>${t("sub_beneficiary")} <b>${cleanTxt(cfg.bankName) || "—"}</b><br>${t("sub_acc_no")} <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
   } else box.style.display = "none";
   updateSubTotal();
   document.getElementById("subWarnModal").classList.remove("open");
@@ -2693,7 +2876,7 @@ window.updateSubTotal = function() {
   const price = +(_subSettingsCache && _subSettingsCache.price) || 0;
   if (price > 0) {
     line.style.display = "";
-    line.textContent = "💰 المبلغ الإجمالي: " + (months * price).toLocaleString("ar") + " ر.ع (" + months + (months === 1 ? " شهر" : " أشهر") + ")";
+    line.textContent = t("sub_total_pre") + fmtNum(months * price) + " " + t("currency") + " (" + months + " " + (months === 1 ? t("sub_month_word") : t("sub_months_word")) + ")";
   } else line.style.display = "none";
 };
 window.closeSubWarnAndOpenSub = function() {
@@ -2706,12 +2889,12 @@ window.submitSubRequest = async function() {
   const name = document.getElementById("subName").value.trim();
   const whats = document.getElementById("subWhats").value.trim();
   const file = document.getElementById("subReceipt").files[0];
-  if (!name) { showToast("اكتب اسم شركتك 🏢", "error"); return; }
-  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast("اكتب رقم الواتساب صحيحًا 📱", "error"); return; }
-  if (!file) { showToast("ارفع صورة الإيصال أولًا 📎", "error"); return; }
-  if (!file.type.startsWith("image/")) { showToast("الإيصال لازم يكون صورة 📷", "error"); return; }
-  if (file.size > 5 * 1024 * 1024) { showToast("الصورة أكبر من 5 ميجا — صغّرها 🗜️", "error"); return; }
-  btn.disabled = true; btn.textContent = "جارٍ الإرسال… ⏳";
+  if (!name) { showToast(t("sub_err_name"), "error"); return; }
+  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast(t("sub_err_whats"), "error"); return; }
+  if (!file) { showToast(t("sub_err_receipt"), "error"); return; }
+  if (!file.type.startsWith("image/")) { showToast(t("sub_err_img"), "error"); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast(t("sub_err_size"), "error"); return; }
+  btn.disabled = true; btn.textContent = t("sub_sending");
   try {
     const receiptUrl = await uploadImage(file, "subscriptions/" + (currentUser.uid || "u"));
     if (!receiptUrl) throw new Error("upload_failed");
@@ -2729,13 +2912,13 @@ window.submitSubRequest = async function() {
     }
     Object.assign(currentUser, fields);
     document.getElementById("subModal").classList.remove("open");
-    showToast(wasActive ? "تم إرسال طلب التمديد — انتظر الموافقة من إدارة التطبيق ⏳" : "وصل طلب اشتراكك للإدارة — بنفعّله بعد تأكيد الحوالة ✅");
+    showToast(wasActive ? t("sub_sent_renew") : t("sub_sent_new"));
     openDashboard();
   } catch (e) {
     console.error(e);
-    showToast("تعذر إرسال الطلب — تأكد من النت وحاول مرة أخرى", "error");
+    showToast(t("sub_err_send"), "error");
   }
-  btn.disabled = false; btn.textContent = "إرسال طلب الاشتراك 🚀";
+  btn.disabled = false; btn.textContent = t("sub_send");
 };
 // 🔔 بوب اب تحذير انتهاء الاشتراك — قبل 5 أيام أو بعده (مرة بالجلسة)
 let _subWarned = false;
@@ -2748,17 +2931,17 @@ function maybeShowSubWarning() {
   if (!expired && (dl === null || dl > 5)) return;
   _subWarned = true;
   document.getElementById("subWarnIcon").textContent = expired ? "✖️" : "⚠️";
-  document.getElementById("subWarnTitle").textContent = expired ? "انتهى اشتراكك الشهري" : "اشتراكك بيخلص قريبًا";
+  document.getElementById("subWarnTitle").textContent = expired ? t("sub_warn_exp_t") : t("sub_warn_soon_t");
   document.getElementById("subWarnMsg").innerHTML = expired
-    ? `انتهى اشتراكك الشهري يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده الآن واستمر بلا انقطاع 💳`
-    : `باقي <b>${dl} ${dl === 1 ? "يوم" : dl === 2 ? "يومين" : "أيام"}</b> وينتهي اشتراكك يوم <b>${new Date(subTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّده قبل لا ينتهي ✨`;
+    ? t("sub_warn_exp_m1") + `<b>${locDate(subTs(currentUser))}</b>` + t("sub_warn_exp_m2")
+    : t("sub_warn_soon_m1") + `<b>${dl} ${dayWord(dl)}</b>` + t("sub_warn_soon_m2") + `<b>${locDate(subTs(currentUser))}</b>` + t("sub_warn_soon_m3");
   document.getElementById("subWarnModal").classList.add("open");
 }
 // 🚫 بوب الإيقاف — يظهر لصاحب الحساب الموقوف مع السبب، يغلقه بـ ✕ بنفسه
 function showSuspendedPopup(reason) {
   const m = document.getElementById("susModal");
   if (!m) return;
-  document.getElementById("susReason").textContent = reason || "تواصل مع الإدارة لمعرفة السبب";
+  document.getElementById("susReason").textContent = reason || t("sus_fallback");
   const isSubReason = (reason || "").includes("اشتراك");
   document.getElementById("susRenewBtn").style.display = isSubReason ? "" : "none";
   m.classList.add("open");
@@ -2769,7 +2952,7 @@ window.openVerifyPayModal = async function(mode) {
   if (!currentUser) return;
   _vpMode = mode === "renew" ? "renew" : "pending";
   document.getElementById("vpBadgeImg").src = VERIFIED_BADGE;
-  document.getElementById("vpTitle").textContent = _vpMode === "renew" ? "تجديد شارة التوثيق" : "طلب شارة التوثيق";
+  document.getElementById("vpTitle").textContent = _vpMode === "renew" ? t("vb_title_renew") : t("vb_title_new");
   document.getElementById("vpName").value = currentUser.companyName || currentUser.displayName || "";
   document.getElementById("vpWhats").value = currentUser.verifyWhats || currentUser.phone || "";
   document.getElementById("vpReceipt").value = "";
@@ -2777,13 +2960,13 @@ window.openVerifyPayModal = async function(mode) {
   const box = document.getElementById("vpBankBox");
   if (cfg.bankName || cfg.bankAccount) {
     box.style.display = "";
-    box.innerHTML = `<b>🏦 حوّل المبلغ على:</b><br>المستفيد: <b>${cleanTxt(cfg.bankName) || "—"}</b><br>رقم الحساب: <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
+    box.innerHTML = `<b>${t("sub_bank_to")}</b><br>${t("sub_beneficiary")} <b>${cleanTxt(cfg.bankName) || "—"}</b><br>${t("sub_acc_no")} <b dir="ltr">${cleanTxt(cfg.bankAccount) || "—"}</b>`;
   } else box.style.display = "none";
   const pl = document.getElementById("vpPriceLine");
   const bPrice = +(cfg.badgePrice) || 0;
   if (bPrice > 0) {
     pl.style.display = "";
-    pl.textContent = "💰 رسوم الشارة: " + bPrice.toLocaleString("ar") + " ر.ع — صالحة لسنة كاملة";
+    pl.textContent = t("vb_fee_pre") + fmtNum(bPrice) + " " + t("currency") + t("vb_fee_post");
   } else pl.style.display = "none";
   document.getElementById("renewModal").classList.remove("open");
   document.getElementById("verifyPayModal").classList.add("open");
@@ -2795,12 +2978,12 @@ window.submitVerifyPay = async function() {
   const name = document.getElementById("vpName").value.trim();
   const whats = document.getElementById("vpWhats").value.trim();
   const file = document.getElementById("vpReceipt").files[0];
-  if (!name) { showToast("اكتب اسم شركتك 🏢", "error"); return; }
-  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast("اكتب رقم الواتساب صحيحًا 📱", "error"); return; }
-  if (!file) { showToast("ارفع صورة الإيصال أولًا 📎", "error"); return; }
-  if (!file.type.startsWith("image/")) { showToast("الإيصال لازم يكون صورة 📷", "error"); return; }
-  if (file.size > 5 * 1024 * 1024) { showToast("الصورة أكبر من 5 ميجا — صغّرها 🗜️", "error"); return; }
-  btn.disabled = true; btn.textContent = "جارٍ الإرسال… ⏳";
+  if (!name) { showToast(t("sub_err_name"), "error"); return; }
+  if (!whats || whats.replace(/\D/g, "").length < 8) { showToast(t("sub_err_whats"), "error"); return; }
+  if (!file) { showToast(t("sub_err_receipt"), "error"); return; }
+  if (!file.type.startsWith("image/")) { showToast(t("sub_err_img"), "error"); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast(t("sub_err_size"), "error"); return; }
+  btn.disabled = true; btn.textContent = t("sub_sending");
   try {
     const receiptUrl = await uploadImage(file, "subscriptions/" + (currentUser.uid || "u"));
     if (!receiptUrl) throw new Error("upload_failed");
@@ -2815,13 +2998,13 @@ window.submitVerifyPay = async function() {
     }
     Object.assign(currentUser, fields);
     document.getElementById("verifyPayModal").classList.remove("open");
-    showToast(_vpMode === "renew" ? "تم إرسال طلب تجديد الشارة — انتظر الموافقة ⏳" : "وصل طلب التوثيق للإدارة — بنفعّل الشارة بعد تأكيد الدفع 🏅");
+    showToast(_vpMode === "renew" ? t("vb_sent_renew") : t("vb_sent_new"));
     openDashboard();
   } catch (e) {
     console.error(e);
-    showToast("تعذر إرسال الطلب — تأكد من النت وحاول مرة أخرى", "error");
+    showToast(t("sub_err_send"), "error");
   }
-  btn.disabled = false; btn.textContent = "إرسال الطلب 🚀";
+  btn.disabled = false; btn.textContent = t("vp_send");
 };
 // 🔔 بوب اب تحذير انتهاء الشارة — يظهر قبل 5 أيام أو بعد الانتهاء (مرة كل 3 أيام فقط — مو مزعج)
 function maybeShowRenewWarning() {
@@ -2833,10 +3016,10 @@ function maybeShowRenewWarning() {
   const expired = isVerifyExpired(currentUser);
   if (!expired && (dl === null || dl > 5)) return;
   document.getElementById("renewIcon").textContent = expired ? "✖️" : "⚠️";
-  document.getElementById("renewTitle").textContent = expired ? "انتهت شارة التوثيق" : "شارة التوثيق بتنتهي قريبًا";
+  document.getElementById("renewTitle").textContent = expired ? t("renew_exp_t") : t("renew_soon_t");
   document.getElementById("renewMsg").innerHTML = expired
-    ? `انتهت صلاحية الشارة الذهبية يوم <b>${new Date(verifyTs(currentUser)).toLocaleDateString("ar-OM")}</b> واختفت من التطبيق.<br>جدّدها الآن وبتظهر فورًا بعد تأكيد الدفع 💳`
-    : `باقي <b>${dl} ${dl === 1 ? "يوم" : dl === 2 ? "يومين" : "أيام"} </b> وتنتهي شارة التوثيق يوم <b>${new Date(verifyTs(currentUser)).toLocaleDateString("ar-OM")}</b>.<br>جدّدها قبل لا تختفي من التطبيق ✨`;
+    ? t("renew_exp_m1") + `<b>${locDate(verifyTs(currentUser))}</b>` + t("renew_exp_m2")
+    : t("renew_soon_m1") + `<b>${dl} ${dayWord(dl)}</b>` + t("renew_soon_m2") + `<b>${locDate(verifyTs(currentUser))}</b>` + t("renew_soon_m3");
   document.getElementById("renewBtn").style.display = (currentUser.verifyReq === "renew" || currentUser.verifyReq === "pending") ? "none" : "";
   document.getElementById("renewSent").style.display = (currentUser.verifyReq === "renew" || currentUser.verifyReq === "pending") ? "" : "none";
   document.getElementById("renewModal").classList.add("open");
@@ -3816,7 +3999,7 @@ function renderAccountView() {
         <button class="acc-item" onclick="closeAccountView();setTimeout(() => document.getElementById('notifBtn').click(), 120)">🔔 <span>${t("acc_notif")}</span><span class="notif-badge" id="notifBadgeAcc" style="display:none">0</span></button>
         <button class="acc-item" onclick="document.getElementById('langToggle').click()">🌐 <span>${t("acc_lang")}</span></button>
         <button class="acc-item" onclick="openHelpWa()">❓ <span>${t("acc_help")}</span></button>
-        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span>رابطك الخاص + باركود QR</span></button>` : ""}
+        ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="closeAccountView();openShareModal()">🔗 <span data-i18n="share_link_item">رابطك الخاص + باركود QR</span></button>` : ""}
         ${(currentUser.role === "provider" || currentUser.role === "tech") ? `<button class="acc-item" onclick="toggleCompanyProfile()">📇 <span>${currentUser.role === "tech" ? "ملفي" : t("acc_profile")}</span></button>` : ""}
         ${currentUser.role === "client" ? `<button class="acc-item" onclick="openMyEdit()">✏️ <span>تعديل ملفي</span></button>` : ""}
         <button class="acc-item" onclick="showView('dash')">📋 <span>${t("tab_dash")}</span></button>
@@ -4024,15 +4207,15 @@ window.openCompany = async function(id) {
       </div>
       <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
     </div>
-    <div class="co-actions">${links}${p.uid ? `<button type="button" class="co-link" onclick="shareCompanyPage('${p.uid}')" style="cursor:pointer;background:#fff;font-family:inherit;font-size:.8rem">🔗 مشاركة الصفحة</button>` : ""}</div>
-    ${(Array.isArray(p.gallery) && p.gallery.length) ? `<div class="co-block"><h3>🖼️ معرض الأعمال (${p.gallery.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch">${p.gallery.map(u => `<a href="${u}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${u}" loading="lazy" style="width:132px;height:96px;object-fit:cover;border-radius:12px;border:1.5px solid #eadfc6;display:block"></a>`).join("")}</div></div>` : ""}
+    <div class="co-actions">${links}${p.uid ? `<button type="button" class="co-link" onclick="shareCompanyPage('${p.uid}')" style="cursor:pointer;background:#fff;font-family:inherit;font-size:.8rem">${t("co_share_page")}</button>` : ""}</div>
+    ${(Array.isArray(p.gallery) && p.gallery.length) ? `<div class="co-block"><h3>${t("co_gallery_title")}(${p.gallery.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch">${p.gallery.map(u => `<a href="${u}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${u}" loading="lazy" style="width:132px;height:96px;object-fit:cover;border-radius:12px;border:1.5px solid #eadfc6;display:block"></a>`).join("")}</div></div>` : ""}
     ${p.bio ? `<div class="co-block"><h3>${t("co_about")}</h3><p>${p.bio}</p></div>` : ""}
     ${svcs.length ? `<div class="co-block"><h3>${t("co_services")}</h3>${svcs.map(s => `<span class="svc-chip" onclick="searchByService('${String(s).replace(/'/g, "")}')">${s}</span>`).join("")}</div>` : ""}
-    <div class="co-block"><h3>💬 آراء العملاء ${revs.length ? `(${revs.length})` : ""}</h3>
+    <div class="co-block"><h3>${t("co_reviews")}${revs.length ? `(${revs.length})` : ""}</h3>
       ${revs.length ? revs.map(r => `
       <div style="padding:10px 0;border-bottom:1px solid #f3efe7">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <b style="font-size:.86rem;color:var(--navy)">${(r.clientName || "عميل دارك").split(" ")[0]}</b>
+          <b style="font-size:.86rem;color:var(--navy)">${(r.clientName || t("co_client_default")).split(" ")[0]}</b>
           <span style="color:#f59e0b;font-size:.82rem;white-space:nowrap">${"⭐".repeat(Math.max(1, +r.stars || 1))}</span>
         </div>
         ${r.comment ? `<p style="font-size:.85rem;color:#5a5245;margin:4px 0 0;line-height:1.6">${r.comment}</p>` : ""}
@@ -4040,7 +4223,7 @@ window.openCompany = async function(id) {
           <small style="color:var(--muted);font-size:.72rem">${tsq(r) ? new Date(tsq(r)).toLocaleDateString(LANG === "ar" ? "ar-OM" : "en-GB") : ""}</small>
           ${isAdmin() && r.id ? `<button class="action-btn action-delete" style="padding:3px 10px;font-size:.72rem" onclick="deleteRating('${r.id}','${p.id}')">🗑️ حذف</button>` : ""}
         </div>
-      </div>`).join("") : '<p style="color:var(--muted);font-size:.85rem;margin:0">لا توجد آراء بعد — التقييمات تظهر هنا بعد كل خدمة مكتملة ⭐</p>'}
+      </div>`).join("") : `<p style="color:var(--muted);font-size:.85rem;margin:0">${t("co_no_reviews")}</p>`}
     </div>
     <div class="co-block"><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3efe7">
@@ -4431,7 +4614,7 @@ function renderCpGalleryPrev() {
   if (!box) return;
   let html = cpGalleryImgs.map((u, i) => `<div style="position:relative;flex:0 0 auto"><img src="${u}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--gold)"><button type="button" onclick="cpGalleryRemove(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#b91c1c;color:#fff;font-size:.7rem;font-weight:900;cursor:pointer;line-height:1">✕</button></div>`).join("");
   html += cpGalleryNewFiles.map((f, i) => `<div style="position:relative;flex:0 0 auto"><img src="${URL.createObjectURL(f)}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px dashed var(--gold);opacity:.85"><button type="button" onclick="cpGalleryRemoveNew(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#b91c1c;color:#fff;font-size:.7rem;font-weight:900;cursor:pointer;line-height:1">✕</button></div>`).join("");
-  box.innerHTML = html || '<small style="color:var(--muted)">لا توجد صور بعد — أضف صور مشاريعك وتبهر العملاء ✨</small>';
+  box.innerHTML = html || `<small style="color:var(--muted)">${t("gal_empty")}</small>`;
 }
 // ربط خانة المعرض مرة وحدة عند تشغيل التطبيق — يشتغل حتى لو فتحت الفورم بأي طريق
 (function bindGalleryInputOnce() {
@@ -4443,13 +4626,13 @@ function renderCpGalleryPrev() {
       const files = Array.from(galInput.files || []);
       let added = 0;
       for (const f of files) {
-        if (cpGalleryImgs.length + cpGalleryNewFiles.length >= 8) { showToast("لحد 8 صور بس بالمعرض 📸", "error"); break; }
-        if (f.size > 5 * 1024 * 1024) { showToast("الصورة " + (f.name || "") + " أكبر من 5 ميجا — صغّرها وحاول 💡", "error"); continue; }
+        if (cpGalleryImgs.length + cpGalleryNewFiles.length >= 8) { showToast(t("gal_max"), "error"); break; }
+        if (f.size > 5 * 1024 * 1024) { showToast((f.name || "") + t("gal_big"), "error"); continue; }
         cpGalleryNewFiles.push(f); added++;
       }
       galInput.value = "";
       renderCpGalleryPrev();
-      if (added) showToast("تم اختيار " + added + (added === 1 ? " صورة" : " صور") + " — اضغط حفظ عشان ترفع 🖼️");
+      if (added) showToast(added + (added === 1 ? t("gal_fail_post1") : t("gal_fail_post2")) + t("gal_added_end"));
     });
   };
   bind();
@@ -4492,7 +4675,7 @@ function refreshPrimarySel() {
   const cur = currentUser.category || "";
   sel.innerHTML = cats.length
     ? cats.map(c => `<option${c === cur ? " selected" : ""}>${c}</option>`).join("")
-    : `<option value="">— اختر تخصصاتك أولًا من الأعلى —</option>`;
+    : `<option value="">${t("cpf_pick_first")}</option>`;
   if (!cur && cats.length) sel.value = cats[0];
 }
 document.getElementById("cpForm").addEventListener("submit", async e => {
@@ -4515,7 +4698,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
   };
   if (currentUser.role === "provider" || currentUser.role === "tech") {
     const cpCats = getPickedCats("cpCatList");
-    if (!cpCats.length) { showToast("اختر تخصصًا واحدًا على الأقل ✅", "error"); return; }
+    if (!cpCats.length) { showToast(t("cpf_need_cat"), "error"); return; }
     data.categories = cpCats;
     const prim = (document.getElementById("cpPrimary").value || "").trim();
     data.category = (prim && cpCats.includes(prim)) ? prim : cpCats[0];
@@ -4524,7 +4707,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
   try {
     if (logoFile) data.logo = await uploadImage(logoFile, "logos");
     if (cpGalleryNewFiles.length) {
-      showToast("جارٍ رفع صور المعرض… 🖼️");
+      showToast(t("gal_uploading"));
       let upFail = 0;
       for (const f of cpGalleryNewFiles) {
         try {
@@ -4533,7 +4716,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
         } catch (upErr) { console.error("gallery upload:", upErr); upFail++; }
       }
       cpGalleryNewFiles = [];
-      if (upFail) showToast("تعذر رفع " + upFail + (upFail === 1 ? " صورة" : " صور") + " — تأكد إنك نشرت قواعد التخزين الجديدة ⚠️", "error");
+      if (upFail) showToast(t("gal_fail_pre") + upFail + (upFail === 1 ? t("gal_fail_post1") : t("gal_fail_post2")) + t("gal_fail_end"), "error");
     }
     data.gallery = cpGalleryImgs.slice(0, 8);
     if (db && getDocsFn) {
@@ -4551,7 +4734,7 @@ document.getElementById("cpForm").addEventListener("submit", async e => {
     const list = JSON.parse(localStorage.getItem("darak_users") || "[]");
     const u = list.find(x => x.uid === currentUser.uid);
     if (u) { Object.assign(u, data); localStorage.setItem("darak_users", JSON.stringify(list)); }
-    showToast(emRes.changed ? "✅ تم الحفظ وتغيير إيميل الدخول — ادخل بالإيميل الجديد من المرة الجاية" : t("cp_saved"));
+    showToast(emRes.changed ? t("cpf_email_changed") : t("cp_saved"));
     addKeywordsToPool(data.services || []);
     loadLiveCompanies();
   } catch (err) { console.error(err); showToast(t("quote_err"), "error"); }
@@ -4762,7 +4945,7 @@ window.openRateModal = function(quoteId, customTitle) {
   const q = (_lastQuotes || []).find(x => x.id === quoteId);
   if (!q) { showToast(t("quote_err"), "error"); return; }
   ratingQuote = q; ratingStars = 0;
-  document.getElementById("rateTitle").textContent = customTitle || "⭐ قيّم الخدمة";
+  document.getElementById("rateTitle").textContent = customTitle || t("rate_title");
   document.getElementById("rateFor").textContent = (q.providerName || "—") + " • " + (q.category || "");
   document.getElementById("rateComment").value = "";
   document.getElementById("rateHint").textContent = "";
@@ -5494,7 +5677,7 @@ async function handleShareParam() {
   const p = allCompanies().find(x => x.uid === uid);
   if (p) {
     openCompany(p.id);
-    showToast("👋 وصلت من رابط " + p.name + " — اضغط «اطلب عرض سعر» وطلبك بيوصلهم مباشرة");
+    showToast(t("share_arrived") + p.name + t("share_arrived_end"));
   } else {
     const cats = userCatsArr(u).join("، ") || u.category || "";
     const firstCat = (userCatsArr(u)[0] || u.category || "").replace(/'/g, "");
@@ -5503,8 +5686,8 @@ async function handleShareParam() {
       <h3 style="color:var(--navy);margin:8px 0 2px">${u.displayName || "—"}</h3>
       <div style="color:var(--gold);font-weight:700;font-size:.85rem">${cats}</div>
       ${u.location ? `<div style="color:#7a6a4d;font-size:.8rem;margin-top:4px">📍 ${u.location}</div>` : ""}
-      <p style="color:var(--muted);font-size:.82rem;line-height:1.7;margin-top:10px">وصلت من رابطهم الخاص — طلبك بيوصل لهم مباشرة 🎯</p>
-      <button class="submit-btn" style="margin-top:14px" onclick="requestFromTarget('${firstCat}', '${u.role}')">📨 اطلب منهم خدمة</button>`;
+      <p style="color:var(--muted);font-size:.82rem;line-height:1.7;margin-top:10px">${t("share_landing")}</p>
+      <button class="submit-btn" style="margin-top:14px" onclick="requestFromTarget('${firstCat}', '${u.role}')">${t("share_landing_btn")}</button>`;
     document.getElementById("shareLandingModal").classList.add("open");
   }
 }
@@ -5534,15 +5717,15 @@ if ("serviceWorker" in navigator) {
 <div class="ios-hint-overlay" id="iosHint" style="display:none">
   <div class="ios-hint-card">
     <div class="ios-hint-head">
-      <h3>📱 عندك آيفون؟ ثبّت دارك على شاشتك الرئيسية</h3>
+      <h3 data-i18n="ios_title">📱 عندك آيفون؟ ثبّت دارك على شاشتك الرئيسية</h3>
       <button class="ios-hint-close" onclick="closeIosHint()" aria-label="إغلاق">✕</button>
     </div>
     <div class="ios-hint-body">
-      <div class="ios-step">١. افتح رابط دارك في متصفح Safari</div>
-      <div class="ios-step">٢. اضغط زر المشاركة ⎋ (السهم اللي فوق)</div>
-      <div class="ios-step">٣. اختر "إضافة إلى الشاشة الرئيسية"</div>
-      <div class="ios-step">٤. اضغط "إضافة" في أعلى الشاشة</div>
-      <div class="ios-hint-foot">بتجد أيقونة دارك بين تطبيقاتك، وافتحها مثل أي تطبيق ✨</div>
+      <div class="ios-step" data-i18n="ios_s1">١. افتح رابط دارك في متصفح Safari</div>
+      <div class="ios-step" data-i18n="ios_s2">٢. اضغط زر المشاركة ⎋ (السهم اللي فوق)</div>
+      <div class="ios-step" data-i18n="ios_s3">٣. اختر "إضافة إلى الشاشة الرئيسية"</div>
+      <div class="ios-step" data-i18n="ios_s4">٤. اضغط "إضافة" في أعلى الشاشة</div>
+      <div class="ios-hint-foot" data-i18n="ios_foot">بتجد أيقونة دارك بين تطبيقاتك، وافتحها مثل أي تطبيق ✨</div>
     </div>
   </div>
 </div>
