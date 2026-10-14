@@ -942,7 +942,7 @@ src="https://www.facebook.com/tr?id=1728216368277236&ev=PageView&noscript=1"
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 93)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 94)</small>
     </div>
   </div>
 </footer>
@@ -3439,7 +3439,7 @@ window.adminFilterUsers = function() {
         : "";
       datesHtml = `<div style="font-size:.68rem;color:var(--muted);line-height:1.8;margin-top:2px">${sLine}${bLine ? "<br>" + bLine : ""}</div>`;
     }
-    return `<div onclick="adminOpenUser('${u.uid}')" style="cursor:pointer;background:#fff;border:1.5px solid #e7dfd0;border-radius:12px;padding:10px" onmouseover="this.style.borderColor='#b98d4e'" onmouseout="this.style.borderColor='#e7dfd0'">
+    return `<div onclick="adminOpenUser('${u.uid}')" style="cursor:pointer;background:#fff;border:1.5px solid #e7dfd0;border-radius:12px;padding:10px;min-width:0;overflow:hidden" onmouseover="this.style.borderColor='#b98d4e'" onmouseout="this.style.borderColor='#e7dfd0'">
       <div style="display:flex;align-items:center;gap:6px">
         <b style="font-size:.82rem;color:var(--navy);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.displayName || "بدون اسم"}</b>
         <span style="flex:0 0 auto;font-size:.6rem;font-weight:800;color:${st[1]};background:${st[2]};border-radius:20px;padding:2px 8px">${st[0]}</span>
