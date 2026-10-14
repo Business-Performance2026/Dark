@@ -942,7 +942,7 @@ src="https://www.facebook.com/tr?id=1728216368277236&ev=PageView&noscript=1"
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 92)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 93)</small>
     </div>
   </div>
 </footer>
@@ -3345,18 +3345,16 @@ async function loadUsersTable() {
     </div>
     <div style="padding:0 12px 12px">
       <div class="q-card" style="cursor:default">
-        <b style="color:var(--navy)">🗂️ إدارة ملف مستخدم</b>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;margin-bottom:8px">
+        <b style="color:var(--navy)">🗂️ إدارة المستخدمين</b>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;margin-bottom:10px">
           <button type="button" class="au-rfilter${adminRoleFilter === "client" ? " on" : ""}" data-rfilter="client" onclick="adminSetRoleFilter('client')">🏠 العملاء (${nC})</button>
           <button type="button" class="au-rfilter${adminRoleFilter === "provider" ? " on" : ""}" data-rfilter="provider" onclick="adminSetRoleFilter('provider')">🛠️ الشركات (${nP})</button>
           <button type="button" class="au-rfilter${adminRoleFilter === "tech" ? " on" : ""}" data-rfilter="tech" onclick="adminSetRoleFilter('tech')">🔧 الفنيون (${nT})</button>
         </div>
-        <div class="form-group" style="margin-top:10px;margin-bottom:8px">
+        <div class="form-group" style="margin-top:0;margin-bottom:10px">
           <input type="text" id="auSearch" placeholder="🔍 ابحث بالاسم أو البريد أو الجوال…" oninput="adminFilterUsers()">
         </div>
-        <div class="form-group" style="margin-bottom:8px">
-          <select id="auSelect" onchange="adminPickUser()"></select>
-        </div>
+        <div id="auCards" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
         <div id="auEditor"></div>
       </div>
     </div>`;
@@ -3407,8 +3405,8 @@ window.adminSetRoleFilter = function(role) {
 };
 
 window.adminFilterUsers = function() {
-  const sel = document.getElementById("auSelect");
-  if (!sel) return;
+  const box = document.getElementById("auCards");
+  if (!box) return;
   const q = normAr((document.getElementById("auSearch").value || "").trim());
   let list = adminUsersCache;
   if (adminRoleFilter) {
@@ -3421,14 +3419,38 @@ window.adminFilterUsers = function() {
       || normAr(u.location || "").includes(q)
       || (u.phone || "").replace(/\s/g, "").includes(q.replace(/\s/g, "")));
   }
-  const groupLbl = adminRoleFilter ? " من " + (adminRoleFilter === "client" ? "العملاء" : adminRoleFilter === "provider" ? "الشركات" : "الفنيون") : "";
-  sel.innerHTML = `<option value="">— اختر المستخدم${groupLbl} (${list.length}) —</option>` +
-    list.map(u => `<option value="${u.uid}">${u.displayName || "بدون اسم"} • ${adminRoleName(u.role)} • ${u.email || ""}</option>`).join("");
-  document.getElementById("auEditor").innerHTML = "";
+  const ed = document.getElementById("auEditor");
+  if (ed) ed.innerHTML = "";
+  if (!list.length) {
+    box.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.78rem;padding:14px">لا يوجد مستخدمون مطابقون 🔍</div>`;
+    return;
+  }
+  const stMap = { approved: ["مفعّل", "#16a34a", "#f0fdf4"], pending: ["قيد المراجعة", "#b45309", "#fffbeb"], rejected: ["مرفوض", "#b91c1c", "#fef2f2"], suspended: ["موقوف", "#7f1d1d", "#fee2e2"] };
+  box.innerHTML = list.map(u => {
+    const st = stMap[u.status || "approved"] || stMap.approved;
+    const isCo = u.role === "provider";
+    let datesHtml = "";
+    if (isCo) {
+      const sLine = subTs(u)
+        ? (isSubExpired(u) ? `💳 اشتراك منتهي: ${new Date(subTs(u)).toLocaleDateString("ar-OM")}` : `💳 الاشتراك: ${new Date(subTs(u)).toLocaleDateString("ar-OM")}`)
+        : "💳 بدون اشتراك";
+      const bLine = verifyTs(u)
+        ? (isVerifyExpired(u) ? `🏅 شارة منتهية: ${new Date(verifyTs(u)).toLocaleDateString("ar-OM")}` : `🏅 الشارة: ${new Date(verifyTs(u)).toLocaleDateString("ar-OM")}`)
+        : "";
+      datesHtml = `<div style="font-size:.68rem;color:var(--muted);line-height:1.8;margin-top:2px">${sLine}${bLine ? "<br>" + bLine : ""}</div>`;
+    }
+    return `<div onclick="adminOpenUser('${u.uid}')" style="cursor:pointer;background:#fff;border:1.5px solid #e7dfd0;border-radius:12px;padding:10px" onmouseover="this.style.borderColor='#b98d4e'" onmouseout="this.style.borderColor='#e7dfd0'">
+      <div style="display:flex;align-items:center;gap:6px">
+        <b style="font-size:.82rem;color:var(--navy);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.displayName || "بدون اسم"}</b>
+        <span style="flex:0 0 auto;font-size:.6rem;font-weight:800;color:${st[1]};background:${st[2]};border-radius:20px;padding:2px 8px">${st[0]}</span>
+      </div>
+      ${datesHtml || `<div style="font-size:.7rem;color:var(--muted);margin-top:3px" dir="ltr">${u.phone || "—"}</div>
+      <div style="font-size:.7rem;color:var(--muted)">📍 ${u.location || "—"}</div>`}
+    </div>`;
+  }).join("");
 };
 
-window.adminPickUser = function() {
-  const uid = document.getElementById("auSelect").value;
+window.adminOpenUser = function(uid) {
   const ed = document.getElementById("auEditor");
   if (!uid) { ed.innerHTML = ""; return; }
   const u = adminUsersCache.find(x => x.uid === uid);
