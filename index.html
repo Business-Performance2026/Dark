@@ -581,6 +581,23 @@ footer ul a:hover{color:var(--gold-2)}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1728216368277236');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1728216368277236&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -925,7 +942,7 @@ footer ul a:hover{color:var(--gold-2)}
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 90)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 92)</small>
     </div>
   </div>
 </footer>
@@ -2482,6 +2499,10 @@ authForm.addEventListener("submit", async e => {
       closeAuth();
       showToast("🚫 " + (st0 === "suspended" ? t("acc_suspended") : t("acc_rejected")) + " — " + t("reason_lbl") + ": " + reason, "error");
       return;
+    }
+    // 📊 Meta Pixel: تسجيل حساب جديد ناجح — هدف الحملات الإعلانية (Lead/CompleteRegistration)
+    if (authMode === "register" && typeof fbq === "function") {
+      try { fbq("track", "CompleteRegistration", { role: currentUser.role || "" }); } catch (e) {}
     }
     closeAuth();
     authForm.reset();
