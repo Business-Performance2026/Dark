@@ -942,7 +942,7 @@ src="https://www.facebook.com/tr?id=1728216368277236&ev=PageView&noscript=1"
       </div>
     </div>
     <div class="footer-bottom">
-      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 94)</small>
+      © <span id="year"></span> <b>دارك</b> — <span data-i18n="rights">جميع الحقوق محفوظة | من أول خطوة.. لبيت أحلامك 🏠</span> <small style="opacity:.45;font-size:.72rem">(إصدار 95)</small>
     </div>
   </div>
 </footer>
@@ -1895,7 +1895,7 @@ window.openTechDir = async function() {
     const catsArr = userCatsArr(u);
     const cats = u.category || catsArr[0] || "فني"; // ⭐ التخصص الرئيسي اللي حدده الفني في ملفه
     const firstCat = (catsArr[0] || "").replace(/'/g, "");
-    return `<div class="co-card" style="cursor:default">
+    return `<div class="co-card" data-open="u_${u.uid}" style="cursor:pointer">
       ${u.logo ? `<img class="co-logo-img" src="${u.logo}" alt="">` : `<div class="co-logo">🔧</div>`}
       <h3>${u.displayName || "فني"}</h3>
       <div class="co-cat">${cats}</div>
@@ -2028,6 +2028,7 @@ function bindRowClicks(id) {
     if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) return; // كان سحبًا مو نقرة
     const card = e.target.closest("[data-open]");
     if (!card) return;
+    if (e.target.closest("button,a,input,select,textarea,label")) return; // عنصر تفاعلي له وظيفته الخاصة
     if (card.dataset.kind === "eng") {
       if (card.dataset.uid && allCompanies().find(x => x.uid === card.dataset.uid)) openCompany("u_" + card.dataset.uid);
       else openCompanyOf(decodeURIComponent(card.dataset.open));
@@ -4217,19 +4218,26 @@ const WA_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#25D366" s
 const IG_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#E1306C" style="flex:0 0 auto"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>';
 
 window.openCompany = async function(id) {
-  const p = allCompanies().find(x => x.id === id);
+  let p = allCompanies().find(x => x.id === id);
+  if (!p && id.indexOf("u_") === 0) {
+    const u = liveTechs.find(x => "u_" + x.uid === id);
+    if (u) {
+      const rt0 = ratingAvg(u.uid);
+      p = { id, uid: u.uid, tech: true, name: u.displayName || "فني", nameEn: u.nameEn || "", cat: u.category || (userCatsArr(u)[0] || "🔧 فني"), catEn: u.category || (userCatsArr(u)[0] || ""), cats: userCatsArr(u), icon: "🔧", rating: rt0 ? rt0.avg : "", ratingCount: rt0 ? rt0.count : 0, phone: u.phone || "", whatsapp: u.whatsapp || u.phone || "", logo: u.logo || "", insta: u.insta || "", web: u.web || "", map: u.map || "", bio: u.bio || "", services: u.services || [], location: u.location || "", demo: false, verified: false, gallery: Array.isArray(u.gallery) ? u.gallery : [], expYears: u.expYears || 0 };
+    }
+  }
   if (!p) return;
   // 💬 آراء العملاء — تحميل كسول إذا ما كانت جاهزة
   if (!RATINGS.length) { try { RATINGS = await fetchRatings(); } catch (e) { console.warn(e); } }
   const revs = RATINGS.filter(r => r.providerUid === p.uid)
     .sort((a, b) => tsq(b) - tsq(a)).slice(0, 10);
   let team = [];
-  if (p.uid && db && getDocsFn) {
+  if (p.uid && !p.tech && db && getDocsFn) {
     try {
       const s = await getDocsFn(queryFn(collectionFn(db, "employees"), whereFn("companyUid", "==", p.uid)));
       team = s.docs.map(d => d.data());
     } catch (e) { console.error(e); }
-  } else if (p.uid) {
+  } else if (p.uid && !p.tech) {
     team = JSON.parse(localStorage.getItem("darak_employees") || "[]").filter(x => x.companyUid === p.uid);
   }
   const svcs = Array.isArray(p.services) ? p.services : [];
@@ -4259,12 +4267,12 @@ window.openCompany = async function(id) {
       <div style="flex:1;min-width:200px">
         <h2>${LANG === "en" && p.nameEn ? p.nameEn : p.name}</h2>
         <div class="co-sub">${LANG === "en" ? (p.catEn || p.cat) : p.cat}</div>
-        <div class="co-rate2">${p.ratingCount ? `★ ${p.rating} (${p.ratingCount} تقييم)` : "✨ شركة جديدة"}</div>
+        <div class="co-rate2">${p.ratingCount ? `★ ${p.rating} (${p.ratingCount} تقييم)` : p.tech ? "✨ فني جديد" : "✨ شركة جديدة"}</div>
         ${(+p.expYears > 0 || doneN > 0) ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${+p.expYears > 0 ? `<span style="background:#fff;border:1.5px solid #eadfc6;border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:800;color:var(--navy)">🏗️ خبرة ${+p.expYears}+ سنة</span>` : ""}${doneN > 0 ? `<span style="background:#fff;border:1.5px solid #eadfc6;border-radius:999px;padding:4px 12px;font-size:.72rem;font-weight:800;color:var(--navy)">✅ ${doneN} ${doneN === 1 ? "مشروع منجز" : doneN === 2 ? "مشروعين منجزين" : "مشاريع منجزة"}</span>` : ""}</div>` : ""}
         ${p.verified ? `<div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#16283a,#2a4159);color:#e3c67f;border:1.5px solid #b98d4e;border-radius:999px;padding:5px 14px;font-size:.74rem;font-weight:800">🏅 شركة موثّقة من دارك</span></div>` : ""}
         ${p.location ? `<div class="co-loc" style="font-size:.85rem;color:#7a6a4d">📍 ${p.location}</div>` : ""}
       </div>
-      <div class="co-hero-btm"><button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button></div>
+      <div class="co-hero-btm">${p.tech ? `<button class="co-quote-btn" onclick="requestTechDirect('${p.uid}', '${String(p.name).replace(/'/g, "")}', '${String((p.cats && p.cats[0]) || p.cat || "").replace(/'/g, "")}')">📨 اطلب منه</button>` : `<button class="co-quote-btn" onclick="pickCategory('${p.cat}')">${t("co_quote")}</button>`}</div>
     </div>
     <div class="co-actions">${links}${p.uid ? `<button type="button" class="co-link" onclick="shareCompanyPage('${p.uid}')" style="cursor:pointer;background:#fff;font-family:inherit;font-size:.8rem">${t("co_share_page")}</button>` : ""}</div>
     ${(Array.isArray(p.gallery) && p.gallery.length) ? `<div class="co-block"><h3>${t("co_gallery_title")}(${p.gallery.length})</h3><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch">${p.gallery.map(u => `<a href="${u}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${u}" loading="lazy" style="width:132px;height:96px;object-fit:cover;border-radius:12px;border:1.5px solid #eadfc6;display:block"></a>`).join("")}</div></div>` : ""}
@@ -4284,7 +4292,7 @@ window.openCompany = async function(id) {
         </div>
       </div>`).join("") : `<p style="color:var(--muted);font-size:.85rem;margin:0">${t("co_no_reviews")}</p>`}
     </div>
-    <div class="co-block"><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
+    <div class="co-block" ${p.tech ? 'style="display:none"' : ""}><h3>${t("co_team")}</h3>${team.length ? team.map(e => `
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3efe7">
         ${e.photo ? `<img src="${e.photo}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 auto">` : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4ae7a);display:grid;place-items:center;color:#fff;flex:0 0 auto">👷</div>'}
         <div style="flex:1"><b style="font-size:.88rem;color:var(--navy)">${e.name}</b>
@@ -5739,10 +5747,11 @@ async function handleShareParam() {
   }
   // انتظر تحميل قائمة الشركات عشان تفتح صفحة الشركة الكاملة لو كانت شركة
   if (u.role === "provider" && !allCompanies().length) { try { await loadLiveCompanies(); } catch (e) {} }
+  if (u.role === "tech" && !liveTechs.length) { try { await loadLiveTechs(); } catch (e) {} }
   pendingTargetUid = uid;
   pendingTargetName = u.displayName || "";
   pendingTargetRole = u.role;
-  const p = allCompanies().find(x => x.uid === uid);
+  const p = allCompanies().find(x => x.uid === uid) || (u.role === "tech" && liveTechs.find(x => x.uid === uid) ? { id: "u_" + uid } : null);
   if (p) {
     openCompany(p.id);
     showToast(t("share_arrived") + p.name + t("share_arrived_end"));
